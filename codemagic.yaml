@@ -15,14 +15,22 @@ workflows:
       - name: Build iOS Simulator
         script: |
           cd ios/App
-          xcodebuild \
-            -workspace App.xcworkspace \
+          if [ -d "App.xcworkspace" ]; then
+            PROJECT_OPTION=(-workspace App.xcworkspace)
+          elif [ -d "App.xcodeproj" ]; then
+            PROJECT_OPTION=(-project App.xcodeproj)
+          else
+            echo "Neither App.xcworkspace nor App.xcodeproj was found"
+            exit 1
+          fi
+          xcodebuild "${PROJECT_OPTION[@]}" \
             -scheme App \
             -configuration Debug \
             -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' \
             CODE_SIGNING_ALLOWED=NO \
-            -derivedDataPath build
+            -derivedDataPath build \
+            build
     artifacts:
       - ios/App/build/Build/Products/Debug-iphonesimulator/*.app
       - /tmp/xcodebuild_logs/*.log
