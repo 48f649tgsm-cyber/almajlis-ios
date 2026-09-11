@@ -1,0 +1,11 @@
+{
+  "appId": "com.almajlis.game",
+  "appName": "المجلس",
+  "webDir": "www",
+  "backgroundColor": "#101827",
+  "ios": {
+    "contentInset": "never",
+    "scrollEnabled": false,
+    "allowsLinkPreview": false
+  }
+}
