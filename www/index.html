@@ -2456,6 +2456,9 @@ async function loadBank(){
     if(!build204Data||!build204Data.categories)throw new Error('BUILD 214 embedded question pack is missing');
     mergeCategories(bank,build204Data.categories);
     build227ApplyMimeBank();
+    // Image-only prompts: the artwork itself is the complete clue.
+    for(const q of (bank['AI كروية']||[]))q.question='من هو اللاعب؟';
+    for(const q of (bank['اسم اللاعب الأول']||[]))q.question='ما اسم اللاعب الأول؟';
     // Every Islamic-letters question uses the same visual alphabet board, including legacy stock.
     for(const q of (bank['حروف اسلامي']||[])){
       const first=(String(q.answer||'').trim().match(/[أإآابتثجحخدذرزسشصضطظعغفقكلمنهوي]/)||['ا'])[0];
@@ -2997,7 +3000,7 @@ function showTransferToast(text){const e=document.getElementById('transferToast'
 function showGameToast(text){const e=document.getElementById('gameToast');e.textContent=text;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1500)}
 
 async function questionMediaWorks(q){
-  const m=q?.media;if(!m||!m.src)return !m||m.type==='player_gallery'||m.type==='lineup';
+  const m=q?.media;if(!m||!m.src)return !m||m.type==='player_gallery'||m.type==='lineup'||m.type==='letter_grid'||m.type==='emoji_clues';
   if(m.type==='image')return await new Promise(res=>{const im=new Image();let done=false;const f=v=>{if(done)return;done=true;res(v)};im.onload=()=>f(true);im.onerror=()=>f(false);im.src=m.src;setTimeout(()=>f(false),3500)});
   if(m.type==='audio')return await new Promise(res=>{const a=new Audio();let done=false;const f=v=>{if(done)return;done=true;a.src='';res(v)};a.preload='metadata';a.onloadedmetadata=()=>f(true);a.oncanplay=()=>f(true);a.onerror=()=>f(false);a.src=m.src;setTimeout(()=>f(false),5000)});
   return true;
@@ -6449,7 +6452,7 @@ document.addEventListener('DOMContentLoaded',()=>{
    const isLetters=cat==='حروف اسلامي'||cat==='حروف إسلامي';
    screen?.classList.toggle('letterMode225',isLetters);
    if(isLetters&&text&&media)text.parentNode.insertBefore(media,text);
-   else if(lower&&media)lower.parentNode.insertBefore(media,lower.nextSibling);
+   else if(text&&media&&text.parentNode===media.parentNode)text.parentNode.insertBefore(media,text.nextSibling);
    return result;
  };
  document.addEventListener('DOMContentLoaded',()=>{
@@ -8243,6 +8246,16 @@ html,body,.app{background:#fff!important}
  #boardScreen.screen.active .broadcastScorebar .scoreTeamName{font-size:14px!important}
  #boardScreen.screen.active .broadcastScorebar .scoreNumber{font-size:19px!important}
 }
+</style>
+<style id="MAJLIS_MEDIA_REPAIR_228">
+/* Keep every question medium inside the approved white question frame. */
+#questionScreen .mjQuestionBody>#qMedia{display:grid!important;place-items:center!important;visibility:visible!important}
+#questionScreen.minimalFlag .mjQuestionBody{justify-content:flex-start!important;gap:8px!important}
+#questionScreen.minimalFlag .mjQuestionBody>#qText{display:block!important;min-height:auto!important;margin:0 auto 4px!important;padding:4px 10px!important}
+#questionScreen.minimalFlag .mjQuestionBody>#qMedia{display:grid!important;place-items:center!important;flex:1 1 auto!important;width:100%!important;min-height:0!important;max-height:38vh!important;overflow:hidden!important}
+#questionScreen.minimalFlag .mjQuestionBody>#qMedia .flagStage{display:grid!important;place-items:center!important;width:100%!important;height:100%!important;max-height:38vh!important;overflow:hidden!important}
+#questionScreen.minimalFlag .mjQuestionBody>#qMedia .flagStage img{display:block!important;width:auto!important;height:auto!important;max-width:min(560px,72%)!important;max-height:35vh!important;margin:auto!important;object-fit:contain!important}
+#questionScreen.letterMode225 .mjQuestionBody>#qMedia{display:block!important;visibility:visible!important;overflow:visible!important}
 </style>
 <style id="MAJLIS_LANDSCAPE_ONLY">
 #mjLandscapeOnly{display:none}
