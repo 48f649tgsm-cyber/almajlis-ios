@@ -8309,4 +8309,99 @@ body{overflow:hidden!important}
  });
 })();
 </script>
+
+<!-- BUILD 231 — final responsive and navigation correction -->
+<style id="ALMAJLIS_BUILD231_FIX">
+:root{--id-main:#c66556;--id-light:#dda195;--id-dark:#9f4435;--id-blue:#263f58;--id-bg:#fffaf6;--id-card:#fff;--id-line:#edb4a8;--id-red:#bf0000}
+body,.app,.screen{background:var(--id-bg)!important;color:#17120f!important}
+
+/* Category picker: selected rail is always present and removable. */
+#cats.screen.active{display:grid!important;grid-template-rows:auto minmax(0,1fr) auto!important;height:100dvh!important;min-height:100dvh!important;overflow:hidden!important;padding:12px!important;gap:10px!important;background:var(--id-bg)!important}
+#cats .categoryPickerShell{display:grid!important;grid-template-columns:minmax(190px,19vw) minmax(0,1fr)!important;gap:12px!important;min-height:0!important;overflow:hidden!important;direction:ltr!important}
+#cats .selectedCategoryRail{display:block!important;min-height:0!important;height:100%!important;overflow-y:auto!important;background:var(--id-blue)!important;border-radius:22px!important;color:#fff!important}
+#cats .selectedRailList{display:grid!important;gap:8px!important}.selectedRailItem{background:#fff!important;border:1px solid var(--id-line)!important}.selectedRailRemove{display:grid!important;place-items:center!important;background:#c9362c!important;color:#fff!important;cursor:pointer!important}
+#cats #catGrid{display:grid!important;grid-template-columns:repeat(4,minmax(145px,1fr))!important;gap:10px!important;height:100%!important;min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain!important;padding:2px 4px 18px!important;direction:rtl!important}
+#cats .cat,#cats .catCard{background:#fff!important;border:3px solid #ef704b!important;border-radius:20px!important;box-shadow:none!important;overflow:hidden!important}
+#cats .categorySetupFooter{background:#fff!important;border-color:var(--id-line)!important}
+
+/* Board: one reliable landscape grid and a fixed lower score bar. */
+#boardScreen.screen.active{display:grid!important;grid-template-rows:62px minmax(0,1fr) 96px!important;height:100dvh!important;min-height:100dvh!important;overflow:hidden!important;padding:10px 18px!important;gap:10px!important;background:#fff!important}
+#boardScreen #boardTurn{display:none!important}
+.boardNav231{grid-row:1;display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;align-items:center;gap:12px;min-height:62px;padding:7px 22px;border-radius:30px;background:linear-gradient(90deg,var(--id-main),var(--id-light));color:#fff;direction:rtl}.nav231Btn{min-height:43px;padding:7px 16px;border:1px solid #ffffff77;border-radius:15px;background:#ffffff18;color:#fff;font-size:clamp(14px,1.5vw,21px);font-weight:900}.boardNavTurn{font-size:clamp(17px,2vw,28px);font-weight:1000;text-align:center}.boardNavBrand{font-size:clamp(21px,2.3vw,31px);font-weight:1000}
+#boardScreen #board{grid-row:2!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:repeat(2,minmax(0,1fr))!important;gap:10px 16px!important;width:100%!important;height:100%!important;min-height:0!important;overflow:hidden!important;direction:rtl!important}
+#boardScreen #board .categoryBox{display:grid!important;grid-template-columns:minmax(145px,34%) minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr)!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;margin:0!important;padding:0!important;gap:9px!important;border:1.5px solid #222!important;border-radius:25px!important;background:#fff!important;box-shadow:none!important;overflow:hidden!important;direction:rtl!important}
+#boardScreen #board .categoryHead{grid-column:1!important;grid-row:1!important;display:grid!important;grid-template-rows:minmax(0,1fr) 45px!important;width:100%!important;height:100%!important;min-height:0!important;margin:0!important;padding:0!important;background:#cfe1f4!important;border-radius:23px 0 0 23px!important;overflow:hidden!important}
+#boardScreen #board .categoryHead .mini{display:block!important;width:100%!important;height:100%!important;min-height:0!important;margin:0!important;border-radius:0!important;overflow:hidden!important;background:#cfe1f4!important}
+#boardScreen #board .categoryHead .mini img{display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;border-radius:0!important}
+#boardScreen #board .categoryHead h3{display:grid!important;place-items:center!important;width:100%!important;height:45px!important;min-height:45px!important;margin:0!important;padding:4px!important;background:var(--id-main)!important;color:#fff!important;font-size:clamp(13px,1.35vw,19px)!important;line-height:1.1!important;text-align:center!important}
+#boardScreen #board .points{grid-column:2!important;grid-row:1!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:repeat(3,minmax(0,1fr))!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;gap:7px 11px!important;padding:7px 0 7px 7px!important;visibility:visible!important;opacity:1!important;overflow:visible!important;direction:ltr!important}
+#boardScreen #board .point,#boardScreen #board .point:nth-child(n){display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;height:100%!important;min-width:0!important;min-height:34px!important;margin:0!important;padding:0!important;border:1px solid var(--id-line)!important;border-radius:999px!important;background:#eaeaea!important;color:var(--id-red)!important;font-size:clamp(24px,2.7vw,45px)!important;font-weight:1000!important;line-height:1!important;visibility:visible!important;opacity:1!important;overflow:hidden!important;box-shadow:none!important}
+#boardScreen #board .point.used{color:#888!important;opacity:.55!important}
+#boardScreen .broadcastScorebar{grid-row:3!important;position:static!important;display:grid!important;grid-template-columns:minmax(0,1fr) minmax(180px,27%) minmax(0,1fr)!important;align-items:center!important;width:100%!important;height:96px!important;min-height:96px!important;margin:0!important;padding:7px 4%!important;gap:18px!important;border:0!important;border-radius:30px!important;background:#dedede!important;box-shadow:none!important;direction:ltr!important;visibility:visible!important}
+#boardScreen .broadcastScorebar>div:nth-child(2)::after{content:"المجلس"!important;color:#c8242c!important;font-size:clamp(30px,4vw,58px)!important;font-weight:1000!important}
+#boardScreen .teamScore{position:relative!important;display:grid!important;grid-template-columns:58px minmax(0,1fr) 58px!important;grid-template-rows:1fr 1fr!important;width:100%!important;height:76px!important;min-width:0!important;padding:0!important;border:5px solid #fff!important;border-radius:23px!important;background:#050505!important;color:#fff!important;overflow:visible!important}
+#boardScreen .teamScore::before,#boardScreen .teamScore::after{display:none!important;content:none!important}.scoreCtl231{grid-row:1/3;display:grid;place-items:center;width:54px;height:54px;align-self:center;border:0;border-radius:50%;background:#fff;color:#000;font-size:34px;font-weight:1000}.scoreCtl231.minus{grid-column:1}.scoreCtl231.plus{grid-column:3}.teamScore .scoreTeamName{grid-column:2!important;grid-row:1!important;color:#fff!important;text-align:center!important}.teamScore .scoreNumber{grid-column:2!important;grid-row:2!important;color:#fff!important;text-align:center!important}
+
+/* Question: no unused assistance panel, real category image, full controls. */
+#questionScreen.screen.active{display:grid!important;grid-template-rows:64px minmax(0,1fr)!important;height:100dvh!important;min-height:100dvh!important;padding:12px 20px 18px!important;gap:30px!important;overflow:hidden!important;background:#fff!important}
+#questionScreen .qFinalTop{display:grid!important;grid-template-columns:auto auto minmax(0,1fr) auto auto!important;gap:9px!important;min-height:64px!important;padding:7px 18px!important;border-radius:30px!important;background:linear-gradient(90deg,var(--id-main),var(--id-light))!important;color:#fff!important}
+#questionScreen .qTopMenu{display:none!important}.qTopCat231{display:flex;align-items:center;justify-content:center;gap:9px;min-width:0;font-size:clamp(14px,1.7vw,22px);font-weight:1000}.qTopCat231 img{display:block!important;position:static!important;width:46px!important;height:46px!important;border:2px solid #fff!important;border-radius:12px!important;object-fit:cover!important}.qTopCtl231{min-height:42px;padding:6px 14px;border:1px solid #ffffff77;border-radius:14px;background:#ffffff18;color:#fff;font-size:clamp(13px,1.4vw,19px);font-weight:900}
+#questionScreen .qFinalLayout{display:block!important;min-height:0!important;height:100%!important;padding:42px 3% 30px!important;direction:rtl!important}
+#questionScreen .qFinalStage{position:relative!important;width:100%!important;height:100%!important;min-height:0!important;padding:50px 28px 42px!important;border:7px solid #c92727!important;border-radius:42px!important;background:#fff!important;box-shadow:none!important}
+#questionScreen .qFinalQuestionBody{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;width:100%!important;height:100%!important;min-height:0!important;overflow:hidden!important}
+#questionScreen #qText.question{flex:0 0 auto!important;width:min(1150px,96%)!important;margin:0 auto 10px!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;color:#070707!important;font-size:clamp(23px,2.8vw,44px)!important;line-height:1.45!important}
+#questionScreen #qMedia{flex:1 1 auto!important;display:grid!important;place-items:center!important;width:100%!important;min-height:0!important;margin:0!important;overflow:hidden!important}#questionScreen #qMedia img,#questionScreen #qMedia video{display:block!important;position:static!important;max-width:92%!important;max-height:48vh!important;width:auto!important;height:auto!important;object-fit:contain!important;margin:auto!important}
+#questionScreen .qTeamRail,#questionScreen .qFinalHelp,#questionScreen .qHelpTitle,#questionScreen .qHelpTools{display:none!important}
+#questionScreen .qFinalPill{top:-37px!important;height:68px!important;min-width:190px!important;background:var(--id-main)!important;color:#fff!important}.qFinalTimer{left:38%!important}.qFinalPoints{right:18%!important}
+#questionScreen .qFinalAnswerBtn{left:32px!important;bottom:-34px!important;width:270px!important;min-height:68px!important;border-radius:24px!important;background:#303fa6!important;color:#fff!important}.qFinalCategory{right:32px!important;bottom:-34px!important;min-width:260px!important;min-height:68px!important;background:var(--id-main)!important;color:#fff!important}
+
+.scoreModal231{position:fixed;inset:0;z-index:20000;display:none;place-items:center;padding:20px;background:#0009}.scoreModal231.show{display:grid}.scoreModalCard{width:min(600px,94vw);padding:24px;border-radius:28px;background:#fff;text-align:center}.scoreModalGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0}.scoreModalTeam{padding:18px;border-radius:18px;background:#eee;font-size:24px;font-weight:1000}.scoreModalCard button{min-height:48px;padding:8px 24px;border:0;border-radius:15px;background:var(--id-main);color:#fff;font-weight:900}
+
+/* Portrait is scrollable and uses one roomy board card per row. */
+@media(orientation:portrait){
+ body:has(#cats.active),body:has(#boardScreen.active){overflow-y:auto!important;overflow-x:hidden!important}
+ #cats.screen.active{display:flex!important;flex-direction:column!important;height:auto!important;min-height:100dvh!important;overflow:visible!important;padding:14px!important}
+ #cats .categoryPickerShell{display:flex!important;flex-direction:column!important;overflow:visible!important;height:auto!important}.selectedCategoryRail{order:1!important;height:auto!important;max-height:none!important;overflow:visible!important}.selectedRailList{grid-template-columns:repeat(2,minmax(0,1fr))!important}#cats #catGrid{order:2!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;height:auto!important;overflow:visible!important;padding-bottom:24px!important}#cats .categorySetupFooter{position:static!important;grid-template-columns:1fr!important}
+ #boardScreen.screen.active{display:flex!important;flex-direction:column!important;height:auto!important;min-height:100dvh!important;overflow:visible!important;padding:12px!important}.boardNav231{width:100%!important;grid-template-columns:auto auto 1fr!important}.boardNavBrand{display:none}.boardNavTurn{grid-column:1/-1;grid-row:2}.boardNav231 .navExit231{display:none!important}
+ #boardScreen #board{display:grid!important;grid-template-columns:1fr!important;grid-template-rows:none!important;gap:14px!important;height:auto!important;overflow:visible!important}#boardScreen #board .categoryBox{grid-template-columns:minmax(150px,38%) minmax(0,1fr)!important;height:260px!important;min-height:260px!important}#boardScreen #board .points{gap:10px!important;padding:10px 0 10px 10px!important}#boardScreen #board .point{min-height:65px!important;font-size:clamp(30px,8vw,48px)!important}#boardScreen .broadcastScorebar{position:sticky!important;bottom:0!important;grid-template-columns:1fr auto 1fr!important;height:92px!important;min-height:92px!important;padding:6px!important;z-index:50!important}#boardScreen .broadcastScorebar>div:nth-child(2)::after{font-size:23px!important}#boardScreen .teamScore{grid-template-columns:42px 1fr 42px!important;height:72px!important}.scoreCtl231{width:40px;height:40px;font-size:25px}
+ #questionScreen.screen.active{height:100dvh!important;padding:8px!important;gap:20px!important}.qTopBrand{display:none}.qTopCat231 img{width:38px!important;height:38px!important}.qTopCtl231{padding:4px 7px!important;font-size:11px!important}#questionScreen .qFinalLayout{padding:35px 0 28px!important}#questionScreen .qFinalStage{padding:42px 10px 36px!important}.qFinalPill{min-width:110px!important}.qFinalTimer{left:30%!important}.qFinalPoints{right:5%!important}
+}
+</style>
+<script id="ALMAJLIS_BUILD231_SCRIPT">
+(function(){
+ 'use strict';
+ function scoreModal(){
+  var m=document.getElementById('scoreModal231');if(!m){m=document.createElement('div');m.id='scoreModal231';m.className='scoreModal231';m.innerHTML='<div class="scoreModalCard"><h2>النتيجة الحالية</h2><div class="scoreModalGrid"><div id="sm1" class="scoreModalTeam"></div><div id="sm2" class="scoreModalTeam"></div></div><button type="button">متابعة اللعبة</button></div>';document.body.appendChild(m);m.querySelector('button').onclick=function(){m.classList.remove('show')}}document.getElementById('sm1').textContent=team1+'\n'+score1;document.getElementById('sm2').textContent=team2+'\n'+score2;m.classList.add('show')
+ }
+ function exitGame(){if(confirm('هل تريد الخروج إلى الشاشة الرئيسية؟')){clearInterval(timerId);show('home')}}
+ function wireScore(card,n){
+  if(!card)return;card.querySelectorAll('.scoreCtl231').forEach(function(x){x.remove()});
+  var minus=document.createElement('button'),plus=document.createElement('button');minus.type=plus.type='button';minus.className='scoreCtl231 minus';plus.className='scoreCtl231 plus';minus.textContent='−';plus.textContent='+';
+  minus.onclick=function(e){e.stopPropagation();if(n===1)score1=Math.max(0,score1-100);else score2=Math.max(0,score2-100);updateScores()};plus.onclick=function(e){e.stopPropagation();if(n===1)score1+=100;else score2+=100;updateScores()};card.prepend(minus);card.append(plus)
+ }
+ function syncSelected231(){
+  var list=document.getElementById('selectedRailList'),empty=document.getElementById('selectedRailEmpty'),count=document.getElementById('railCount');if(!list)return;
+  if(count)count.textContent=selected.length+'/6';if(empty)empty.hidden=selected.length>0;
+  var signature=selected.join('|');if(list.dataset.signature===signature)return;list.dataset.signature=signature;list.innerHTML='';
+  selected.forEach(function(c){var item=document.createElement('div');item.className='selectedRailItem';item.innerHTML='<span class="railImage">'+categoryVisual(c)+'</span><b>'+escapeHtml(c)+'</b><button class="selectedRailRemove" type="button" aria-label="حذف">×</button>';item.querySelector('button').onclick=function(){selected=selected.filter(function(x){return x!==c});renderCats();syncSelected231()};list.appendChild(item)})
+ }
+ function syncNav(){
+  var turn=document.getElementById('boardNavTurn231');if(turn)turn.textContent='الدور الآن: '+(currentTurn===1?team1:team2)+' — اختر الفئة والسؤال';
+  var qturn=document.getElementById('qTopTurn');if(qturn)qturn.textContent='دور فريق: '+(currentTurn===1?team1:team2);
+  var qi=document.getElementById('qRealCatImg231'),qn=document.getElementById('qRealCatName231');if(qn)qn.textContent=current?.cat||'';if(qi){var src=(typeof CATEGORY_IMAGE_SOURCES==='object'&&current)?CATEGORY_IMAGE_SOURCES[current.cat]:'';if(src){qi.src=src;qi.hidden=false}else qi.hidden=true}
+ }
+ function installNav(){
+  var bs=document.getElementById('boardScreen');if(bs&&!document.getElementById('boardNav231')){var h=document.createElement('header');h.id='boardNav231';h.className='boardNav231';h.innerHTML='<button class="nav231Btn navExit231" type="button">الخروج</button><button class="nav231Btn navResult231" type="button">النتيجة</button><div id="boardNavTurn231" class="boardNavTurn"></div><div class="boardNavBrand">المجلس</div>';bs.prepend(h);h.querySelector('.navExit231').onclick=exitGame;h.querySelector('.navResult231').onclick=scoreModal}
+  var qt=document.getElementById('qFinalTop');if(qt&&!document.getElementById('qBoard231')){qt.innerHTML='<button id="qExit231" class="qTopCtl231" type="button">الخروج</button><button id="qResult231" class="qTopCtl231" type="button">النتيجة</button><div id="qTopTurn" class="qTopTurn"></div><div class="qTopCat231"><img id="qRealCatImg231" alt=""><span id="qRealCatName231"></span></div><button id="qBoard231" class="qTopCtl231" type="button">▦ الرجوع إلى اللوحة</button>';document.getElementById('qBoard231').onclick=function(){clearInterval(timerId);show('boardScreen')};document.getElementById('qResult231').onclick=scoreModal;document.getElementById('qExit231').onclick=exitGame}
+ }
+ document.addEventListener('DOMContentLoaded',function(){
+  installNav();
+  var oldScores=window.updateScores;window.updateScores=function(){var out=oldScores.apply(this,arguments);wireScore(document.getElementById('s1'),1);wireScore(document.getElementById('s2'),2);syncNav();return out};
+  var oldBoard=window.renderBoard;window.renderBoard=function(){var out=oldBoard.apply(this,arguments);syncNav();return out};
+  var oldCats=window.renderCats;window.renderCats=function(){var out=oldCats.apply(this,arguments);syncSelected231();return out};
+  var oldOpen=window.openQuestion;window.openQuestion=async function(){var out=await oldOpen.apply(this,arguments);syncNav();return out};
+  updateScores();syncNav();syncSelected231();setInterval(syncSelected231,400);
+ });
+})();
+</script>
 </body></html>
