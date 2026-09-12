@@ -2456,9 +2456,19 @@ async function loadBank(){
     if(!build204Data||!build204Data.categories)throw new Error('BUILD 214 embedded question pack is missing');
     mergeCategories(bank,build204Data.categories);
     build227ApplyMimeBank();
-    // Image-only prompts: the artwork itself is the complete clue.
-    for(const q of (bank['AI كروية']||[]))q.question='من هو اللاعب؟';
-    for(const q of (bank['اسم اللاعب الأول']||[]))q.question='ما اسم اللاعب الأول؟';
+    // Image-only prompts: the player portrait itself is the complete clue.
+    for(const q of (bank['AI كروية']||[])){
+      q.question='من هو اللاعب؟';
+      q.media={type:'wiki_player',wiki:q.answer,variant:'illustrated',alt:'صورة اللاعب مرسومة بأسلوب واقعي'};
+    }
+    const firstPlayerNames={
+      b196_first_1:'محمد صلاح',b196_first_2:'ليونيل ميسي',b196_first_3:'كيليان مبابي',b196_first_4:'إيرلينغ هالاند',b196_first_5:'فويتشيك تشيزني',b196_first_6:'خفيتشا كفاراتسخيليا',b196_first_7:'كيفن دي بروين',b196_first_8:'جود بيلينغهام',b196_first_9:'فيديريكو فالفيردي',b196_first_10:'بوكايو ساكا',b196_first_11:'دومينيك سوبوسلاي',b196_first_12:'هنريخ مخيتاريان',
+      first_01:'هاري كين',first_02:'سون هيونغ مين',first_03:'رودريغو غوس',first_04:'أليسون بيكر',first_05:'فيرجيل فان دايك',first_06:'أنطوان غريزمان',first_07:'يان أوبلاك',first_08:'رياض محرز',first_09:'نغولو كانتي',first_10:'أشرف حكيمي',first_11:'توني كروس',first_12:'يوشوا كيميش',first_13:'لاوتارو مارتينيز',first_14:'رونالد أراوخو',first_15:'نيكولو باريلا',first_16:'جانلويجي دوناروما',first_17:'دافيد ألابا',first_18:'كينغسلي كومان',first_19:'حكيم زياش',first_20:'أندريه أونانا',first_21:'هاكان تشالهان أوغلو',first_22:'يوشكو غفارديول',first_23:'تاكيفوسا كوبو',first_24:'سيرغي ميلينكوفيتش سافيتش',first_25:'إلكاي غوندوغان',first_26:'ديان كولوسيفسكي',first_27:'مانويل لوكاتيلي',first_28:'ألكسندر ميتروفيتش',first_29:'مارك كوكوريا',first_30:'إيكر كاسياس'
+    };
+    for(const q of (bank['اسم اللاعب الأول']||[])){
+      q.question='ما اسم اللاعب الأول؟';
+      q.media={type:'wiki_player',wiki:firstPlayerNames[q.id]||q.answer,variant:'photo',alt:'صورة لاعب حقيقية'};
+    }
     // Every Islamic-letters question uses the same visual alphabet board, including legacy stock.
     for(const q of (bank['حروف اسلامي']||[])){
       const first=(String(q.answer||'').trim().match(/[أإآابتثجحخدذرزسشصضطظعغفقكلمنهوي]/)||['ا'])[0];
@@ -2603,8 +2613,6 @@ function recycleWorldMediaStockIfNeeded(){
   return changed;
 }
 function renderCats(){
-  recycleSilentStockIfNeeded();
-  recycleWorldMediaStockIfNeeded();
   catGrid.innerHTML='';
 
   // Remove any category that became unavailable since the previous visit.
@@ -3000,7 +3008,7 @@ function showTransferToast(text){const e=document.getElementById('transferToast'
 function showGameToast(text){const e=document.getElementById('gameToast');e.textContent=text;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1500)}
 
 async function questionMediaWorks(q){
-  const m=q?.media;if(!m||!m.src)return !m||m.type==='player_gallery'||m.type==='lineup'||m.type==='letter_grid'||m.type==='emoji_clues';
+  const m=q?.media;if(!m||!m.src)return !m||m.type==='player_gallery'||m.type==='lineup'||m.type==='letter_grid'||m.type==='emoji_clues'||m.type==='wiki_player';
   if(m.type==='image')return await new Promise(res=>{const im=new Image();let done=false;const f=v=>{if(done)return;done=true;res(v)};im.onload=()=>f(true);im.onerror=()=>f(false);im.src=m.src;setTimeout(()=>f(false),3500)});
   if(m.type==='audio')return await new Promise(res=>{const a=new Audio();let done=false;const f=v=>{if(done)return;done=true;a.src='';res(v)};a.preload='metadata';a.onloadedmetadata=()=>f(true);a.oncanplay=()=>f(true);a.onerror=()=>f(false);a.src=m.src;setTimeout(()=>f(false),5000)});
   return true;
@@ -3187,6 +3195,11 @@ function renderQuestionMedia(q){
     const symbols=Array.isArray(m.symbols)?m.symbols:[];
     return `<div class="silentPuzzle emojiPuzzle" aria-label="قرائن بصرية"><div class="silentRow">${symbols.map(s=>`<span class="silentToken">${s}</span>`).join('')}</div><div class="silentQ">؟</div></div>`;
   }
+  if(m.type==='wiki_player'){
+    const title=String(m.wiki||q.answer||'').trim();
+    const variant=m.variant==='illustrated'?' illustratedPlayer':' realPlayer';
+    return `<div class="wikiPlayerStage${variant}" data-wiki-player="${encodeURIComponent(title)}" data-player-variant="${m.variant==='illustrated'?'illustrated':'photo'}"><div class="wikiPlayerLoading">جاري تحميل صورة اللاعب…</div></div>`;
+  }
   if(m.type==='image'){
     const flagClass=cat==='أعلام دول'?' flagStage':'';
     return `<div class="mediaFrame${flagClass}">
@@ -3249,6 +3262,22 @@ async function hydratePlayerGallery(){
     }catch(e){
       const f=card.querySelector('.playerFallback'); if(f)f.textContent='تعذر تحميل الصورة';
     }
+  }
+}
+async function fetchWikiPlayerImage(title){
+  const summary=async lang=>{const r=await fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`);if(!r.ok)throw new Error('summary');const d=await r.json();return d.originalimage?.source||d.thumbnail?.source||''};
+  const search=async lang=>{const api=`https://${lang}.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(title)}&gsrlimit=1&prop=pageimages&piprop=original|thumbnail&pithumbsize=1200&format=json&origin=*`;const r=await fetch(api);if(!r.ok)throw new Error('search');const d=await r.json(),page=Object.values(d.query?.pages||{})[0];return page?.original?.source||page?.thumbnail?.source||''};
+  for(const fn of [()=>summary('ar'),()=>search('ar'),()=>search('en')]){try{const src=await fn();if(src)return src}catch(_){ }}
+  return '';
+}
+async function hydrateWikiPlayers(){
+  const stages=[...document.querySelectorAll('.wikiPlayerStage[data-wiki-player]')];
+  for(const stage of stages){
+    if(stage.dataset.done==='1')continue;stage.dataset.done='1';
+    const title=decodeURIComponent(stage.dataset.wikiPlayer||''),src=await fetchWikiPlayerImage(title);
+    if(!src){stage.dataset.done='0';stage.innerHTML='<div class="wikiPlayerLoading">تعذر تحميل الصورة. تحقق من الاتصال ثم افتح السؤال مجددًا.</div>';continue}
+    const illustrated=stage.dataset.playerVariant==='illustrated';
+    stage.innerHTML=`<img src="${src.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" alt="${illustrated?'صورة اللاعب بأسلوب فني':'صورة اللاعب الحقيقية'}" loading="eager" decoding="async" referrerpolicy="no-referrer">`;
   }
 }
 
@@ -3369,7 +3398,7 @@ async function openQuestion(cat,pts,btn){
   turnText.textContent=cat==='من غير كلام'?'بانتظار مسح الرمز — '+firstName:'دور '+firstName;if(window.phaseLabel)phaseLabel.textContent=cat==='من غير كلام'?firstName+' — امسح الرمز ثم ابدأ':firstName+' — 30 ثانية';
   questionScreen.classList.toggle('challenge500',Number(pts)===500);if(window.tvLowerThird)tvLowerThird.textContent=cat+' | '+pts+' نقطة';showCategorySplash(cat,pts);
   show('questionScreen');gameTone('question');if(cat==='من غير كلام')paintTimer();else runTimer();
-  setTimeout(()=>{if(typeof hydratePlayerGallery==='function')hydratePlayerGallery();const pg=qMedia.querySelector('.playerGallery');if(pg&&pg.children.length===2)pg.classList.add('twoPlayers')},0);
+  setTimeout(()=>{if(typeof hydratePlayerGallery==='function')hydratePlayerGallery();if(typeof hydrateWikiPlayers==='function')hydrateWikiPlayers();const pg=qMedia.querySelector('.playerGallery');if(pg&&pg.children.length===2)pg.classList.add('twoPlayers')},0);
 }
 function runTimer(){
   clearInterval(timerId);
@@ -4275,7 +4304,7 @@ function playWinnerComedyThen(finalCallback){
     const stops=plainCareerText(q);
     const cards=stops.map((x,i)=>careerCard(x,i<stops.length-1?i:-1)).join('');
     setTimeout(window.hydrateCareerClubLogos,0);
-    return `<div class="careerVisualShell"><div class="careerVisualTitle">المسيرة الاحترافية الكاملة</div><div class="careerClubTrack">${cards}</div><div class="careerHintBox"><button type="button" class="btn careerHintBtn" onclick="showCareerHint(this)">💡 تلميح</button><span class="careerHintText hidden">تلميح متاح مرة واحدة</span></div></div>`;
+    return `<div class="careerVisualShell"><div class="careerVisualTitle">المسيرة الاحترافية الكاملة</div><div class="careerClubTrack">${cards}</div><div class="careerHintBox"><button type="button" class="btn careerHintBtn" onclick="showCareerHint(this)">تلميح</button><span class="careerHintText hidden">تلميح متاح مرة واحدة</span></div></div>`;
   };
   async function wikiLogo(club,lang){
     const api=`https://${lang}.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(club+' football club')}&gsrlimit=1&prop=pageimages&piprop=thumbnail&pithumbsize=180&format=json&origin=*`;
@@ -6392,8 +6421,7 @@ const oldAward=window.award;window.award=function(n){
 document.getElementById('undo224').onclick=()=>{
  if(!lastAward)return showGameToast('لا توجد عملية نقاط حديثة للتراجع');
  score1=lastAward.score1;score2=lastAward.score2;usedCount=lastAward.usedCount;currentTurn=lastAward.currentTurn;
- if(lastAward.btn){lastAward.btn.dataset.used='0';lastAward.btn.className='point';lastAward.btn.innerHTML=lastAward.html}
- if(lastAward.q?.id)usedIds.delete(lastAward.q.id);updateScores();updateTurnBanner();setTeamGlow224();snapshot();lastAward=null;showGameToast('تم التراجع عن آخر احتساب');
+ updateScores();updateTurnBanner();setTeamGlow224();snapshot();lastAward=null;showGameToast('تم التراجع عن النقاط — بقي السؤال مستخدمًا');
 };
 document.getElementById('pause224').onclick=e=>{
  paused=!paused;document.body.classList.toggle('paused224',paused);e.currentTarget.textContent=paused?'▶':'Ⅱ';
@@ -6451,8 +6479,7 @@ document.addEventListener('DOMContentLoaded',()=>{
    const lower=document.querySelector('#questionScreen .tvLowerThird');
    const isLetters=cat==='حروف اسلامي'||cat==='حروف إسلامي';
    screen?.classList.toggle('letterMode225',isLetters);
-   if(isLetters&&text&&media)text.parentNode.insertBefore(media,text);
-   else if(text&&media&&text.parentNode===media.parentNode)text.parentNode.insertBefore(media,text.nextSibling);
+   if(text&&media&&text.parentNode===media.parentNode)text.parentNode.insertBefore(media,text.nextSibling);
    return result;
  };
  document.addEventListener('DOMContentLoaded',()=>{
@@ -7858,7 +7885,16 @@ document.addEventListener('DOMContentLoaded',()=>{window.updateSelectionStatus21
  function paintSelected(){const rail=document.getElementById('mjSelected');if(!rail)return;rail.innerHTML='';selected.forEach(c=>{const item=document.createElement('div');item.className='mjSelectedItem';item.innerHTML='<span class="mjThumb">'+categoryVisual(c)+'</span><b>'+esc(c)+'</b><button class="mjRemove" type="button" aria-label="حذف '+esc(c)+'">×</button>';item.querySelector('button').onclick=()=>{selected=selected.filter(x=>x!==c);renderCats()};rail.appendChild(item)})}
  function setupBoard(){const screen=document.getElementById('boardScreen');if(!screen)return;const h=document.createElement('header');h.className='mjBoardHeader';h.append(navButton('الخروج',exitGame),navButton('النتيجة',resultModal));const turn=document.createElement('div');turn.id='mjBoardTurn';turn.className='mjBoardTurn';const brand=document.createElement('div');brand.className='mjBoardBrand';brand.textContent='المجلس';h.append(turn,brand);screen.prepend(h)}
  function wireScore(card,n){if(!card)return;card.querySelectorAll('.mjScoreMinus,.mjScorePlus').forEach(x=>x.remove());const minus=navButton('−',()=>{if(n===1)score1=Math.max(0,score1-100);else score2=Math.max(0,score2-100);updateScores()},'mjScoreMinus'),plus=navButton('+',()=>{if(n===1)score1+=100;else score2+=100;updateScores()},'mjScorePlus');card.prepend(minus);card.append(plus)}
- function setupQuestion(){const screen=document.getElementById('questionScreen');if(!screen)return;const h=document.createElement('header');h.className='mjQuestionHeader';h.append(navButton('الخروج',exitGame),navButton('النتيجة',resultModal));const turn=document.createElement('div');turn.id='mjQTurn';turn.className='mjBoardTurn';h.append(turn,navButton('▦ الرجوع إلى اللوحة',()=>{clearInterval(timerId);show('boardScreen')}));const frame=document.createElement('main');frame.className='mjQuestionFrame';frame.innerHTML='<div class="mjQuestionToolbar"><div id="mjQTimer">00:30</div><div id="mjQPoints">100 نقطة</div></div><div class="mjQuestionBody"></div>';const body=frame.querySelector('.mjQuestionBody');body.append(document.getElementById('qText'),document.getElementById('qMedia'));const revealBtn=document.getElementById('answerBtn');revealBtn.className='btn mjReveal';revealBtn.textContent='إظهار الجواب';frame.appendChild(revealBtn);const side=document.createElement('aside');side.className='mjQuestionSide';side.innerHTML='<div class="mjSideCategory"><img id="mjQCatImg" alt=""><strong id="mjQCatName"></strong></div><div class="mjSideTeam one"><span>الفريق</span><b id="mjQTeam1"></b><strong id="mjQScore1">0</strong></div><div class="mjSideTeam two"><span>الفريق</span><b id="mjQTeam2"></b><strong id="mjQScore2">0</strong></div>';screen.prepend(h,frame,side)}
+ function returnUnscoredQuestionToBoard(){
+  clearInterval(timerId);
+  if(current?.q&&current?.cat&&current?.pts&&current?.btn?.dataset.used!=='1'){
+   const pool=gameQuestions?.[current.cat]?.[current.pts];
+   if(Array.isArray(pool)&&!pool.some(q=>q?.id===current.q.id))pool.unshift(current.q);
+  }
+  current=null;
+  show('boardScreen');
+ }
+ function setupQuestion(){const screen=document.getElementById('questionScreen');if(!screen)return;const h=document.createElement('header');h.className='mjQuestionHeader';h.append(navButton('الخروج',exitGame),navButton('النتيجة',resultModal));const turn=document.createElement('div');turn.id='mjQTurn';turn.className='mjBoardTurn';h.append(turn,navButton('▦ الرجوع إلى اللوحة',returnUnscoredQuestionToBoard));const frame=document.createElement('main');frame.className='mjQuestionFrame';frame.innerHTML='<div class="mjQuestionToolbar"><div id="mjQTimer">00:30</div><div id="mjQPoints">100 نقطة</div></div><div class="mjQuestionBody"></div>';const body=frame.querySelector('.mjQuestionBody');body.append(document.getElementById('qText'),document.getElementById('qMedia'));const revealBtn=document.getElementById('answerBtn');revealBtn.className='btn mjReveal';revealBtn.textContent='إظهار الجواب';frame.appendChild(revealBtn);const side=document.createElement('aside');side.className='mjQuestionSide';side.innerHTML='<div class="mjSideCategory"><img id="mjQCatImg" alt=""><strong id="mjQCatName"></strong></div><div class="mjSideTeam one"><span>الفريق</span><b id="mjQTeam1"></b><strong id="mjQScore1">0</strong></div><div class="mjSideTeam two"><span>الفريق</span><b id="mjQTeam2"></b><strong id="mjQScore2">0</strong></div>';screen.prepend(h,frame,side)}
  function setupAnswer(){const s=document.createElement('section');s.id='mjAnswerScreen';s.className='screen';s.innerHTML='<header class="mjQuestionHeader"><button id="mjABack" class="mjNavBtn" type="button">الرجوع إلى السؤال</button><div id="mjATurn" class="mjBoardTurn"></div><div class="mjBoardBrand">المجلس</div></header><main class="mjAnswerCard"><div id="mjAnswerText" class="mjAnswerText"></div><div id="mjAnswerMedia" class="mjAnswerMedia"></div></main><footer class="mjDecision"><strong>من جاوب؟</strong><button id="mjA1" type="button"></button><button id="mjA2" type="button"></button><button id="mjANone" class="none" type="button">لا أحد</button></footer>';document.querySelector('.app').appendChild(s);s.querySelector('#mjABack').onclick=()=>show('questionScreen');s.querySelector('#mjA1').onclick=()=>award(1);s.querySelector('#mjA2').onclick=()=>award(2);s.querySelector('#mjANone').onclick=()=>award(0)}
  function sync(){const bn=document.getElementById('mjBoardTurn');if(bn)bn.textContent='الدور الآن: '+(currentTurn===1?team1:team2)+' — اختر الفئة والسؤال';const qt=document.getElementById('mjQTurn');if(qt)qt.textContent='دور فريق: '+(currentTurn===1?team1:team2);const cn=document.getElementById('mjQCatName');if(cn)cn.textContent=current?.cat||'';const ci=document.getElementById('mjQCatImg');if(ci&&current){ci.src=CATEGORY_IMAGE_SOURCES[current.cat]||''}const qp=document.getElementById('mjQPoints');if(qp)qp.textContent=(current?.pts||100)+' نقطة';const raw=document.getElementById('timer')?.textContent||'00:30',tm=document.getElementById('mjQTimer');if(tm){tm.textContent=raw;const seconds=Math.max(0,Math.min(30,parseInt(raw.split(':').pop(),10)||0));tm.style.setProperty('--timer-progress',(seconds/30*360)+'deg')}const n1=document.getElementById('mjQTeam1'),n2=document.getElementById('mjQTeam2'),s1=document.getElementById('mjQScore1'),s2=document.getElementById('mjQScore2');if(n1)n1.textContent=team1||'الفريق الأول';if(n2)n2.textContent=team2||'الفريق الثاني';if(s1)s1.textContent=score1;if(s2)s2.textContent=score2}
  function openAnswer(){if(!current)return;clearInterval(timerId);document.getElementById('mjAnswerText').textContent=current.q?.answer||'';document.getElementById('mjAnswerMedia').innerHTML=document.getElementById('qMedia').innerHTML;document.getElementById('mjATurn').textContent=(current.cat||'')+' — '+current.pts+' نقطة';document.getElementById('mjA1').textContent=(team1||'الفريق الأول')+' +'+current.pts;document.getElementById('mjA2').textContent=(team2||'الفريق الثاني')+' +'+current.pts;show('mjAnswerScreen')}
@@ -8256,6 +8292,61 @@ html,body,.app{background:#fff!important}
 #questionScreen.minimalFlag .mjQuestionBody>#qMedia .flagStage{display:grid!important;place-items:center!important;width:100%!important;height:100%!important;max-height:38vh!important;overflow:hidden!important}
 #questionScreen.minimalFlag .mjQuestionBody>#qMedia .flagStage img{display:block!important;width:auto!important;height:auto!important;max-width:min(560px,72%)!important;max-height:35vh!important;margin:auto!important;object-fit:contain!important}
 #questionScreen.letterMode225 .mjQuestionBody>#qMedia{display:block!important;visibility:visible!important;overflow:visible!important}
+</style>
+<style id="MAJLIS_VISUAL_QUESTIONS_229">
+/* Category cards: the photograph uses the complete area above its title. */
+@media(orientation:landscape){
+ #cats #catGrid .cat{display:grid!important;grid-template-rows:minmax(0,1fr) 42px!important;height:176px!important;min-height:176px!important;padding:0!important;gap:0!important;overflow:hidden!important}
+ #cats #catGrid .catIcon{grid-area:1/1!important;width:100%!important;height:100%!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;border-radius:17px 17px 0 0!important;background:#eaf3f8!important;overflow:hidden!important}
+ #cats #catGrid .catIcon img,#cats #catGrid .catIcon img.catPhoto,#cats #catGrid .catIcon img.catAsset{display:block!important;width:100%!important;height:100%!important;min-height:100%!important;margin:0!important;padding:0!important;object-fit:cover!important;object-position:center!important;border-radius:0!important}
+ #cats #catGrid .catName{grid-area:2/1!important;width:100%!important;height:42px!important;min-height:42px!important;margin:0!important;padding:4px 5px!important;border-radius:0!important;font-size:clamp(12px,1.25vw,17px)!important;line-height:1.15!important}
+}
+
+/* Do not hide generated visual media that is not a direct img element. */
+#questionScreen.lineupMode .mjQuestionBody>#qMedia,
+#questionScreen.careerMode .mjQuestionBody>#qMedia,
+#questionScreen.letterMode225 .mjQuestionBody>#qMedia,
+#questionScreen .mjQuestionBody>#qMedia:has(.wikiPlayerStage),
+#questionScreen .mjQuestionBody>#qMedia:has(.playerGallery){display:grid!important;visibility:visible!important;place-items:center!important;margin:0 auto!important}
+
+/* Real player photograph / artistically rendered player photograph. */
+.wikiPlayerStage{position:relative;display:grid!important;place-items:center!important;width:min(720px,94%)!important;height:min(38vh,310px)!important;min-height:170px!important;margin:auto!important;overflow:hidden!important;border-radius:20px!important;background:#f3f0ea!important;border:1px solid #ead9cf!important}
+.wikiPlayerStage img{display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:contain!important;object-position:center top!important;background:#f3f0ea!important;border:0!important;border-radius:0!important;cursor:zoom-in!important}
+.wikiPlayerStage.illustratedPlayer img{filter:saturate(1.16) contrast(1.08) brightness(1.02)!important}
+.wikiPlayerStage.illustratedPlayer:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(135deg,rgba(199,100,84,.10),transparent 48%,rgba(35,58,82,.10));mix-blend-mode:multiply}
+.wikiPlayerLoading{padding:18px;color:#24394d;font-weight:900;font-size:18px;text-align:center}
+#questionScreen .mjQuestionBody:has(.wikiPlayerStage) #qText{min-height:0!important;max-height:18vh!important;padding:8px 18px!important;font-size:clamp(24px,3vw,38px)!important;line-height:1.25!important}
+
+/* Islamic letters: question first, then all 28 letters without overlap. */
+#questionScreen.letterMode225 .mjQuestionBody{display:flex!important;flex-direction:column!important;justify-content:flex-start!important;gap:6px!important;overflow:hidden!important}
+#questionScreen.letterMode225 #qText.question{order:1!important;width:min(920px,96%)!important;min-height:0!important;max-height:17vh!important;margin:0 auto!important;padding:7px 14px!important;font-size:clamp(18px,2.5vw,29px)!important;line-height:1.3!important;overflow:auto!important}
+#questionScreen.letterMode225 #qMedia{order:2!important;flex:1 1 auto!important;width:min(920px,96%)!important;min-height:0!important;max-height:36vh!important;margin:0 auto!important;overflow:hidden!important}
+#questionScreen.letterMode225 .letterGrid{display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;grid-template-rows:repeat(4,minmax(0,1fr))!important;width:100%!important;height:100%!important;max-height:36vh!important;gap:5px!important;padding:6px!important;overflow:hidden!important}
+#questionScreen.letterMode225 .letterCell{aspect-ratio:auto!important;min-height:0!important;height:auto!important;border-radius:8px!important;font-size:clamp(17px,3.6vh,28px)!important;line-height:1!important}
+
+/* Full line-up and career stay visible and use the available white frame. */
+#questionScreen.lineupMode .mjQuestionBody{gap:5px!important;overflow:hidden!important}
+#questionScreen.lineupMode #qText.question{min-height:0!important;max-height:15vh!important;padding:6px 14px!important;font-size:clamp(18px,2.4vw,29px)!important;line-height:1.25!important}
+#questionScreen.lineupMode #qMedia{flex:1 1 auto!important;width:min(840px,98%)!important;min-height:0!important;max-height:39vh!important;overflow:hidden!important}
+#questionScreen.lineupMode .lineupStage{display:flex!important;width:100%!important;height:100%!important;max-width:800px!important;max-height:39vh!important;margin:auto!important;padding:5px!important;overflow:hidden!important}
+#questionScreen.lineupMode .footballPitch{flex:1 1 auto!important;width:100%!important;height:100%!important;min-height:0!important;max-height:34vh!important;aspect-ratio:auto!important}
+#questionScreen.careerMode .mjQuestionBody{gap:5px!important;overflow:hidden!important}
+#questionScreen.careerMode #qText.question{min-height:0!important;max-height:13vh!important;margin:0 auto!important;padding:6px 14px!important;font-size:clamp(18px,2.3vw,28px)!important;line-height:1.2!important}
+#questionScreen.careerMode #qMedia{flex:1 1 auto!important;width:min(1100px,99%)!important;min-height:0!important;max-height:41vh!important;overflow:auto!important}
+#questionScreen.careerMode .careerVisualShell{display:flex!important;flex-direction:column!important;width:100%!important;height:auto!important;min-height:0!important;overflow:visible!important}
+#questionScreen.careerMode .careerVisualTitle{display:block!important;margin:0 auto 4px!important;padding:3px 10px!important;font-size:12px!important}
+#questionScreen.careerMode .careerClubTrack{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;grid-auto-rows:minmax(70px,auto)!important;width:100%!important;height:auto!important;gap:5px!important;overflow:visible!important;padding:2px!important}
+#questionScreen.careerMode .careerClubCard{display:grid!important;grid-template-columns:42px minmax(0,1fr)!important;grid-template-rows:auto auto!important;align-items:center!important;height:auto!important;min-height:70px!important;padding:5px!important;gap:2px 5px!important}
+#questionScreen.careerMode .careerClubLogo{grid-column:1!important;grid-row:1/3!important;width:38px!important;height:38px!important;margin:0!important}
+#questionScreen.careerMode .careerClubLogo img{width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:contain!important;cursor:default!important}
+#questionScreen.careerMode .careerClubName{grid-column:2!important;grid-row:1!important;margin:0!important;font-size:11px!important;line-height:1.1!important;text-align:right!important}
+#questionScreen.careerMode .careerClubYears{grid-column:2!important;grid-row:2!important;margin:0!important;font-size:9px!important;line-height:1.1!important;text-align:right!important;direction:ltr!important}
+#questionScreen.careerMode .careerArrow,#questionScreen.careerMode .careerHintBox{display:none!important}
+
+/* Maps, flags and other photographic questions: compact text and a large clear image. */
+#questionScreen .mjQuestionBody:has(#qMedia img) #qText{min-height:0!important;max-height:18vh!important;padding:8px 18px!important;font-size:clamp(20px,2.7vw,34px)!important;line-height:1.3!important}
+#questionScreen .mjQuestionBody>#qMedia .mediaFrame:not(.audioStage):not(.lineupStage){display:grid!important;place-items:center!important;width:100%!important;height:100%!important;min-height:0!important;overflow:hidden!important}
+#questionScreen .mjQuestionBody>#qMedia .mediaFrame:not(.audioStage):not(.lineupStage) img{width:100%!important;height:100%!important;max-width:96%!important;max-height:39vh!important;object-fit:contain!important;object-position:center!important}
 </style>
 <style id="MAJLIS_LANDSCAPE_ONLY">
 #mjLandscapeOnly{display:none}
