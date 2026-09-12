@@ -8045,6 +8045,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 .majlisHeroShade{position:absolute;inset:0;background:linear-gradient(180deg,transparent 48%,rgba(12,6,16,.78) 100%);pointer-events:none}
 .majlisHeroActions{position:absolute;z-index:2;bottom:max(34px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;gap:12px;align-items:center;justify-content:center;width:min(760px,92%)}
 .majlisStart{min-width:min(380px,76vw);min-height:68px;border:2px solid #ffcc57;border-radius:22px;background:linear-gradient(135deg,#71347d,#38175e);color:#ffe38a;font-size:clamp(22px,3vw,34px);font-weight:1000;box-shadow:0 0 0 5px #4c183ccc,0 12px 34px #0008;cursor:pointer}
+.majlisStart{position:relative!important;z-index:30!important;pointer-events:auto!important;touch-action:manipulation!important;-webkit-tap-highlight-color:transparent}
 .majlisScrollHint{border:1px solid #ffffff80;border-radius:18px;background:#ffffff18;color:#fff;min-height:54px;padding:8px 18px;font-size:17px;font-weight:900;backdrop-filter:blur(8px)}
 .majlisIntro{position:relative;display:grid;grid-template-columns:minmax(320px,.9fr) minmax(0,1.1fr);gap:clamp(25px,5vw,80px);align-items:center;min-height:650px;padding:clamp(55px,8vw,110px) clamp(25px,8vw,130px);overflow:hidden;background:#fff}
 .majlisIntro::before{content:"";position:absolute;left:-10%;top:8%;width:55%;height:78%;border-radius:45% 55% 60% 40%;background:linear-gradient(145deg,#f6d9ca,#f7b58d);opacity:.8}
@@ -8062,11 +8063,23 @@ document.addEventListener('DOMContentLoaded',()=>{
  document.addEventListener('DOMContentLoaded',function(){
   const home=document.getElementById('home');if(!home||home.querySelector('.majlisLanding'))return;
   const landing=document.createElement('div');landing.className='majlisLanding';
-  landing.innerHTML='<section class="majlisHero"><img class="majlisHeroImage" src="home-hero.jpeg" alt="المجلس — اختبر معلوماتك وتحدى أصدقاءك"><div class="majlisHeroShade"></div><div class="majlisHeroActions"><button class="majlisStart" type="button">ابدأ اللعبة</button><button class="majlisScrollHint" type="button">تعرّف على اللعبة ↓</button></div></section><section class="majlisIntro"><div class="majlisDevice"><img src="home-hero.jpeg" alt="لعبة المجلس"></div><div class="majlisIntroText"><h2>تحدَّ أصدقاءك واختبر معلوماتك <span>مع لعبة المجلس</span></h2><p>لعبة جماعية عربية تجمع المتعة والمعرفة، بفئات متنوعة وأسئلة تناسب جلسات العائلة والأصدقاء.</p><div class="majlisFeatures"><div class="majlisFeature"><i>؟</i><div><b>أسئلة متنوعة</b><span>مواضيع شيقة في المعرفة والرياضة والتاريخ والثقافة.</span></div></div><div class="majlisFeature"><i>♟</i><div><b>تحديات جماعية</b><span>فريقان يتنافسان في تجربة واضحة وسريعة.</span></div></div><div class="majlisFeature"><i>♧</i><div><b>وسائل مساعدة</b><span>خيارات مساعدة تضيف الحماس إلى كل جولة.</span></div></div></div></div></section><section class="majlisCategoriesSection"><h2>فئات المجلس</h2><p>اختر ست فئات وابدأ المنافسة</p><div id="majlisPreviewGrid" class="majlisPreviewGrid"></div></section><section class="majlisBottomCta"><h2>هل أنتم مستعدون للمجلس؟</h2><button class="majlisStart" type="button">لعبة جديدة</button></section>';
+  landing.innerHTML='<section class="majlisHero"><img class="majlisHeroImage" src="home-hero.jpeg" alt="المجلس — اختبر معلوماتك وتحدى أصدقاءك"><div class="majlisHeroShade"></div><div class="majlisHeroActions"><button class="majlisStart" data-majlis-start="1" type="button" onclick="return window.openMajlisCategories(event)">ابدأ اللعبة</button><button class="majlisScrollHint" type="button">تعرّف على اللعبة ↓</button></div></section><section class="majlisIntro"><div class="majlisDevice"><img src="home-hero.jpeg" alt="لعبة المجلس"></div><div class="majlisIntroText"><h2>تحدَّ أصدقاءك واختبر معلوماتك <span>مع لعبة المجلس</span></h2><p>لعبة جماعية عربية تجمع المتعة والمعرفة، بفئات متنوعة وأسئلة تناسب جلسات العائلة والأصدقاء.</p><div class="majlisFeatures"><div class="majlisFeature"><i>؟</i><div><b>أسئلة متنوعة</b><span>مواضيع شيقة في المعرفة والرياضة والتاريخ والثقافة.</span></div></div><div class="majlisFeature"><i>♟</i><div><b>تحديات جماعية</b><span>فريقان يتنافسان في تجربة واضحة وسريعة.</span></div></div><div class="majlisFeature"><i>♧</i><div><b>وسائل مساعدة</b><span>خيارات مساعدة تضيف الحماس إلى كل جولة.</span></div></div></div></div></section><section class="majlisCategoriesSection"><h2>فئات المجلس</h2><p>اختر ست فئات وابدأ المنافسة</p><div id="majlisPreviewGrid" class="majlisPreviewGrid"></div></section><section class="majlisBottomCta"><h2>هل أنتم مستعدون للمجلس؟</h2><button class="majlisStart" data-majlis-start="1" type="button" onclick="return window.openMajlisCategories(event)">لعبة جديدة</button></section>';
   home.appendChild(landing);
   const sample=['معلومات عامة','تاريخ إسلامي','كأس العالم'].filter(c=>(categories||[]).includes(c));const fallback=(categories||[]).slice(0,3);document.getElementById('majlisPreviewGrid').innerHTML=(sample.length===3?sample:fallback).map(previewCard).join('');
-  landing.querySelectorAll('.majlisStart').forEach(b=>b.onclick=()=>startNewGame());landing.querySelector('.majlisScrollHint').onclick=()=>landing.querySelector('.majlisIntro').scrollIntoView({behavior:'smooth'});
+  landing.querySelector('.majlisScrollHint').onclick=()=>landing.querySelector('.majlisIntro').scrollIntoView({behavior:'smooth'});
  });
+ window.openMajlisCategories=function(event){
+  if(event){event.preventDefault();event.stopPropagation()}
+  try{selected=[]}catch(_error){}
+  try{resetGameLocks()}catch(_error){}
+  try{renderCats()}catch(_error){}
+  document.querySelectorAll('.screen').forEach(screen=>screen.classList.remove('active'));
+  const cats=document.getElementById('cats');if(cats){cats.classList.add('active');cats.scrollTop=0}
+  try{window.scrollTo(0,0)}catch(_error){}
+  try{setTimeout(ensureAmbientMusic,80)}catch(_error){}
+  return false;
+ };
+ document.addEventListener('touchend',function(event){const button=event.target.closest('[data-majlis-start]');if(button)window.openMajlisCategories(event)},{passive:false});
 })();
 </script>
 </body></html>
