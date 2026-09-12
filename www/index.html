@@ -8082,4 +8082,136 @@ document.addEventListener('DOMContentLoaded',()=>{
  document.addEventListener('touchend',function(event){const button=event.target.closest('[data-majlis-start]');if(button)window.openMajlisCategories(event)},{passive:false});
 })();
 </script>
+
+<!-- =========================================================================
+     MAJLIS UNIFIED IDENTITY — FINAL OVERRIDE (BUILD-222-UNIFIED-IDENTITY)
+     Purpose: replace the 4-5 competing color themes (dark navy/gold "premium"
+     board, purple/gold opening screen, coral landing sections, cream/gold
+     default cards) with ONE consistent warm terracotta identity used across
+     every screen — opening, categories, board, question, and result — the
+     same way "شتقول" keeps one palette from header to footer.
+     Also fixes the overlapping header/assist-icon layout on the question
+     screen by forcing a non-absolute, safe flex layout at every breakpoint.
+     This block is intentionally last so its !important rules win the cascade
+     over every earlier per-build patch without deleting/breaking any of them.
+     ========================================================================= -->
+<style id="ALMAJLIS_UNIFIED_IDENTITY">
+:root{
+  --mj-primary:#c9614a;      /* main terracotta — buttons, headers, accents */
+  --mj-primary-dark:#a3462f; /* pressed / borders */
+  --mj-primary-light:#e8927c;
+  --mj-ink:#241611;          /* text on light backgrounds */
+  --mj-cream:#fff8f2;        /* page / card background */
+  --mj-cream-2:#fdece2;      /* secondary surface */
+  --mj-gold:#d8ad50;         /* small accents only: logo, point pills */
+  --mj-navy:#22384a;         /* team A / secondary buttons */
+  --mj-red-team:#a3462f;     /* team B — stays in-family with primary */
+  --mj-line:#e8cdbd;
+  --mj-shadow:0 10px 26px rgba(90,45,25,.16);
+}
+
+/* ---------- Global surface + typography ---------- */
+body,.app{background:var(--mj-cream)!important}
+.screen{background:var(--mj-cream)!important;color:var(--mj-ink)!important}
+h1,h2,h3,.badge,.small,.note,.logo{color:var(--mj-ink)!important}
+
+/* ---------- One button style everywhere (CTA unification) ---------- */
+.btn,.majlisStart,.pregamePrimary,.resultNewGameBtn,#startBtn,#resultNewGameBtn,
+button[onclick*="startNewGame"],button[onclick*="startFreshCouncil"],button[onclick*="draw"]{
+  background:linear-gradient(135deg,var(--mj-primary),var(--mj-primary-dark))!important;
+  color:#fff8f2!important;
+  border:2px solid var(--mj-primary-dark)!important;
+  border-radius:18px!important;
+  font-weight:900!important;
+  box-shadow:var(--mj-shadow)!important;
+  text-shadow:none!important;
+}
+.btn.blue{background:linear-gradient(135deg,var(--mj-navy),#132430)!important;border-color:#0d1b24!important}
+.btn.red{background:linear-gradient(135deg,var(--mj-red-team),#7a2f1c)!important;border-color:#5f2415!important}
+.btn:hover,.majlisStart:hover{filter:brightness(1.06)}
+
+/* ---------- Opening (home) screen: swap purple/navy hero for terracotta ---------- */
+.majlisHero{background:linear-gradient(160deg,#3a1a12,#1c0d09)!important}
+.majlisHeroShade{background:linear-gradient(180deg,transparent 40%,rgba(20,8,5,.85) 100%)!important}
+.majlisStart{background:linear-gradient(135deg,var(--mj-primary),var(--mj-primary-dark))!important;
+  border-color:var(--mj-gold)!important;color:#fff!important}
+.majlisBottomCta{background:linear-gradient(160deg,var(--mj-primary),var(--mj-primary-dark))!important;color:#fff!important}
+.majlisBottomCta .majlisStart{background:var(--mj-navy)!important;border-color:#fff!important}
+.majlisIntro::before{background:linear-gradient(145deg,var(--mj-cream-2),var(--mj-primary-light))!important;opacity:.55!important}
+.majlisIntroText h2 span{color:var(--mj-primary-dark)!important}
+.majlisFeature i{background:var(--mj-primary)!important}
+.majlisCategoriesSection{background:linear-gradient(180deg,#fff,var(--mj-cream))!important}
+.majlisPreviewCard{background:var(--mj-primary)!important;border-color:var(--mj-primary-dark)!important}
+
+/* ---------- Category selection screen ---------- */
+.categories .catCard,.categoryBox,.categories>*{
+  background:#fff!important;border:1px solid var(--mj-line)!important;border-radius:16px!important;box-shadow:var(--mj-shadow)!important
+}
+.badge{background:var(--mj-primary)!important;color:#fff!important;border-radius:999px!important;padding:4px 12px!important}
+
+/* ---------- Board (categories/points) screen: remove dark navy "broadcast" theme ---------- */
+#boardScreen{background:linear-gradient(165deg,var(--mj-cream-2),var(--mj-cream))!important}
+#boardScreen:before,#boardScreen:after{display:none!important}
+#boardScreen .logo{color:var(--mj-primary-dark)!important;text-shadow:none!important}
+#boardScreen .categoryBox{background:#fff!important;border:1px solid var(--mj-line)!important}
+#boardScreen .categoryBox:hover{border-color:var(--mj-primary)!important;box-shadow:var(--mj-shadow)!important}
+#boardScreen .categoryHead{background:var(--mj-cream-2)!important}
+#boardScreen .categoryHead h3{color:var(--mj-ink)!important;text-shadow:none!important}
+#boardScreen .point{background:linear-gradient(145deg,#fff,var(--mj-cream-2))!important;color:var(--mj-primary-dark)!important;border:1px solid var(--mj-line)!important}
+#boardScreen .point[data-pts="500"]:not(.used){background:linear-gradient(145deg,var(--mj-primary-light),var(--mj-cream-2))!important;color:var(--mj-ink)!important}
+#boardScreen .point:hover:not(.used){border-color:var(--mj-primary)!important;box-shadow:0 0 18px rgba(201,97,74,.28)!important}
+#boardTurn{background:var(--mj-primary)!important;color:#fff!important;border-color:var(--mj-gold)!important}
+#boardScreen .broadcastScorebar,#questionScreen .broadcastScorebar{background:var(--mj-navy)!important}
+#boardScreen .teamScore,#questionScreen .teamScore{background:var(--mj-primary)!important;border-color:var(--mj-primary-dark)!important}
+.teamScore.red{background:#fff3ee!important;border-color:var(--mj-primary-light)!important}
+.teamScore.blue{background:#eef4f7!important;border-color:var(--mj-navy)!important}
+
+/* ---------- Question screen: unify colors ---------- */
+#questionScreen{background:var(--mj-cream)!important}
+#questionScreen .question{color:var(--mj-ink)!important}
+#questionScreen .questionLandscapeCategory{background:var(--mj-cream-2)!important;border:1px solid var(--mj-line)!important}
+#questionScreen .questionLandscapeCategory small{color:var(--mj-primary-dark)!important}
+#questionScreen .questionTeamScore{background:#fff!important;border:2px solid var(--mj-primary-light)!important}
+.timer{border-color:var(--mj-primary)!important;color:var(--mj-ink)!important;background:#fff!important}
+.timer.steal{border-color:var(--mj-navy)!important}
+.answer{color:var(--mj-primary-dark)!important}
+#answerBtn{background:linear-gradient(135deg,var(--mj-primary),var(--mj-primary-dark))!important}
+
+/* ---------- FIX: overlapping header / assist icons on the question screen ----------
+   Force one safe, non-absolute, flex-based layout at ALL breakpoints instead of
+   the many device-specific "position:absolute" rules stacked from older builds. */
+#questionScreen.screen.active{
+  display:flex!important;flex-direction:column!important;
+  padding:max(10px,env(safe-area-inset-top)) 12px 16px 12px!important;
+  gap:8px!important;
+}
+#questionScreen.screen.active .questionLandscapeBar{
+  position:static!important;inset:auto!important;top:auto!important;right:auto!important;bottom:auto!important;left:auto!important;
+  display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
+  align-items:stretch!important;justify-content:space-between!important;
+  width:100%!important;max-width:100%!important;height:auto!important;min-height:0!important;
+  gap:6px!important;margin:0 0 6px 0!important;order:0!important;z-index:30!important;overflow:visible!important;
+}
+#questionScreen.screen.active .questionLandscapeCategory,
+#questionScreen.screen.active .questionTeamScore{
+  position:static!important;flex:1 1 0!important;min-width:0!important;
+  display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
+  padding:6px 4px!important;border-radius:12px!important;overflow:hidden!important;
+}
+#questionScreen.screen.active .questionTeamScore .scoreTeamName{font-size:clamp(11px,3vw,14px)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+#questionScreen.screen.active .questionTeamScore .scoreNumber{font-size:clamp(18px,5vw,26px)!important}
+#questionScreen.screen.active .topline{position:static!important;top:auto!important;left:auto!important;transform:none!important;
+  display:flex!important;justify-content:center!important;gap:8px!important;order:1!important;margin:0!important}
+/* assist icons (SOS / X2 / block) — sit in normal flow, never on top of the header */
+#questionScreen .helpIcons,#questionScreen [class*="assist"],#questionScreen [class*="wasael"]{
+  position:static!important;display:flex!important;justify-content:center!important;gap:14px!important;
+  margin:4px 0!important;z-index:1!important;
+}
+#questionScreen img,#questionScreen .mini{position:static!important}
+
+/* ---------- Result / winner screen ---------- */
+#result .winner .trophy{filter:none!important}
+.winnerName{color:var(--mj-primary)!important}
+#result #finalScores{background:rgba(36,22,17,.85)!important;border-color:var(--mj-gold)!important}
+</style>
 </body></html>
