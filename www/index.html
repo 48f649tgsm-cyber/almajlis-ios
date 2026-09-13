@@ -111,7 +111,7 @@ Future batches may update only question JSON loading and game logic, not CATEGOR
 <meta http-equiv="Expires" content="0">
 <meta name="almajlis-build" content="BUILD-221-STABILITY-AUDIT-20260911"><meta name="build-number" content="221">
 
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#ffffff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>المجلس</title>
@@ -8408,6 +8408,146 @@ html,body,.app{background:#fff!important}
  }
  document.addEventListener('DOMContentLoaded',lockLandscape,{once:true});
  document.addEventListener('pointerdown',lockLandscape,{once:true,passive:true});
+})();
+</script>
+<!-- MAJLIS BUILD 226: iPhone-safe approved visual layer. The original landscape notice is intentionally untouched. -->
+<style id="MAJLIS_BUILD_226_APPROVED_UI">
+@import url('https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap');
+
+/* Apply the approved game typography without affecting the original portrait notice. */
+body .screen,
+body .screen button,
+body .screen input,
+body .mjModal,
+body .mjModal button{
+  font-family:'Readex Pro','SF Arabic','Geeza Pro',Tahoma,Arial,sans-serif!important;
+  font-kerning:normal!important;
+  text-rendering:optimizeLegibility!important;
+  letter-spacing:0!important;
+}
+
+/* iPhone must never zoom the page when a team-name field receives focus. */
+#cats #t1,#cats #t2{
+  font-size:20px!important;
+  line-height:1.4!important;
+  min-height:54px!important;
+  -webkit-appearance:none!important;
+  -webkit-text-size-adjust:100%!important;
+  touch-action:manipulation!important;
+  transform:translateZ(0)!important;
+}
+#cats,#cats button,#cats input{touch-action:manipulation!important}
+
+/* Team setup follows the category grid and is reached by scrolling. */
+#cats.screen.active{
+  display:block!important;
+  height:100dvh!important;
+  min-height:100dvh!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  -webkit-overflow-scrolling:touch!important;
+  padding-bottom:max(18px,env(safe-area-inset-bottom))!important;
+}
+#cats.screen.active .mjCatLayout{
+  min-height:calc(100dvh - 20px)!important;
+  height:auto!important;
+  align-items:start!important;
+}
+#cats.screen.active #catGrid{
+  min-height:calc(100dvh - 20px)!important;
+  align-content:start!important;
+}
+#cats .mjCatFooter{
+  position:relative!important;
+  inset:auto!important;
+  width:100%!important;
+  min-height:112px!important;
+  margin:14px 0 4px!important;
+}
+
+/* Clear visual hierarchy similar to the approved review. */
+.mjBoardTurn,.mjQuestionHeader .btn,.mjAnswerHeader .btn{font-weight:400!important}
+#catGrid .catName,.mjSelected b,.mjSideCategory strong,.mjSideTeam b,.mjTeamField label{font-weight:500!important}
+.boardPoint,.mjQuestionToolbar>*,.broadcastScorebar strong,.mjReveal{font-weight:600!important}
+
+/* Questions adapt to their real length and keep media visible below. */
+#questionScreen .mjQuestionBody>#qText{
+  width:min(1080px,96%)!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow:visible!important;
+  padding:8px 18px 10px!important;
+  font-family:'Readex Pro','SF Arabic','Geeza Pro',Tahoma,Arial,sans-serif!important;
+  font-size:clamp(21px,2.35vw,34px)!important;
+  font-weight:600!important;
+  line-height:1.62!important;
+  text-align:center!important;
+}
+#questionScreen .mjQuestionBody>#qText.mjLongQuestion{font-size:clamp(17px,1.9vw,28px)!important;line-height:1.56!important}
+#questionScreen .mjQuestionBody>#qText.mjVeryLongQuestion{font-size:clamp(14px,1.55vw,23px)!important;line-height:1.5!important}
+#questionScreen .mjQuestionBody:has(#qText.mjLongQuestion)>#qMedia{max-height:39vh!important}
+#questionScreen .mjQuestionBody:has(#qText.mjVeryLongQuestion)>#qMedia{max-height:34vh!important}
+
+/* One complete undistorted image in question, answer, category and board views. */
+#catGrid .catIcon img,.mjSelected img,.boardCatImage img,.mjSideCategory img,
+#questionScreen #qMedia img,#mjAnswerScreen #mjAnswerMedia img{
+  object-fit:contain!important;
+  object-position:center!important;
+  max-width:100%!important;
+  max-height:100%!important;
+}
+#questionScreen #qMedia img{cursor:zoom-in!important}
+
+@media(orientation:landscape) and (max-height:540px){
+  #cats.screen.active .mjCatLayout,#cats.screen.active #catGrid{min-height:calc(100dvh - 12px)!important}
+  #cats .mjCatFooter{min-height:92px!important;margin-top:12px!important}
+  #questionScreen .mjQuestionBody>#qText{font-size:clamp(18px,2.5vw,29px)!important;line-height:1.5!important}
+  #questionScreen .mjQuestionBody>#qText.mjLongQuestion{font-size:clamp(15px,2.1vw,24px)!important}
+  #questionScreen .mjQuestionBody>#qText.mjVeryLongQuestion{font-size:clamp(13px,1.75vw,20px)!important}
+}
+</style>
+<script id="MAJLIS_BUILD_226_IPHONE_GUARD">
+(function(){
+ 'use strict';
+ let gameHasStarted=false;
+ function fields(){return [document.getElementById('t1'),document.getElementById('t2')].filter(Boolean)}
+ function namesReady(){const f=fields();return f.length===2&&f.every(x=>x.value.trim())}
+ function refreshStart(){const b=document.getElementById('startBtn');if(b)b.disabled=selected.length!==6||!namesReady()}
+ function prepareTeamFields(){
+  fields().forEach((input,index)=>{
+   input.value='';input.defaultValue='';input.placeholder='';
+   input.name='majlis_team_'+(index+1)+'_entry';
+   input.autocomplete='one-time-code';input.setAttribute('autocapitalize','none');
+   input.setAttribute('spellcheck','false');input.setAttribute('readonly','');
+   const unlock=()=>input.removeAttribute('readonly');
+   input.addEventListener('pointerdown',unlock,{once:true});
+   input.addEventListener('touchstart',unlock,{once:true,passive:true});
+   input.addEventListener('input',refreshStart);
+  });
+  refreshStart();
+ }
+ function fitQuestion(){
+  const q=document.getElementById('qText');if(!q)return;
+  const text=(q.textContent||'').trim();
+  q.classList.remove('mjLongQuestion','mjVeryLongQuestion');
+  if(text.length>120)q.classList.add('mjVeryLongQuestion');
+  else if(text.length>72)q.classList.add('mjLongQuestion');
+ }
+ document.addEventListener('DOMContentLoaded',()=>{
+  prepareTeamFields();
+  const originalRender=window.renderCats;
+  if(typeof originalRender==='function')window.renderCats=function(){const out=originalRender.apply(this,arguments);refreshStart();return out};
+  const originalOpen=window.openQuestion;
+  if(typeof originalOpen==='function')window.openQuestion=async function(){const out=await originalOpen.apply(this,arguments);requestAnimationFrame(fitQuestion);return out};
+  const originalDraw=window.draw;
+  window.draw=function(){
+   if(selected.length!==6||!namesReady()){refreshStart();show('cats');return}
+   team1=document.getElementById('t1').value.trim();team2=document.getElementById('t2').value.trim();
+   gameHasStarted=true;
+   return originalDraw.apply(this,arguments);
+  };
+ },{once:true});
+ window.addEventListener('pageshow',()=>{if(!gameHasStarted){fields().forEach(x=>x.value='');refreshStart()}});
 })();
 </script>
 </body></html>
