@@ -8756,4 +8756,240 @@ body .screen,body .screen button,body .screen input,#mjAnswerScreen,.mjModal{
  },{once:true});
 })();
 </script>
+<!-- BUILD 233 — category-selection screen only; matched to the approved reference -->
+<style id="MAJLIS_CATEGORIES_APPROVED_233">
+@media(orientation:landscape){
+ #cats.screen.active{
+  display:grid!important;
+  grid-template-rows:minmax(0,1fr) 76px!important;
+  gap:8px!important;
+  width:100%!important;
+  height:100dvh!important;
+  min-height:100dvh!important;
+  padding:var(--mj-safe-top) var(--mj-safe-right) var(--mj-safe-bottom) var(--mj-safe-left)!important;
+  overflow:hidden!important;
+  background:#fffaf5!important;
+ }
+ #cats.screen.active .mjCatLayout{
+  grid-row:1!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) clamp(108px,12.5vw,132px)!important;
+  grid-template-rows:minmax(0,1fr)!important;
+  gap:9px!important;
+  width:100%!important;
+  height:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  overflow:hidden!important;
+  direction:ltr!important;
+ }
+ #cats.screen.active .mjCatLayout>#catGrid{
+  grid-column:1!important;
+  grid-row:1!important;
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  grid-auto-rows:154px!important;
+  gap:10px 9px!important;
+  width:100%!important;
+  height:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:2px 4px 8px!important;
+  align-content:start!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  -webkit-overflow-scrolling:touch!important;
+  direction:rtl!important;
+ }
+ #cats #catGrid .cat{
+  position:relative!important;
+  display:grid!important;
+  grid-template-rows:minmax(0,1fr) 35px!important;
+  width:100%!important;
+  height:154px!important;
+  min-height:154px!important;
+  margin:0!important;
+  padding:0!important;
+  gap:0!important;
+  border:3px solid #293e50!important;
+  border-radius:21px!important;
+  background:#fff!important;
+  box-shadow:none!important;
+  overflow:hidden!important;
+ }
+ #cats #catGrid .catIcon{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:17px 17px 0 0!important;
+  background:#d6e7f7!important;
+  overflow:hidden!important;
+ }
+ #cats #catGrid .catIcon img,#cats #catGrid .catIcon img.catPhoto,#cats #catGrid .catIcon img.catAsset{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:100%!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  object-fit:cover!important;
+  object-position:center!important;
+ }
+ #cats #catGrid .catName{
+  display:grid!important;
+  place-items:center!important;
+  width:100%!important;
+  height:35px!important;
+  min-height:35px!important;
+  margin:0!important;
+  padding:3px 4px!important;
+  background:#fff!important;
+  color:#111!important;
+  font-family:'DIN Next Arabic','SF Arabic','Geeza Pro',Arial,sans-serif!important;
+  font-size:clamp(10px,1.12vw,15px)!important;
+  font-weight:500!important;
+  line-height:1.12!important;
+  text-align:center!important;
+ }
+ #cats #catGrid .cat.sel{border-color:#ef704b!important;outline:0!important}
+ #cats #catGrid .cat.sel .catName{background:#c86557!important;color:#fff!important}
+ #cats #catGrid .cat.sel::after{
+  content:'✓'!important;
+  position:absolute!important;
+  top:5px!important;
+  right:5px!important;
+  display:grid!important;
+  place-items:center!important;
+  width:25px!important;
+  height:25px!important;
+  border-radius:50%!important;
+  background:#45a84f!important;
+  color:#fff!important;
+  font:700 17px/1 Arial!important;
+  box-shadow:0 2px 5px #0003!important;
+ }
+
+ /* Six selected categories stay fully visible in a slim rail on the physical right. */
+ #cats.screen.active .mjCatLayout>.mjSelected{
+  grid-column:2!important;
+  grid-row:1!important;
+  position:relative!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:4px!important;
+  width:100%!important;
+  height:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:5px 4px 35px!important;
+  border:3px solid #bf6558!important;
+  border-radius:22px!important;
+  background:#f8f0ed!important;
+  overflow:hidden!important;
+  direction:rtl!important;
+ }
+ #cats .mjSelectedItem{
+  position:relative!important;
+  display:grid!important;
+  grid-template-columns:38px minmax(0,1fr)!important;
+  align-items:center!important;
+  gap:4px!important;
+  flex:1 1 0!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  max-height:47px!important;
+  margin:0!important;
+  padding:3px 4px 3px 22px!important;
+  border:1px solid #e5c5be!important;
+  border-radius:12px!important;
+  background:#fff!important;
+  box-shadow:none!important;
+  overflow:hidden!important;
+ }
+ #cats .mjSelectedItem .mjThumb{display:block!important;width:38px!important;height:38px!important;border-radius:8px!important;overflow:hidden!important}
+ #cats .mjSelectedItem .mjThumb img{width:100%!important;height:100%!important;object-fit:cover!important}
+ #cats .mjSelectedItem b{min-width:0!important;color:#111!important;font-size:clamp(8px,.86vw,11px)!important;font-weight:500!important;line-height:1.05!important;text-align:center!important;overflow-wrap:anywhere!important}
+ #cats .mjSelectedItem .mjRemove{
+  left:2px!important;
+  top:2px!important;
+  transform:none!important;
+  display:grid!important;
+  place-items:center!important;
+  width:19px!important;
+  height:19px!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:50%!important;
+  background:#e23b36!important;
+  color:#fff!important;
+  font:700 14px/1 Arial!important;
+ }
+ #cats .mjSelected::after{
+  content:attr(data-selection-count) '/6'!important;
+  position:absolute!important;
+  right:50%!important;
+  bottom:5px!important;
+  transform:translateX(50%)!important;
+  display:grid!important;
+  place-items:center!important;
+  min-width:48px!important;
+  height:25px!important;
+  padding:2px 9px!important;
+  border-radius:10px!important;
+  background:#bf6558!important;
+  color:#fff!important;
+  font:700 13px/1 Arial!important;
+ }
+
+ /* Bottom setup strip is separate and never covers the cards. */
+ #cats.screen.active>.mjCatFooter{
+  grid-row:2!important;
+  display:grid!important;
+  grid-template-columns:minmax(145px,.55fr) minmax(0,1fr) minmax(0,1fr)!important;
+  grid-template-rows:1fr!important;
+  align-items:end!important;
+  gap:10px!important;
+  width:100%!important;
+  height:76px!important;
+  min-height:76px!important;
+  margin:0!important;
+  padding:6px 12px!important;
+  border:0!important;
+  border-radius:22px!important;
+  background:#dedede!important;
+  box-shadow:none!important;
+  direction:ltr!important;
+ }
+ #cats .mjCatFooter .mjTeamField:nth-child(1){grid-column:3!important;direction:rtl!important}
+ #cats .mjCatFooter .mjTeamField:nth-child(2){grid-column:2!important;direction:rtl!important}
+ #cats .mjCatFooter #startBtn{grid-column:1!important;grid-row:1!important}
+ #cats .mjCatFooter .mjTeamField{display:grid!important;grid-template-rows:20px 44px!important;min-width:0!important;height:64px!important}
+ #cats .mjCatFooter .mjTeamField label{margin:0 5px!important;color:#111!important;font-size:13px!important;font-weight:600!important;line-height:20px!important}
+ #cats .mjCatFooter .mjTeamField .input{width:100%!important;height:44px!important;min-height:44px!important;margin:0!important;padding:6px 12px!important;border:0!important;border-radius:13px!important;background:#fff!important;color:#111!important;font-size:17px!important;box-shadow:none!important}
+ #cats .mjCatFooter #startBtn{width:100%!important;height:48px!important;min-height:48px!important;margin:0 0 2px!important;border:0!important;border-radius:14px!important;background:#cc695a!important;color:#fff!important;font-size:18px!important;font-weight:600!important;box-shadow:none!important}
+}
+@media(orientation:landscape) and (max-width:820px){
+ #cats.screen.active .mjCatLayout>#catGrid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+}
+</style>
+<script id="MAJLIS_BUILD_233_RUNTIME">
+(function(){
+ function updateSelectedCount(){const rail=document.getElementById('mjSelected');if(rail)rail.dataset.selectionCount=String(typeof selected!=='undefined'?selected.length:rail.children.length)}
+ document.addEventListener('DOMContentLoaded',()=>{
+  const rail=document.getElementById('mjSelected');if(rail){updateSelectedCount();new MutationObserver(updateSelectedCount).observe(rail,{childList:true})}
+  document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-233-CATEGORIES-ONLY-20260913');
+  document.querySelector('meta[name="build-number"]')?.setAttribute('content','233');
+  document.querySelector('#draw .note')?.replaceChildren(document.createTextNode('الإصدار: BUILD 233'));
+ },{once:true});
+})();
+</script>
 </body></html>
