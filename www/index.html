@@ -9008,7 +9008,6 @@ body .screen,body .screen button,body .screen input,#mjAnswerScreen,.mjModal{
  .mjv2-image{display:block;width:100%;height:100%;min-height:0;overflow:hidden;background:#cfe2f5}
  .mjv2-image img,.mjv2-image img.catPhoto,.mjv2-image img.catAsset{display:block;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;object-fit:cover!important;object-position:center!important}
  .mjv2-name{display:grid;place-items:center;min-width:0;height:38px;padding:3px 5px;background:#bf6254;color:#fff;font-size:clamp(11px,1.16vw,16px);font-weight:600;line-height:1.12;text-align:center}
- .mjv2-remaining{position:absolute;top:-2px;left:50%;transform:translateX(-50%);display:grid;place-items:center;min-width:82px;height:36px;padding:3px 9px;border-radius:0 0 16px 16px;background:#cc392b;color:#fff;font:600 clamp(9px,.86vw,12px)/1.15 'DIN Next Arabic','SF Arabic','Geeza Pro',Arial,sans-serif;text-align:center;box-shadow:0 4px 8px #0002}
  .mjv2-cat.is-selected::after{content:'✓';position:absolute;top:6px;right:6px;display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:#45aa52;color:#fff;font:700 18px/1 Arial;box-shadow:0 2px 6px #0003}
  .mjv2-rail{display:grid;grid-template-rows:repeat(6,minmax(0,1fr)) 27px;gap:4px;min-width:0;min-height:0;padding:5px 4px;border:3px solid #b86458;border-radius:21px;background:#f8efec;overflow:hidden;direction:rtl}
  .mjv2-slot{position:relative;display:grid;grid-template-columns:35px minmax(0,1fr);align-items:center;gap:4px;min-width:0;min-height:0;padding:2px 3px 2px 20px;border:1px solid #e4c5be;border-radius:10px;background:#fff;overflow:hidden}
@@ -9050,15 +9049,14 @@ body .screen,body .screen button,body .screen input,#mjAnswerScreen,.mjModal{
   const grid=document.getElementById('mjv2Grid');if(!grid)return;grid.innerHTML='';
   (categories||[]).forEach(c=>{
    const playable=categoryPlayable(c),b=document.createElement('button');b.type='button';b.className='mjv2-cat'+(selected.includes(c)?' is-selected':'');b.disabled=!playable;
-   const remaining=playable?categoryRemainingTotal(c):0;
-   b.innerHTML='<span class="mjv2-image">'+categoryVisual(c)+'</span><span class="mjv2-name">'+escapeV2(c)+'</span><span class="mjv2-remaining">'+(playable?'الباقي '+remaining+'<br>لعبة':'غير متوفرة')+'</span>';
+   b.innerHTML='<span class="mjv2-image">'+categoryVisual(c)+'</span><span class="mjv2-name">'+escapeV2(c)+'</span>';
    b.onclick=()=>{if(!playable)return;if(selected.includes(c))selected=selected.filter(x=>x!==c);else if(selected.length<6)selected.push(c);window.renderCats()};grid.appendChild(b);
   });
   renderRail();const start=document.getElementById('startBtn');if(start)start.disabled=selected.length!==6||!document.getElementById('t1')?.value.trim()||!document.getElementById('t2')?.value.trim();
  }
  document.addEventListener('DOMContentLoaded',()=>{
   buildShell();const legacyRender=window.renderCats;window.renderCats=function(){const out=legacyRender.apply(this,arguments);renderV2();return out};renderV2();
-  document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-235-ISOLATED-CATEGORY-SCREEN-20260913');document.querySelector('meta[name="build-number"]')?.setAttribute('content','235');document.querySelector('#draw .note')?.replaceChildren(document.createTextNode('الإصدار: BUILD 235'));
+  document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-236-CATEGORY-CARDS-CLEAN-20260913');document.querySelector('meta[name="build-number"]')?.setAttribute('content','236');document.querySelector('#draw .note')?.replaceChildren(document.createTextNode('الإصدار: BUILD 236'));
  },{once:true});
 })();
 </script>
