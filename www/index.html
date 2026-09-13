@@ -8644,4 +8644,116 @@ document.addEventListener('DOMContentLoaded',()=>{
  document.querySelector('#draw .note')?.replaceChildren(document.createTextNode('الإصدار: BUILD 231'));
 },{once:true});
 </script>
+<!-- BUILD 232 — Shtegool-reference layout for categories, board, question and answer -->
+<style id="MAJLIS_SHTGOOL_MATCH_232">
+:root{--st-coral:#ca685a;--st-coral-soft:#dfa096;--st-red:#c90008;--st-gray:#e2e2e2;--st-navy:#283e53}
+body .screen,body .screen button,body .screen input,#mjAnswerScreen,.mjModal{
+ font-family:'DIN Next Arabic','SF Arabic','Geeza Pro','Readex Pro',Arial,sans-serif!important;
+ letter-spacing:0!important;font-style:normal!important
+}
+.questionTools,#hostTools224,.hostTools224,.questionReportMenu,.tvLowerThird,.phaseLabel{display:none!important}
+@media(orientation:landscape){
+ /* اختيار الفئات: المختارات يميناً، شبكة الفئات يساراً، وبيانات الفريقين أسفل الشاشة. */
+ #cats.screen.active{display:grid!important;grid-template-rows:minmax(0,1fr) 82px!important;gap:8px!important;height:100dvh!important;overflow:hidden!important;background:#fffaf5!important}
+ #cats.screen.active .mjCatLayout{display:grid!important;grid-template-columns:minmax(0,1fr) clamp(150px,18vw,205px)!important;gap:10px!important;width:100%!important;height:100%!important;min-height:0!important;direction:ltr!important}
+ #cats.screen.active .mjCatLayout>#catGrid{grid-column:1!important;grid-row:1!important;display:grid!important;grid-template-columns:repeat(4,minmax(135px,1fr))!important;gap:10px!important;min-width:0!important;height:100%!important;padding:2px 4px!important;overflow-y:auto!important;direction:rtl!important}
+ #cats.screen.active .mjCatLayout>.mjSelected{grid-column:2!important;grid-row:1!important;display:flex!important;flex-direction:column!important;gap:6px!important;width:100%!important;min-width:0!important;height:100%!important;padding:3px!important;overflow-y:auto!important;direction:rtl!important}
+ #cats .mjSelectedItem{grid-template-columns:50px minmax(0,1fr)!important;gap:6px!important;min-height:50px!important;height:50px!important;margin:0!important;padding:3px 5px 3px 31px!important;border:2px solid #e9aaa0!important;border-radius:15px!important;box-shadow:none!important}
+ #cats .mjSelectedItem .mjThumb{width:50px!important;height:44px!important;border-radius:11px!important}
+ #cats .mjSelectedItem b{font-size:clamp(11px,1.2vw,15px)!important;font-weight:600!important;line-height:1.15!important}
+ #cats .mjRemove{left:4px!important;top:50%!important;transform:translateY(-50%)!important;width:25px!important;height:25px!important;font-size:17px!important}
+ #cats #catGrid .cat{height:168px!important;min-height:168px!important;grid-template-rows:minmax(0,1fr) 39px!important;border:3px solid var(--st-navy)!important;border-radius:22px!important}
+ #cats #catGrid .catIcon{padding:0!important;border:0!important;border-radius:18px 18px 0 0!important}
+ #cats #catGrid .catIcon img{object-fit:cover!important;border-radius:0!important}
+ #cats #catGrid .catName{height:39px!important;min-height:39px!important;background:#fff!important;color:#111!important;font-size:clamp(12px,1.28vw,17px)!important;font-weight:500!important}
+ #cats #catGrid .cat.sel{outline:0!important;border-color:#ef704b!important}
+ #cats #catGrid .cat.sel .catName{background:var(--st-coral)!important;color:#fff!important}
+ #cats .mjCatFooter{grid-row:2!important;display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(170px,.55fr)!important;gap:10px!important;align-items:center!important;width:100%!important;height:82px!important;min-height:82px!important;margin:0!important;padding:7px 12px!important;border:0!important;border-radius:22px!important;background:var(--st-gray)!important}
+ #cats .mjTeamField label{margin:0 5px 3px!important;font-size:14px!important;font-weight:600!important}
+ #cats .mjTeamField .input{height:48px!important;min-height:48px!important;border:0!important;border-radius:14px!important;background:#fff!important;font-size:18px!important}
+ #cats #startBtn{height:50px!important;min-height:50px!important;border-radius:15px!important;background:var(--st-coral)!important;color:#fff!important;font-weight:700!important}
+
+ /* لوحة الأسئلة. */
+ #boardScreen .mjBoardHeader,#questionScreen>.mjQuestionHeader,#mjAnswerScreen>.mjQuestionHeader{position:relative!important;display:flex!important;align-items:center!important;justify-content:center!important;min-height:64px!important;height:64px!important;padding:6px 22px!important;border-radius:34px!important;background:linear-gradient(90deg,var(--st-coral),var(--st-coral-soft))!important;color:#fff!important}
+ #boardScreen .mjBoardHeader .mjBoardBrand,#questionScreen>.mjQuestionHeader .mjBoardBrand,#mjAnswerScreen>.mjQuestionHeader .mjBoardBrand{position:absolute!important;right:24px!important;display:block!important;color:#fff!important;font-family:'DIN Next Arabic','SF Arabic','Geeza Pro',Arial,sans-serif!important;font-size:clamp(25px,2.7vw,38px)!important;font-weight:400!important;text-shadow:none!important}
+ #boardScreen .mjBoardHeader .mjBoardTurn,#questionScreen>.mjQuestionHeader .mjBoardTurn,#mjAnswerScreen>.mjQuestionHeader .mjBoardTurn{color:#fff!important;font-size:clamp(18px,2vw,27px)!important;font-weight:400!important;text-align:center!important}
+ #boardScreen .mjBoardHeader .mjNavBtn,#questionScreen>.mjQuestionHeader .mjNavBtn,#mjAnswerScreen>.mjQuestionHeader .mjNavBtn{height:46px!important;padding:5px 18px!important;border:1.5px solid #ffffffb8!important;border-radius:17px!important;background:transparent!important;color:#fff!important;-webkit-text-fill-color:#fff!important;font-size:clamp(16px,1.75vw,23px)!important;font-weight:500!important}
+ #boardScreen .mjBoardHeader .mjNavBtn:nth-of-type(1){position:absolute!important;left:16px!important}
+ #boardScreen .mjBoardHeader .mjNavBtn:nth-of-type(2){position:absolute!important;left:calc(16px + 112px)!important}
+ #boardScreen #board .categoryBox{grid-template-columns:minmax(0,52%) minmax(125px,48%)!important;border-radius:24px!important}
+ #boardScreen #board .categoryHead h3{background:var(--st-coral)!important;color:#111!important;font-weight:500!important}
+ #boardScreen #board .categoryBox .point{background:var(--st-gray)!important;color:#b60000!important;border:1px solid #efb0a7!important;border-radius:999px!important;font-family:Arial,sans-serif!important;font-size:clamp(25px,3vw,45px)!important;font-weight:700!important}
+ #boardScreen #board .categoryBox .point[data-pts="500"]:not(.used){background:var(--st-gray)!important;color:#b60000!important;border-color:#efb0a7!important}
+
+ /* السؤال: الفريقان يميناً فوق بعض، والتحكم الأبيض أعلى اليسار. */
+ #questionScreen.screen.active{grid-template-columns:minmax(0,1fr) clamp(155px,19vw,215px)!important;grid-template-rows:64px minmax(0,1fr)!important;gap:10px!important;direction:ltr!important}
+ #questionScreen>.mjQuestionHeader{grid-column:1/-1!important;grid-row:1!important;direction:rtl!important}
+ #questionScreen>.mjQuestionHeader .mjHeaderExit{position:absolute!important;left:16px!important}
+ #questionScreen>.mjQuestionHeader .mjHeaderBack{position:absolute!important;left:calc(16px + 94px)!important}
+ #questionScreen>.mjQuestionHeader .mjHeaderResult{display:none!important}
+ #questionScreen>.mjQuestionFrame{grid-column:1!important;grid-row:2!important;margin:42px 4px 28px!important;padding:49px 18px 42px!important;border:6px solid var(--st-red)!important;border-radius:38px!important;direction:rtl!important}
+ #questionScreen.screen.active>.mjQuestionSide{grid-column:2!important;grid-row:2!important;display:flex!important;flex-direction:column!important;justify-content:space-around!important;gap:16px!important;width:100%!important;min-width:0!important;padding:16px 0!important;direction:rtl!important}
+ #questionScreen .mjSideCategory{display:none!important}
+ #questionScreen .mjSideTeam{display:grid!important;grid-template-columns:1fr!important;grid-template-rows:auto auto!important;width:100%!important;min-height:108px!important;padding:0!important;border:0!important;border-radius:20px!important;background:transparent!important;color:#fff!important;box-shadow:none!important;overflow:visible!important}
+ #questionScreen .mjSideTeam b{display:grid!important;place-items:center!important;min-height:42px!important;padding:5px!important;border-radius:18px 18px 7px 7px!important;background:var(--st-navy)!important;color:#fff!important;font-size:clamp(15px,1.6vw,21px)!important;font-weight:600!important;text-align:center!important}
+ #questionScreen .mjSideTeam strong{display:grid!important;place-items:center!important;min-height:64px!important;margin-top:-3px!important;border-radius:15px!important;color:#fff!important;font:700 clamp(25px,3vw,39px)/1 Arial!important}
+ #questionScreen .mjSideTeam.one strong{background:#303fa6!important}#questionScreen .mjSideTeam.two strong{background:#cf3528!important}
+ #questionScreen .mjSideTeam span{display:none!important}
+ #questionScreen .mjQuestionToolbar #mjQTimer{display:grid!important;width:80px!important;min-width:80px!important;height:80px!important;border-radius:50%!important;font-size:19px!important}
+ #questionScreen .mjQuestionToolbar #mjQPoints{min-width:190px!important;height:62px!important;background:var(--st-coral)!important;color:#fff!important}
+ #questionScreen .mjQuestionBody>#qText{font-family:'DIN Next Arabic','SF Arabic','Geeza Pro',Arial,sans-serif!important;font-weight:600!important;color:#080808!important}
+ #questionScreen .mjReveal{background:#303fa6!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
+ #questionScreen .mjCategoryChip{position:absolute!important;right:28px!important;bottom:-30px!important;display:grid!important;place-items:center!important;min-width:190px!important;height:60px!important;padding:7px 20px!important;border-radius:20px!important;background:var(--st-coral)!important;color:#fff!important;font-size:20px!important;font-weight:500!important}
+
+ /* الإجابة: نفس الرأس ونفس شريط الفريقين، مع أسماء الفرق فقط في قرار النقاط. */
+ #mjAnswerScreen.screen.active{display:grid!important;grid-template-columns:minmax(0,1fr) clamp(155px,19vw,215px)!important;grid-template-rows:64px minmax(0,1fr) 86px!important;gap:10px!important;height:100dvh!important;overflow:hidden!important;background:#fff!important;direction:ltr!important}
+ #mjAnswerScreen>.mjQuestionHeader{grid-column:1/-1!important;grid-row:1!important;direction:rtl!important}
+ #mjAnswerScreen>.mjQuestionHeader .mjHeaderExit{position:absolute!important;left:16px!important}
+ #mjAnswerScreen>.mjQuestionHeader #mjABack{position:absolute!important;left:calc(16px + 94px)!important}
+ #mjAnswerScreen>.mjAnswerCard{grid-column:1!important;grid-row:2!important;min-height:0!important;margin:20px 4px 10px!important;padding:20px!important;border:6px solid var(--st-red)!important;border-radius:38px!important;direction:rtl!important}
+ #mjAnswerScreen>.mjAnswerSide{grid-column:2!important;grid-row:2!important;display:flex!important;flex-direction:column!important;justify-content:space-around!important;gap:16px!important;padding:16px 0!important;direction:rtl!important}
+ #mjAnswerScreen .mjAnswerSide .mjSideTeam{display:grid!important;grid-template-columns:1fr!important;grid-template-rows:auto auto!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important}
+ #mjAnswerScreen .mjAnswerSide .mjSideTeam b{display:grid!important;place-items:center!important;min-height:42px!important;border-radius:18px 18px 7px 7px!important;background:var(--st-navy)!important;color:#fff!important;font-size:clamp(15px,1.6vw,21px)!important}
+ #mjAnswerScreen .mjAnswerSide .mjSideTeam strong{display:grid!important;place-items:center!important;min-height:64px!important;margin-top:-3px!important;border-radius:15px!important;color:#fff!important;font:700 clamp(25px,3vw,39px)/1 Arial!important}
+ #mjAnswerScreen .mjAnswerSide .one strong{background:#303fa6!important}#mjAnswerScreen .mjAnswerSide .two strong{background:#cf3528!important}
+ #mjAnswerScreen>.mjDecision{grid-column:1/-1!important;grid-row:3!important;display:grid!important;grid-template-columns:auto repeat(3,minmax(130px,1fr))!important;gap:12px!important;height:86px!important;margin:0 7%!important;padding:10px 18px!important;border-radius:24px!important;background:var(--st-gray)!important;direction:rtl!important}
+ #mjAnswerScreen>.mjDecision strong{font-size:clamp(21px,2.4vw,31px)!important;font-weight:600!important}
+ #mjAnswerScreen>.mjDecision button{height:58px!important;border-radius:17px!important;background:#fff!important;color:#111!important;font-size:clamp(17px,1.8vw,23px)!important;font-weight:600!important}
+ #mjAnswerScreen>.mjDecision .none{background:var(--st-coral)!important;color:#111!important}
+ #mjAnswerScreen .mjAnswerText{font-family:'DIN Next Arabic','SF Arabic','Geeza Pro',Arial,sans-serif!important;font-weight:600!important;color:#111!important}
+}
+</style>
+<script id="MAJLIS_BUILD_232_RUNTIME">
+(function(){
+ function buttonByText(root,text){return [...root.querySelectorAll('button')].find(b=>(b.textContent||'').includes(text))}
+ function decorate(){
+  const q=document.querySelector('#questionScreen>.mjQuestionHeader');
+  if(q){
+   const exit=buttonByText(q,'الخروج'),back=buttonByText(q,'الرجوع إلى اللوحة'),result=buttonByText(q,'النتيجة');
+   exit?.classList.add('mjHeaderExit');back?.classList.add('mjHeaderBack');result?.classList.add('mjHeaderResult');
+   if(!q.querySelector('.mjBoardBrand')){const brand=document.createElement('div');brand.className='mjBoardBrand';brand.textContent='المجلس';q.appendChild(brand)}
+  }
+  const frame=document.querySelector('#questionScreen>.mjQuestionFrame');
+  if(frame&&!frame.querySelector('.mjCategoryChip')){const chip=document.createElement('div');chip.id='mjCategoryChip';chip.className='mjCategoryChip';frame.appendChild(chip)}
+  const a=document.querySelector('#mjAnswerScreen>.mjQuestionHeader');
+  if(a&&!a.querySelector('.mjHeaderExit')){const exit=document.createElement('button');exit.type='button';exit.className='mjNavBtn mjHeaderExit';exit.textContent='الخروج';exit.onclick=()=>{if(confirm('هل تريد الخروج إلى الصفحة الرئيسية؟')){clearInterval(timerId);show('home')}};a.appendChild(exit)}
+  const card=document.querySelector('#mjAnswerScreen>.mjAnswerCard');
+  if(card&&!document.querySelector('#mjAnswerScreen>.mjAnswerSide')){const side=document.createElement('aside');side.className='mjAnswerSide';side.innerHTML='<div class="mjSideTeam one"><b id="mjATeam1"></b><strong id="mjAScore1">0</strong></div><div class="mjSideTeam two"><b id="mjATeam2"></b><strong id="mjAScore2">0</strong></div>';card.after(side)}
+  const label=document.querySelector('#mjAnswerScreen .mjDecision>strong');if(label)label.textContent='من أجاب؟';
+ }
+ function sync232(){
+  const chip=document.getElementById('mjCategoryChip');if(chip)chip.textContent=current?.cat||'';
+  const vals=[["mjATeam1",team1||'الفريق الأول'],["mjATeam2",team2||'الفريق الثاني'],["mjAScore1",score1],["mjAScore2",score2],["mjA1",team1||'الفريق الأول'],["mjA2",team2||'الفريق الثاني']];
+  vals.forEach(([id,val])=>{const e=document.getElementById(id);if(e)e.textContent=val});
+ }
+ document.addEventListener('DOMContentLoaded',()=>{
+  decorate();sync232();
+  const oldReveal=window.reveal;if(typeof oldReveal==='function')window.reveal=function(){const out=oldReveal.apply(this,arguments);decorate();sync232();return out};
+  const oldScores=window.updateScores;if(typeof oldScores==='function')window.updateScores=function(){const out=oldScores.apply(this,arguments);sync232();return out};
+  document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-232-SHTGOOL-VISUAL-MATCH-20260913');
+  document.querySelector('meta[name="build-number"]')?.setAttribute('content','232');
+  document.querySelector('#draw .note')?.replaceChildren(document.createTextNode('الإصدار: BUILD 232'));
+ },{once:true});
+})();
+</script>
 </body></html>
