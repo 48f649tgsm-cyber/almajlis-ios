@@ -8761,7 +8761,7 @@ body .screen,body .screen button,body .screen input,#mjAnswerScreen,.mjModal{
 @media(orientation:landscape){
  #cats.screen.active{
   display:grid!important;
-  grid-template-rows:minmax(0,1fr) 76px!important;
+  grid-template-rows:minmax(0,1fr) 72px!important;
   gap:8px!important;
   width:100%!important;
   height:100dvh!important;
@@ -8788,7 +8788,7 @@ body .screen,body .screen button,body .screen input,#mjAnswerScreen,.mjModal{
   grid-row:1!important;
   display:grid!important;
   grid-template-columns:repeat(5,minmax(0,1fr))!important;
-  grid-auto-rows:154px!important;
+  grid-auto-rows:166px!important;
   gap:10px 9px!important;
   width:100%!important;
   height:100%!important;
@@ -8807,8 +8807,8 @@ body .screen,body .screen button,body .screen input,#mjAnswerScreen,.mjModal{
   display:grid!important;
   grid-template-rows:minmax(0,1fr) 35px!important;
   width:100%!important;
-  height:154px!important;
-  min-height:154px!important;
+  height:166px!important;
+  min-height:166px!important;
   margin:0!important;
   padding:0!important;
   gap:0!important;
@@ -8850,8 +8850,8 @@ body .screen,body .screen button,body .screen input,#mjAnswerScreen,.mjModal{
   min-height:35px!important;
   margin:0!important;
   padding:3px 4px!important;
-  background:#fff!important;
-  color:#111!important;
+  background:#c56557!important;
+  color:#fff!important;
   font-family:'DIN Next Arabic','SF Arabic','Geeza Pro',Arial,sans-serif!important;
   font-size:clamp(10px,1.12vw,15px)!important;
   font-weight:500!important;
@@ -8859,7 +8859,7 @@ body .screen,body .screen button,body .screen input,#mjAnswerScreen,.mjModal{
   text-align:center!important;
  }
  #cats #catGrid .cat.sel{border-color:#ef704b!important;outline:0!important}
- #cats #catGrid .cat.sel .catName{background:#c86557!important;color:#fff!important}
+ #cats #catGrid .cat.sel .catName{background:#b95348!important;color:#fff!important}
  #cats #catGrid .cat.sel::after{
   content:'✓'!important;
   position:absolute!important;
@@ -8896,6 +8896,9 @@ body .screen,body .screen button,body .screen input,#mjAnswerScreen,.mjModal{
   overflow:hidden!important;
   direction:rtl!important;
  }
+ #cats.screen.active .mjCatLayout>.mjSelected:empty{display:none!important}
+ #cats.screen.active .mjCatLayout:has(>.mjSelected:empty){grid-template-columns:minmax(0,1fr)!important}
+ #cats.screen.active .mjCatLayout:has(>.mjSelected:empty)>#catGrid{grid-column:1!important}
  #cats .mjSelectedItem{
   position:relative!important;
   display:grid!important;
@@ -8959,8 +8962,8 @@ body .screen,body .screen button,body .screen input,#mjAnswerScreen,.mjModal{
   align-items:end!important;
   gap:10px!important;
   width:100%!important;
-  height:76px!important;
-  min-height:76px!important;
+  height:72px!important;
+  min-height:72px!important;
   margin:0!important;
   padding:6px 12px!important;
   border:0!important;
@@ -8969,12 +8972,12 @@ body .screen,body .screen button,body .screen input,#mjAnswerScreen,.mjModal{
   box-shadow:none!important;
   direction:ltr!important;
  }
- #cats .mjCatFooter .mjTeamField:nth-child(1){grid-column:3!important;direction:rtl!important}
- #cats .mjCatFooter .mjTeamField:nth-child(2){grid-column:2!important;direction:rtl!important}
+ #cats .mjCatFooter .mjTeamField:nth-child(1){grid-column:3!important;grid-row:1!important;direction:rtl!important}
+ #cats .mjCatFooter .mjTeamField:nth-child(2){grid-column:2!important;grid-row:1!important;direction:rtl!important}
  #cats .mjCatFooter #startBtn{grid-column:1!important;grid-row:1!important}
- #cats .mjCatFooter .mjTeamField{display:grid!important;grid-template-rows:20px 44px!important;min-width:0!important;height:64px!important}
- #cats .mjCatFooter .mjTeamField label{margin:0 5px!important;color:#111!important;font-size:13px!important;font-weight:600!important;line-height:20px!important}
- #cats .mjCatFooter .mjTeamField .input{width:100%!important;height:44px!important;min-height:44px!important;margin:0!important;padding:6px 12px!important;border:0!important;border-radius:13px!important;background:#fff!important;color:#111!important;font-size:17px!important;box-shadow:none!important}
+ #cats .mjCatFooter .mjTeamField{display:grid!important;grid-template-rows:18px 42px!important;align-self:center!important;min-width:0!important;height:60px!important;overflow:hidden!important}
+ #cats .mjCatFooter .mjTeamField label{margin:0 5px!important;color:#111!important;font-size:12px!important;font-weight:600!important;line-height:18px!important}
+ #cats .mjCatFooter .mjTeamField .input{width:100%!important;height:42px!important;min-height:42px!important;margin:0!important;padding:5px 12px!important;border:0!important;border-radius:12px!important;background:#fff!important;color:#111!important;font-size:17px!important;box-shadow:none!important}
  #cats .mjCatFooter #startBtn{width:100%!important;height:48px!important;min-height:48px!important;margin:0 0 2px!important;border:0!important;border-radius:14px!important;background:#cc695a!important;color:#fff!important;font-size:18px!important;font-weight:600!important;box-shadow:none!important}
 }
 @media(orientation:landscape) and (max-width:820px){
@@ -8986,9 +8989,76 @@ body .screen,body .screen button,body .screen input,#mjAnswerScreen,.mjModal{
  function updateSelectedCount(){const rail=document.getElementById('mjSelected');if(rail)rail.dataset.selectionCount=String(typeof selected!=='undefined'?selected.length:rail.children.length)}
  document.addEventListener('DOMContentLoaded',()=>{
   const rail=document.getElementById('mjSelected');if(rail){updateSelectedCount();new MutationObserver(updateSelectedCount).observe(rail,{childList:true})}
-  document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-233-CATEGORIES-ONLY-20260913');
-  document.querySelector('meta[name="build-number"]')?.setAttribute('content','233');
-  document.querySelector('#draw .note')?.replaceChildren(document.createTextNode('الإصدار: BUILD 233'));
+  document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-234-CATEGORIES-CORRECTED-20260913');
+  document.querySelector('meta[name="build-number"]')?.setAttribute('content','234');
+  document.querySelector('#draw .note')?.replaceChildren(document.createTextNode('الإصدار: BUILD 234'));
+ },{once:true});
+})();
+</script>
+<!-- BUILD 235 — isolated category screen; legacy category layout is no longer rendered -->
+<style id="MAJLIS_CATEGORY_SCREEN_V2_235">
+@media(orientation:landscape){
+ #cats.screen.active{display:block!important;width:100%!important;height:100dvh!important;min-height:100dvh!important;padding:0!important;overflow:hidden!important;background:#fffaf7!important}
+ #cats.screen.active>*:not(#mjCategoriesV2){display:none!important}
+ #mjCategoriesV2{display:grid;grid-template-rows:minmax(0,1fr) 72px;gap:9px;width:100%;height:100%;padding:max(8px,env(safe-area-inset-top)) max(14px,calc(env(safe-area-inset-right) + 8px)) max(9px,env(safe-area-inset-bottom)) max(14px,calc(env(safe-area-inset-left) + 8px));overflow:hidden;background:#fffaf7;direction:ltr;font-family:'DIN Next Arabic','SF Arabic','Geeza Pro',Arial,sans-serif}
+ .mjv2-main{display:grid;grid-template-columns:minmax(0,1fr) clamp(104px,11vw,124px);gap:10px;min-width:0;min-height:0;overflow:hidden}
+ .mjv2-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-rows:166px;gap:10px;min-width:0;min-height:0;padding:2px 3px 8px;overflow-x:hidden;overflow-y:auto;align-content:start;direction:rtl;-webkit-overflow-scrolling:touch}
+ .mjv2-cat{all:unset;position:relative;display:grid;grid-template-rows:minmax(0,1fr) 38px;box-sizing:border-box;width:100%;height:166px;border:3px solid #2597d5;border-radius:20px;background:#cfe2f5;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent}
+ .mjv2-cat[disabled]{filter:grayscale(.8);opacity:.42;cursor:not-allowed}
+ .mjv2-image{display:block;width:100%;height:100%;min-height:0;overflow:hidden;background:#cfe2f5}
+ .mjv2-image img,.mjv2-image img.catPhoto,.mjv2-image img.catAsset{display:block;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;object-fit:cover!important;object-position:center!important}
+ .mjv2-name{display:grid;place-items:center;min-width:0;height:38px;padding:3px 5px;background:#bf6254;color:#fff;font-size:clamp(11px,1.16vw,16px);font-weight:600;line-height:1.12;text-align:center}
+ .mjv2-remaining{position:absolute;top:-2px;left:50%;transform:translateX(-50%);display:grid;place-items:center;min-width:82px;height:36px;padding:3px 9px;border-radius:0 0 16px 16px;background:#cc392b;color:#fff;font:600 clamp(9px,.86vw,12px)/1.15 'DIN Next Arabic','SF Arabic','Geeza Pro',Arial,sans-serif;text-align:center;box-shadow:0 4px 8px #0002}
+ .mjv2-cat.is-selected::after{content:'✓';position:absolute;top:6px;right:6px;display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:#45aa52;color:#fff;font:700 18px/1 Arial;box-shadow:0 2px 6px #0003}
+ .mjv2-rail{display:grid;grid-template-rows:repeat(6,minmax(0,1fr)) 27px;gap:4px;min-width:0;min-height:0;padding:5px 4px;border:3px solid #b86458;border-radius:21px;background:#f8efec;overflow:hidden;direction:rtl}
+ .mjv2-slot{position:relative;display:grid;grid-template-columns:35px minmax(0,1fr);align-items:center;gap:4px;min-width:0;min-height:0;padding:2px 3px 2px 20px;border:1px solid #e4c5be;border-radius:10px;background:#fff;overflow:hidden}
+ .mjv2-slot.is-empty{background:#f5ebe8;border-style:dashed}
+ .mjv2-thumb{display:block;width:35px;height:35px;border-radius:7px;overflow:hidden}.mjv2-thumb img{width:100%!important;height:100%!important;object-fit:cover!important}
+ .mjv2-slot-name{min-width:0;color:#111;font-size:clamp(7px,.72vw,10px);font-weight:600;line-height:1.05;text-align:center;overflow-wrap:anywhere}
+ .mjv2-remove{all:unset;position:absolute;left:2px;top:2px;display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:#e53d38;color:#fff;font:700 13px/1 Arial;cursor:pointer}
+ .mjv2-count{display:grid;place-items:center;justify-self:center;min-width:48px;height:25px;padding:2px 9px;border-radius:9px;background:#b86458;color:#fff;font:700 12px/1 Arial}
+ .mjv2-footer{display:grid;grid-template-columns:minmax(145px,.56fr) minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:center;min-width:0;height:72px;padding:6px 12px;border-radius:21px;background:#dedede;direction:ltr}
+ .mjv2-team{display:grid;grid-template-rows:18px 42px;min-width:0;height:60px;direction:rtl}.mjv2-team.one{grid-column:3}.mjv2-team.two{grid-column:2}
+ .mjv2-team label{margin:0 5px;color:#111;font-size:12px;font-weight:600;line-height:18px}
+ #cats #mjCategoriesV2 .mjv2-team input{all:unset;box-sizing:border-box;display:block;width:100%;height:42px;padding:5px 12px;border-radius:12px;background:#fff;color:#111;font-size:17px;line-height:32px;direction:rtl}
+ #cats #mjCategoriesV2 #startBtn{all:unset;box-sizing:border-box;grid-column:1;grid-row:1;display:grid;width:100%;height:48px;place-items:center;border-radius:14px;background:#cc695a;color:#fff;font-size:18px;font-weight:600;text-align:center;cursor:pointer}
+ #cats #mjCategoriesV2 #startBtn:disabled{opacity:.42;cursor:not-allowed}
+}
+@media(orientation:landscape) and (max-width:820px){#mjCategoriesV2 .mjv2-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
+<script id="MAJLIS_CATEGORY_SCREEN_V2_RUNTIME_235">
+(function(){
+ const escapeV2=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ function buildShell(){
+  const host=document.getElementById('cats');if(!host||document.getElementById('mjCategoriesV2'))return;
+  const t1el=document.getElementById('t1'),t2el=document.getElementById('t2'),start=document.getElementById('startBtn');
+  const shell=document.createElement('div');shell.id='mjCategoriesV2';
+  shell.innerHTML='<div class="mjv2-main"><div id="mjv2Grid" class="mjv2-grid"></div><aside id="mjv2Rail" class="mjv2-rail" aria-label="الفئات المختارة"></aside></div><footer class="mjv2-footer"><div class="mjv2-team two"><label for="t2">اسم الفريق الثاني</label></div><div class="mjv2-team one"><label for="t1">اسم الفريق الأول</label></div></footer>';
+  const footer=shell.querySelector('.mjv2-footer');shell.querySelector('.mjv2-team.one').appendChild(t1el);shell.querySelector('.mjv2-team.two').appendChild(t2el);footer.prepend(start);host.appendChild(shell);
+  [t1el,t2el].forEach(el=>el.addEventListener('input',renderV2));
+ }
+ function renderRail(){
+  const rail=document.getElementById('mjv2Rail');if(!rail)return;rail.innerHTML='';
+  for(let i=0;i<6;i++){
+   const c=selected[i];const slot=document.createElement('div');slot.className='mjv2-slot'+(c?'':' is-empty');
+   if(c){slot.innerHTML='<span class="mjv2-thumb">'+categoryVisual(c)+'</span><span class="mjv2-slot-name">'+escapeV2(c)+'</span><button class="mjv2-remove" type="button" aria-label="حذف '+escapeV2(c)+'">×</button>';slot.querySelector('button').onclick=()=>{selected=selected.filter(x=>x!==c);window.renderCats()}}
+   rail.appendChild(slot);
+  }
+  const count=document.createElement('div');count.className='mjv2-count';count.textContent=selected.length+'/6';rail.appendChild(count);
+ }
+ function renderV2(){
+  const grid=document.getElementById('mjv2Grid');if(!grid)return;grid.innerHTML='';
+  (categories||[]).forEach(c=>{
+   const playable=categoryPlayable(c),b=document.createElement('button');b.type='button';b.className='mjv2-cat'+(selected.includes(c)?' is-selected':'');b.disabled=!playable;
+   const remaining=playable?categoryRemainingTotal(c):0;
+   b.innerHTML='<span class="mjv2-image">'+categoryVisual(c)+'</span><span class="mjv2-name">'+escapeV2(c)+'</span><span class="mjv2-remaining">'+(playable?'الباقي '+remaining+'<br>لعبة':'غير متوفرة')+'</span>';
+   b.onclick=()=>{if(!playable)return;if(selected.includes(c))selected=selected.filter(x=>x!==c);else if(selected.length<6)selected.push(c);window.renderCats()};grid.appendChild(b);
+  });
+  renderRail();const start=document.getElementById('startBtn');if(start)start.disabled=selected.length!==6||!document.getElementById('t1')?.value.trim()||!document.getElementById('t2')?.value.trim();
+ }
+ document.addEventListener('DOMContentLoaded',()=>{
+  buildShell();const legacyRender=window.renderCats;window.renderCats=function(){const out=legacyRender.apply(this,arguments);renderV2();return out};renderV2();
+  document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-235-ISOLATED-CATEGORY-SCREEN-20260913');document.querySelector('meta[name="build-number"]')?.setAttribute('content','235');document.querySelector('#draw .note')?.replaceChildren(document.createTextNode('الإصدار: BUILD 235'));
  },{once:true});
 })();
 </script>
