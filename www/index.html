@@ -9060,4 +9060,70 @@ body .screen,body .screen button,body .screen input,#mjAnswerScreen,.mjModal{
  },{once:true});
 })();
 </script>
+<!-- BUILD 237 — isolated question screen; legacy question layout is no longer rendered -->
+<style id="MAJLIS_QUESTION_SCREEN_V2_237">
+@media(orientation:landscape){
+ #questionScreen.screen.active{display:block!important;width:100%!important;height:100dvh!important;min-height:100dvh!important;padding:0!important;overflow:hidden!important;background:#fff!important;direction:rtl!important}
+ #questionScreen.screen.active>*:not(#mjQuestionV2){display:none!important}
+ #mjQuestionV2{display:grid!important;grid-template-rows:64px minmax(0,1fr);gap:10px;width:100%;height:100%;padding:max(8px,env(safe-area-inset-top)) max(14px,calc(env(safe-area-inset-right) + 8px)) max(10px,env(safe-area-inset-bottom)) max(14px,calc(env(safe-area-inset-left) + 8px));overflow:hidden;background:#fff;direction:rtl;font-family:'DIN Next Arabic','SF Arabic','Geeza Pro',Arial,sans-serif}
+ .qv2-header{position:relative;display:grid;place-items:center;width:100%;height:64px;padding:6px 18px;border-radius:32px;background:linear-gradient(90deg,#c96658,#dfa096);color:#fff;overflow:hidden}
+ .qv2-turn{max-width:58%;color:#fff;font-size:clamp(18px,2.1vw,28px);font-weight:500;line-height:1.2;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .qv2-exit{all:unset;position:absolute;right:16px;top:9px;display:grid;place-items:center;min-width:118px;height:46px;padding:0 18px;border:1.5px solid #ffffffba;border-radius:17px;color:#fff;font-size:clamp(16px,1.65vw,22px);font-weight:600;cursor:pointer}
+ .qv2-brand{position:absolute;left:24px;color:#fff;font-size:clamp(23px,2.45vw,35px);font-weight:400}
+ .qv2-stage{display:grid;grid-template-columns:minmax(0,1fr) clamp(155px,18.5vw,215px);gap:15px;min-width:0;min-height:0;overflow:hidden;direction:ltr}
+ .qv2-frame{position:relative;display:flex;align-items:center;justify-content:center;min-width:0;min-height:0;margin:43px 4px 31px;padding:50px 22px 43px;border:6px solid #c91e24;border-radius:38px;background:#fff;direction:rtl}
+ .qv2-points{position:absolute;top:-41px;right:8%;display:grid;place-items:center;min-width:190px;height:64px;padding:7px 23px;border-radius:20px;background:#c66557;color:#fff;font-size:clamp(18px,1.9vw,25px);font-weight:600;white-space:nowrap}
+ .qv2-timer{position:absolute;top:-42px;left:50%;transform:translateX(-50%);display:grid;place-items:center;width:76px;height:76px;border:7px solid #fff;border-radius:50%;background:#c66557;color:#fff;font:700 clamp(17px,1.8vw,23px)/1 Arial;box-shadow:0 5px 14px #0002}
+ .qv2-body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;width:100%;height:100%;min-width:0;min-height:0;overflow:hidden}
+ #questionScreen #mjQuestionV2 #qText{position:static!important;display:block!important;flex:0 0 auto!important;width:min(1050px,96%)!important;min-height:0!important;max-height:26vh!important;margin:0 auto!important;padding:4px 12px!important;border:0!important;border-radius:0!important;background:transparent!important;color:#080808!important;-webkit-text-fill-color:#080808!important;box-shadow:none!important;font-family:'DIN Next Arabic','SF Arabic','Geeza Pro',Arial,sans-serif!important;font-size:clamp(25px,2.75vw,42px)!important;font-weight:650!important;line-height:1.42!important;text-align:center!important;overflow:auto!important}
+ #questionScreen #mjQuestionV2 #qText.qv2-long{font-size:clamp(20px,2.25vw,34px)!important;line-height:1.38!important;max-height:30vh!important}
+ #questionScreen #mjQuestionV2 #qText.qv2-very-long{font-size:clamp(17px,1.9vw,28px)!important;line-height:1.34!important;max-height:32vh!important}
+ #questionScreen #mjQuestionV2 #qMedia{position:static!important;display:grid!important;place-items:center!important;flex:1 1 auto!important;width:100%!important;min-width:0!important;min-height:0!important;max-height:none!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;overflow:hidden!important}
+ #questionScreen #mjQuestionV2 #qMedia:empty{display:none!important}
+ #questionScreen #mjQuestionV2 #qMedia img,#questionScreen #mjQuestionV2 #qMedia video{display:block!important;width:auto!important;height:auto!important;max-width:96%!important;max-height:42vh!important;margin:auto!important;padding:0!important;border:0!important;border-radius:12px!important;background:transparent!important;box-shadow:none!important;object-fit:contain!important;cursor:zoom-in!important}
+ #questionScreen #mjQuestionV2 #qMedia audio{width:min(720px,90%)!important}
+ .qv2-category{position:absolute;right:7%;bottom:-30px;display:grid;place-items:center;min-width:185px;height:60px;padding:7px 20px;border-radius:20px;background:#c66557;color:#fff;font-size:clamp(16px,1.65vw,22px);font-weight:600;white-space:nowrap}
+ #questionScreen #mjQuestionV2 #answerBtn{all:unset;position:absolute!important;left:4%!important;bottom:-30px!important;display:grid!important;place-items:center!important;width:190px!important;height:60px!important;padding:0 18px!important;border-radius:20px!important;background:#303fa6!important;color:#fff!important;-webkit-text-fill-color:#fff!important;font-size:clamp(18px,1.9vw,25px)!important;font-weight:600!important;text-align:center!important;cursor:pointer!important}
+ .qv2-teams{display:flex;flex-direction:column;justify-content:space-around;gap:18px;min-width:0;min-height:0;padding:20px 0;direction:rtl}
+ .qv2-team{display:grid;grid-template-rows:45px 68px;width:100%;min-width:0;color:#fff}
+ .qv2-team-name{display:grid;place-items:center;z-index:1;width:84%;min-width:0;margin:0 auto -5px;padding:5px 8px;border-radius:18px 18px 8px 8px;background:#293f54;color:#fff;font-size:clamp(14px,1.55vw,20px);font-weight:600;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .qv2-team-score{display:grid;place-items:center;border-radius:16px;color:#fff;font:700 clamp(26px,3vw,41px)/1 Arial}.qv2-team.one .qv2-team-score{background:#303fa6}.qv2-team.two .qv2-team-score{background:#cf3528}
+}
+.qv2-modal,.qv2-media-modal{position:fixed;inset:0;z-index:999999;display:none;place-items:center;padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left));background:#0009;direction:rtl;font-family:'DIN Next Arabic','SF Arabic','Geeza Pro',Arial,sans-serif}
+.qv2-modal.show,.qv2-media-modal.show{display:grid}
+.qv2-dialog{width:min(460px,90vw);padding:25px;border-radius:24px;background:#fff;text-align:center;box-shadow:0 18px 55px #0005}.qv2-dialog h3{margin:0 0 20px;color:#111;font-size:25px}.qv2-dialog-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}.qv2-dialog button{height:52px;border:0;border-radius:15px;font-size:19px;font-weight:650}.qv2-exit-yes{background:#c66557;color:#fff}.qv2-exit-no{background:#e4e4e4;color:#111}
+.qv2-media-modal{background:#071018f2}.qv2-media-content{display:grid;place-items:center;width:100%;height:100%;overflow:auto}.qv2-media-content img,.qv2-media-content video{display:block;max-width:96vw!important;max-height:92vh!important;width:auto!important;height:auto!important;object-fit:contain!important}.qv2-media-close{position:absolute;top:max(14px,env(safe-area-inset-top));right:max(14px,env(safe-area-inset-right));z-index:2;width:48px;height:48px;border:0;border-radius:50%;background:#fff;color:#111;font:700 25px/1 Arial;box-shadow:0 4px 14px #0005}
+</style>
+<script id="MAJLIS_QUESTION_SCREEN_V2_RUNTIME_237">
+(function(){
+ function buildQuestionV2(){
+  const host=document.getElementById('questionScreen');if(!host||document.getElementById('mjQuestionV2'))return;
+  const qText=document.getElementById('qText'),qMedia=document.getElementById('qMedia'),answerBtn=document.getElementById('answerBtn');
+  const shell=document.createElement('div');shell.id='mjQuestionV2';shell.innerHTML='<header class="qv2-header"><button id="qv2Exit" class="qv2-exit" type="button">الخروج</button><div id="qv2Turn" class="qv2-turn"></div><div class="qv2-brand">المجلس</div></header><div class="qv2-stage"><main class="qv2-frame"><div id="qv2Points" class="qv2-points"></div><div id="qv2Timer" class="qv2-timer">00:30</div><div class="qv2-body"></div><div id="qv2Category" class="qv2-category"></div></main><aside class="qv2-teams"><div class="qv2-team one"><div id="qv2Team1" class="qv2-team-name"></div><div id="qv2Score1" class="qv2-team-score">0</div></div><div class="qv2-team two"><div id="qv2Team2" class="qv2-team-name"></div><div id="qv2Score2" class="qv2-team-score">0</div></div></aside></div>';
+  answerBtn.textContent='الجواب';shell.querySelector('.qv2-body').append(qText,qMedia);shell.querySelector('.qv2-frame').appendChild(answerBtn);host.appendChild(shell);
+  const exitModal=document.createElement('div');exitModal.id='qv2ExitModal';exitModal.className='qv2-modal';exitModal.innerHTML='<div class="qv2-dialog" role="dialog" aria-modal="true" aria-labelledby="qv2ExitTitle"><h3 id="qv2ExitTitle">هل تريد الخروج من اللعبة؟</h3><div class="qv2-dialog-actions"><button id="qv2ExitYes" class="qv2-exit-yes" type="button">نعم</button><button id="qv2ExitNo" class="qv2-exit-no" type="button">لا</button></div></div>';document.body.appendChild(exitModal);
+  const mediaModal=document.createElement('div');mediaModal.id='qv2MediaModal';mediaModal.className='qv2-media-modal';mediaModal.innerHTML='<button id="qv2MediaClose" class="qv2-media-close" type="button" aria-label="إغلاق">×</button><div id="qv2MediaContent" class="qv2-media-content"></div>';document.body.appendChild(mediaModal);
+  document.getElementById('qv2Exit').onclick=()=>exitModal.classList.add('show');
+  document.getElementById('qv2ExitNo').onclick=()=>exitModal.classList.remove('show');
+  document.getElementById('qv2ExitYes').onclick=()=>{exitModal.classList.remove('show');try{clearInterval(timerId)}catch(_){ }if(typeof window.startNewGame==='function')window.startNewGame();else show('cats')};
+  document.getElementById('qv2MediaClose').onclick=closeMediaV2;mediaModal.addEventListener('click',e=>{if(e.target===mediaModal)closeMediaV2()});
+  qMedia.addEventListener('click',e=>{if(e.target.closest('audio,button,a'))return;openMediaV2()});
+  new MutationObserver(()=>{fitQuestionV2();syncQuestionV2()}).observe(qText,{childList:true,subtree:true,characterData:true});
+  new MutationObserver(syncQuestionV2).observe(document.getElementById('timer'),{childList:true,subtree:true,characterData:true});
+ }
+ function fitQuestionV2(){const q=document.getElementById('qText');if(!q)return;const n=(q.textContent||'').trim().length;q.classList.remove('qv2-long','qv2-very-long');if(n>135)q.classList.add('qv2-very-long');else if(n>78)q.classList.add('qv2-long')}
+ function syncQuestionV2(){
+  const values={qv2Turn:'دور فريق: '+(currentTurn===1?(team1||'الفريق الأول'):(team2||'الفريق الثاني')),qv2Points:(current?.pts||100)+' نقطة',qv2Timer:document.getElementById('timer')?.textContent||'00:30',qv2Category:current?.cat||'',qv2Team1:team1||'الفريق الأول',qv2Team2:team2||'الفريق الثاني',qv2Score1:score1,qv2Score2:score2};
+  Object.entries(values).forEach(([id,value])=>{const el=document.getElementById(id);if(el)el.textContent=value});fitQuestionV2();
+ }
+ function openMediaV2(){const source=document.getElementById('qMedia'),modal=document.getElementById('qv2MediaModal'),content=document.getElementById('qv2MediaContent');if(!source||!modal||!content||!source.children.length)return;content.innerHTML=source.innerHTML;content.querySelectorAll('video,audio').forEach(x=>x.controls=true);modal.classList.add('show')}
+ function closeMediaV2(){const modal=document.getElementById('qv2MediaModal'),content=document.getElementById('qv2MediaContent');modal?.classList.remove('show');if(content)content.innerHTML=''}
+ document.addEventListener('DOMContentLoaded',()=>{
+  buildQuestionV2();syncQuestionV2();
+  const oldOpen=window.openQuestion;if(typeof oldOpen==='function')window.openQuestion=async function(){const out=await oldOpen.apply(this,arguments);syncQuestionV2();return out};
+  const oldScores=window.updateScores;if(typeof oldScores==='function')window.updateScores=function(){const out=oldScores.apply(this,arguments);syncQuestionV2();return out};
+  document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-237-ISOLATED-QUESTION-SCREEN-20260913');document.querySelector('meta[name="build-number"]')?.setAttribute('content','237');document.querySelector('#draw .note')?.replaceChildren(document.createTextNode('الإصدار: BUILD 237'));
+ },{once:true});
+})();
+</script>
 </body></html>
