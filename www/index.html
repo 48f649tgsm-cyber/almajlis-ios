@@ -9186,4 +9186,39 @@ body .screen,body .screen button,body .screen input,#mjAnswerScreen,.mjModal{
  },{once:true});
 })();
 </script>
+<!-- BUILD 241 — clean board renderer; no legacy board visual classes are reused -->
+<style id="MAJLIS_BOARD_SCREEN_V4_241">
+@media(orientation:landscape){
+ #boardScreen.screen.active>#mjBoardV3{grid-template-areas:"head" "cards" "foot"!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:62px minmax(0,1fr) 92px!important}
+ #mjBoardV3>.bv3-header{grid-area:head!important;grid-row:1!important;align-self:start!important;position:relative!important;inset:auto!important;width:100%!important;height:62px!important;margin:0!important;z-index:3!important}
+ #mjBoardV3>.bv4-grid{grid-area:cards!important;grid-row:2!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:repeat(2,minmax(0,1fr))!important;gap:10px 13px!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;direction:rtl!important}
+ #mjBoardV3>.bv3-footer{grid-area:foot!important;grid-row:3!important;align-self:end!important;position:relative!important;inset:auto!important;width:100%!important;height:92px!important;margin:0!important;z-index:3!important}
+ #boardScreen>#board{display:none!important}
+ .bv4-card{all:unset;box-sizing:border-box;display:grid!important;grid-template-columns:minmax(0,54%) minmax(0,46%)!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;border:1.5px solid #202b35!important;border-radius:24px!important;background:#fff!important;overflow:hidden!important;direction:ltr!important}
+ .bv4-visual{display:grid!important;grid-template-rows:minmax(0,1fr) 42px!important;grid-column:2!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;background:#cfe2f5!important;overflow:hidden!important;direction:rtl!important}
+ .bv4-photo{display:block!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;overflow:hidden!important;background:#cfe2f5!important}
+ .bv4-photo img{display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;object-fit:cover!important;object-position:center!important;background:#cfe2f5!important}
+ .bv4-name{display:grid!important;place-items:center!important;width:100%!important;height:42px!important;padding:3px 6px!important;background:#bf6254!important;color:#fff!important;-webkit-text-fill-color:#fff!important;font-size:clamp(12px,1.25vw,17px)!important;font-weight:600!important;line-height:1.1!important;text-align:center!important;overflow:hidden!important}
+ .bv4-points{display:grid!important;grid-column:1!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:repeat(3,minmax(0,1fr))!important;gap:6px 8px!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;padding:7px!important;background:#fff!important;direction:ltr!important}
+ .bv4-point{all:unset;box-sizing:border-box;display:grid!important;place-items:center!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;border:1px solid #e5b8b0!important;border-radius:999px!important;background:#e4e4e4!important;color:#b30000!important;-webkit-text-fill-color:#b30000!important;font:700 clamp(23px,3.1vw,43px)/1 Arial!important;text-align:center!important;cursor:pointer!important;-webkit-tap-highlight-color:transparent!important}
+ .bv4-point.is-used{background:#343434!important;color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:.5!important;pointer-events:none!important}
+ .bv3-team{position:relative!important;inset:auto!important}.bv3-logo{position:relative!important;inset:auto!important}
+}
+@media(orientation:landscape) and (max-height:500px){
+ #boardScreen.screen.active>#mjBoardV3{grid-template-rows:56px minmax(0,1fr) 78px!important}#mjBoardV3>.bv3-header{height:56px!important}#mjBoardV3>.bv3-footer{height:78px!important}.bv4-visual{grid-template-rows:minmax(0,1fr) 34px!important}.bv4-name{height:34px!important}.bv4-points{gap:4px 6px!important;padding:5px!important}
+}
+</style>
+<script id="MAJLIS_BOARD_SCREEN_V4_RUNTIME_241">
+(function(){
+ const esc241=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ function sourceFor241(c){return (typeof CATEGORY_IMAGE_SOURCES==='object'&&CATEGORY_IMAGE_SOURCES&&CATEGORY_IMAGE_SOURCES[c])||''}
+ function legacyButton241(catIndex,pointIndex){return document.querySelectorAll('#board>.categoryBox')[catIndex]?.querySelectorAll('.point')[pointIndex]||null}
+ function renderBoard241(){
+  const grid=document.getElementById('bv4Grid');if(!grid)return;grid.innerHTML='';
+  (selected||[]).slice(0,6).forEach((cat,ci)=>{const card=document.createElement('section');card.className='bv4-card';const visual=document.createElement('div');visual.className='bv4-visual';const src=sourceFor241(cat);visual.innerHTML='<span class="bv4-photo">'+(src?'<img src="'+src+'" alt="'+esc241(cat)+'">':'')+'</span><strong class="bv4-name">'+esc241(cat)+'</strong>';const points=document.createElement('div');points.className='bv4-points';[100,100,300,300,500,500].forEach((pts,pi)=>{const b=document.createElement('button'),original=legacyButton241(ci,pi);b.type='button';b.className='bv4-point'+(original?.dataset.used==='1'?' is-used':'');b.textContent=pts;b.disabled=original?.dataset.used==='1';b.onclick=()=>{const live=legacyButton241(ci,pi);if(live&&live.dataset.used!=='1')live.click()};points.appendChild(b)});card.append(points,visual);grid.appendChild(card)});
+ }
+ function install241(){const shell=document.getElementById('mjBoardV3'),board=document.getElementById('board');if(!shell||!board||document.getElementById('bv4Grid'))return;const grid=document.createElement('div');grid.id='bv4Grid';grid.className='bv4-grid';shell.insertBefore(grid,shell.querySelector('.bv3-footer'));document.getElementById('boardScreen').appendChild(board);renderBoard241();new MutationObserver(renderBoard241).observe(board,{childList:true,subtree:true,attributes:true,attributeFilter:['data-used']})}
+ document.addEventListener('DOMContentLoaded',()=>{install241();const rb=window.renderBoard;if(typeof rb==='function')window.renderBoard=function(){const out=rb.apply(this,arguments);renderBoard241();return out};renderBoard241();document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-241-REFERENCE-BOARD-CLEAN-20260913');document.querySelector('meta[name="build-number"]')?.setAttribute('content','241');document.querySelector('#draw .note')?.replaceChildren(document.createTextNode('الإصدار: BUILD 241'))},{once:true});
+})();
+</script>
 </body></html>
