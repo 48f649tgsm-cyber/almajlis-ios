@@ -9342,7 +9342,7 @@ body>#mjBoardV5{display:none!important}
   <div id="mjRecoveryMsg" class="mjAuthMsg" role="status"></div>
  </form>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 <script id="BUILD245_AUTH_LOGIC">
 (()=>{
  const URL='https://qkacbcpcezsevhrkiirb.supabase.co',KEY='sb_publishable_BzxkT4zQCP8mYvjtqOqD4w_FWb4Em9h';
@@ -9352,7 +9352,7 @@ body>#mjBoardV5{display:none!important}
  const setRoute=route=>localStorage.setItem('almajlis_auth_route',route);
  async function adminAllowed(uid){const {data,error}=await auth.from('admin_users').select('user_id').eq('user_id',uid).eq('active',true).maybeSingle();return !error&&!!data}
  async function continueAs(user,asAdmin,remember){if(remember){localStorage.setItem('almajlis_remember','1')}else{localStorage.removeItem('almajlis_remember');sessionStorage.setItem('almajlis_session_only','1')}if(asAdmin){if(!(await adminAllowed(user.id))){await auth.auth.signOut();throw new Error('هذا الحساب لا يملك صلاحية الأدمن')}setRoute('admin');window.location.href='admin.html';return}setRoute('player');showGame()}
- async function restore(){const gameOnly=new URLSearchParams(location.search).get('game')==='1';const {data:{session}}=await auth.auth.getSession();if(!session)return;if(!localStorage.getItem('almajlis_remember')&&!sessionStorage.getItem('almajlis_session_only')){await auth.auth.signOut();return}const route=localStorage.getItem('almajlis_auth_route');if(route==='admin'&&!gameOnly&&await adminAllowed(session.user.id)){window.location.href='admin.html';return}showGame()}
+ async function restore(){const params=new URLSearchParams(location.search),gameOnly=params.get('game')==='1',forceLogin=params.get('login')==='1';if(forceLogin){await auth.auth.signOut();localStorage.removeItem('almajlis_auth_route');localStorage.removeItem('almajlis_remember');sessionStorage.removeItem('almajlis_session_only');return}const {data:{session}}=await auth.auth.getSession();if(!session)return;if(!localStorage.getItem('almajlis_remember')&&!sessionStorage.getItem('almajlis_session_only')){await auth.auth.signOut();return}const route=localStorage.getItem('almajlis_auth_route');if(route==='admin'&&!gameOnly&&await adminAllowed(session.user.id)){window.location.href='admin.html';return}showGame()}
  login.addEventListener('submit',async e=>{e.preventDefault();loginMsg.textContent='جارٍ التحقق…';const {data,error}=await auth.auth.signInWithPassword({email:byId('mjLoginEmail').value.trim(),password:byId('mjLoginPassword').value});if(error){loginMsg.textContent='تعذر الدخول. تأكد من البريد وكلمة المرور.';return}try{await continueAs(data.user,byId('mjAdminMode').checked,byId('mjRemember').checked)}catch(err){loginMsg.textContent=err.message}});
  byId('mjShowSignup').onclick=()=>{login.hidden=true;signup.hidden=false};byId('mjBackLogin').onclick=()=>{signup.hidden=true;login.hidden=false;signupMsg.textContent=''};
  byId('mjShowRecovery').onclick=()=>{login.hidden=true;recovery.hidden=false};byId('mjBackFromRecovery').onclick=()=>{recovery.hidden=true;login.hidden=false;recoveryMsg.textContent=''};
