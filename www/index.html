@@ -9345,8 +9345,8 @@ body>#mjBoardV5{display:none!important}
 <script src="supabase.js"></script>
 <script id="BUILD245_AUTH_LOGIC">
 (()=>{
- const URL='https://qkacbcpcezsevhrkiirb.supabase.co',KEY='sb_publishable_BzxkT4zQCP8mYvjtqOqD4w_FWb4Em9h';
- const auth=supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}),byId=id=>document.getElementById(id);
+ const SUPABASE_URL='https://qkacbcpcezsevhrkiirb.supabase.co',SUPABASE_KEY='sb_publishable_BzxkT4zQCP8mYvjtqOqD4w_FWb4Em9h';
+ const auth=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}),byId=id=>document.getElementById(id);
  const gate=byId('mjAuthGate'),login=byId('mjLoginForm'),signup=byId('mjSignupForm'),recovery=byId('mjRecoveryForm'),loginMsg=byId('mjLoginMsg'),signupMsg=byId('mjSignupMsg'),recoveryMsg=byId('mjRecoveryMsg');let pendingEmail='',recoveryEmail='';
  const showGame=()=>{gate.classList.add('mjAuthHidden');document.documentElement.classList.add('mjAuthenticated')};
  const setRoute=route=>localStorage.setItem('almajlis_auth_route',route);

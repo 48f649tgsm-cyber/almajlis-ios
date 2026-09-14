@@ -17,6 +17,7 @@
   </style>
 </head>
 <body>
+<section id="adminLoading" class="login"><div class="login-card"><div class="brand">المجلس</div><div class="sub">جارٍ فتح لوحة الإدارة…</div><p id="adminLoadMsg" class="sub"></p><button id="adminLoadBack" type="button" class="btn hidden" style="width:100%">العودة إلى شاشة الدخول</button></div></section>
 <section id="app" class="shell hidden"><aside class="side"><div class="brand">المجلس</div><nav class="nav" id="nav"></nav></aside><main class="main"><header class="top"><b id="pageTitle">لوحة التحكم</b><div class="actions"><button id="goGame" class="btn small">الانتقال إلى اللعبة</button><button id="changePassword" class="btn small">تغيير كلمة المرور</button><button id="backToPlayerLogin" class="btn small">العودة لدخول اللاعبين</button><button id="logout" class="btn red small">تسجيل الخروج</button></div></header><div class="content">
   <section class="page active" data-page="dashboard"><div class="head"><h1>نظرة عامة</h1><button class="btn small" onclick="loadAll()">تحديث</button></div><div id="stats" class="stats"></div></section>
   <section class="page" data-page="categories"><div class="head"><h1>إدارة الفئات</h1><button class="btn gold" onclick="categoryDialog()">إضافة فئة</button></div><div id="categoriesTable"></div></section>
@@ -29,9 +30,9 @@
   <section class="page" data-page="audit"><div class="head"><h1>سجل الأدمن</h1></div><div id="auditTable"></div></section>
 </div></main></section><div id="modal" class="modal hidden"></div><div id="toast" class="toast hidden"></div>
 <script>
-const URL='https://qkacbcpcezsevhrkiirb.supabase.co';
-const KEY='sb_publishable_BzxkT4zQCP8mYvjtqOqD4w_FWb4Em9h';
-const db=supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true}});
+const SUPABASE_URL='https://qkacbcpcezsevhrkiirb.supabase.co';
+const SUPABASE_KEY='sb_publishable_BzxkT4zQCP8mYvjtqOqD4w_FWb4Em9h';
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
 const pages=[['dashboard','لوحة التحكم'],['categories','الفئات'],['questions','الأسئلة'],['media','الوسائط'],['users','الحسابات'],['reports','البلاغات'],['sessions','جلسات اللعب'],['recycle','المحذوفات'],['audit','سجل الأدمن']];
 let state={categories:[],questions:[],answers:[],media:[],profiles:[],reports:[],sessions:[],recycle:[],audit:[],user:null};
 const $=s=>document.querySelector(s), esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -41,7 +42,8 @@ function table(headers,rows){return `<div class="table-wrap"><table><thead><tr>$
 async function audit(action,type,id,oldData=null,newData=null){await db.from('admin_audit_log').insert({admin_id:state.user.id,action,entity_type:type,entity_id:String(id||''),old_data:oldData,new_data:newData})}
 async function isAdmin(user){const {data,error}=await db.from('admin_users').select('user_id,role,active').eq('user_id',user.id).eq('active',true).maybeSingle();return !error&&!!data}
 function unifiedLogin(){localStorage.removeItem('almajlis_auth_route');localStorage.removeItem('almajlis_remember');sessionStorage.removeItem('almajlis_session_only');window.location.replace('index.html?login=1')}
-async function boot(){const {data:{session}}=await db.auth.getSession();if(!session)return unifiedLogin();if(!(await isAdmin(session.user))){await db.auth.signOut();return unifiedLogin()}state.user=session.user;$('#app').classList.remove('hidden');buildNav();await loadAll()}
+async function boot(){const {data:{session},error}=await db.auth.getSession();if(error)throw error;if(!session)return unifiedLogin();if(!(await isAdmin(session.user))){await db.auth.signOut();return unifiedLogin()}state.user=session.user;$('#adminLoading').classList.add('hidden');$('#app').classList.remove('hidden');buildNav();await loadAll()}
+$('#adminLoadBack').onclick=unifiedLogin;
 $('#logout').onclick=async()=>{await db.auth.signOut();unifiedLogin()};
 $('#backToPlayerLogin').onclick=async()=>{await db.auth.signOut();unifiedLogin()};
 $('#changePassword').onclick=()=>{modal(`<div class="head"><h2>تغيير كلمة المرور</h2><button class="btn red small" onclick="closeModal()">إغلاق</button></div><form id="passwordForm"><label>كلمة المرور الجديدة</label><input name="password" class="field" type="password" minlength="8" required><label>تأكيد كلمة المرور</label><input name="confirm" class="field" type="password" minlength="8" required><button class="btn gold" style="width:100%;margin-top:16px">حفظ كلمة المرور</button></form>`);$('#passwordForm').onsubmit=updatePassword};
@@ -75,5 +77,5 @@ function renderSessions(){const rows=state.sessions.map(s=>`<tr><td>${esc(s.team
 function renderRecycle(){const rows=state.recycle.filter(x=>!x.restored_at).map(r=>`<tr><td>${esc(r.entity_type)}</td><td>${esc(r.entity_id)}</td><td>${new Date(r.deleted_at).toLocaleString('ar')}</td><td><button class="btn green small" onclick="restoreItem('${r.id}')">استعادة</button></td></tr>`).join('');$('#recycleTable').innerHTML=table(['النوع','المعرّف','تاريخ الحذف','الإجراء'],rows)}
 async function restoreItem(id){const r=state.recycle.find(x=>x.id===id);if(r.entity_type==='question'&&r.snapshot?.question){const q=r.snapshot.question;delete q.updated_at;const {error}=await db.from('questions').upsert({...q,status:'active'});if(error)return toast(error.message,true);if(r.snapshot.answers?.length){const {error:a}=await db.from('answers').upsert(r.snapshot.answers);if(a)return toast(a.message,true)}}const {error}=await db.from('recycle_bin').update({restored_at:new Date().toISOString(),restored_by:state.user.id}).eq('id',id);if(error)return toast(error.message,true);await audit('restore',r.entity_type,r.entity_id);await loadAll()}
 function renderAudit(){const rows=state.audit.map(a=>`<tr><td>${esc(a.action)}</td><td>${esc(a.entity_type)}</td><td>${esc(a.entity_id||'—')}</td><td>${new Date(a.created_at).toLocaleString('ar')}</td></tr>`).join('');$('#auditTable').innerHTML=table(['الإجراء','النوع','المعرّف','التاريخ'],rows)}
-boot();
+boot().catch(e=>{$('#adminLoadMsg').textContent='تعذر فتح لوحة الإدارة: '+(e?.message||'خطأ غير معروف');$('#adminLoadBack').classList.remove('hidden')});
 </script></body></html>
