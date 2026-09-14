@@ -9317,7 +9317,7 @@ body>#mjBoardV5{display:none!important}
   <label for="mjLoginEmail">البريد الإلكتروني</label><input id="mjLoginEmail" class="mjAuthInput" type="email" autocomplete="username" required>
   <label for="mjLoginPassword">كلمة المرور</label><input id="mjLoginPassword" class="mjAuthInput" type="password" autocomplete="current-password" required>
   <div class="mjAuthChecks"><label class="mjAuthCheck"><input id="mjRemember" type="checkbox" checked> تذكرني</label><label class="mjAuthCheck"><input id="mjAdminMode" type="checkbox"> الدخول كأدمن</label></div>
-  <button class="mjAuthBtn" type="submit">تسجيل الدخول</button><button id="mjShowSignup" class="mjAuthBtn secondary" type="button">إنشاء حساب لاعب جديد</button>
+  <button class="mjAuthBtn" type="submit">تسجيل الدخول</button><button id="mjShowSignup" class="mjAuthBtn secondary" type="button">إنشاء حساب لاعب جديد</button><button id="mjShowRecovery" class="mjAuthBtn ghost" type="button">نسيت كلمة المرور؟</button>
   <div id="mjLoginMsg" class="mjAuthMsg" role="status"></div>
  </form>
  <form id="mjSignupForm" class="mjAuthCard" hidden>
@@ -9330,13 +9330,24 @@ body>#mjBoardV5{display:none!important}
   <div id="mjOtpBox" class="mjOtpBox" hidden><label>رمز OTP المرسل إلى البريد</label><input id="mjOtp" class="mjAuthInput" inputmode="numeric" autocomplete="one-time-code" maxlength="8"><button id="mjVerifyOtp" class="mjAuthBtn ghost" type="button">تأكيد الرمز وتفعيل الحساب</button></div>
   <div id="mjSignupMsg" class="mjAuthMsg" role="status"></div>
  </form>
+ <form id="mjRecoveryForm" class="mjAuthCard" hidden>
+  <button id="mjBackFromRecovery" class="mjAuthClose" type="button">رجوع</button><div class="mjAuthBrand">استعادة الحساب</div><div class="mjAuthSub">سنرسل رمز تحقق إلى بريدك الإلكتروني</div>
+  <label>البريد الإلكتروني</label><input id="mjRecoveryEmail" class="mjAuthInput" type="email" autocomplete="email" required>
+  <button id="mjSendRecovery" class="mjAuthBtn" type="submit" style="margin-top:14px">إرسال رمز الاستعادة</button>
+  <div id="mjRecoveryCodeBox" class="mjOtpBox" hidden>
+   <label>رمز الاستعادة</label><input id="mjRecoveryOtp" class="mjAuthInput" inputmode="numeric" autocomplete="one-time-code" maxlength="8">
+   <label>كلمة المرور الجديدة</label><input id="mjNewPassword" class="mjAuthInput" type="password" minlength="8" autocomplete="new-password">
+   <button id="mjConfirmRecovery" class="mjAuthBtn ghost" type="button">تأكيد وتغيير كلمة المرور</button>
+  </div>
+  <div id="mjRecoveryMsg" class="mjAuthMsg" role="status"></div>
+ </form>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script id="BUILD245_AUTH_LOGIC">
 (()=>{
  const URL='https://qkacbcpcezsevhrkiirb.supabase.co',KEY='sb_publishable_BzxkT4zQCP8mYvjtqOqD4w_FWb4Em9h';
  const auth=supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}),byId=id=>document.getElementById(id);
- const gate=byId('mjAuthGate'),login=byId('mjLoginForm'),signup=byId('mjSignupForm'),loginMsg=byId('mjLoginMsg'),signupMsg=byId('mjSignupMsg');let pendingEmail='';
+ const gate=byId('mjAuthGate'),login=byId('mjLoginForm'),signup=byId('mjSignupForm'),recovery=byId('mjRecoveryForm'),loginMsg=byId('mjLoginMsg'),signupMsg=byId('mjSignupMsg'),recoveryMsg=byId('mjRecoveryMsg');let pendingEmail='',recoveryEmail='';
  const showGame=()=>{gate.classList.add('mjAuthHidden');document.documentElement.classList.add('mjAuthenticated')};
  const setRoute=route=>localStorage.setItem('almajlis_auth_route',route);
  async function adminAllowed(uid){const {data,error}=await auth.from('admin_users').select('user_id').eq('user_id',uid).eq('active',true).maybeSingle();return !error&&!!data}
@@ -9344,8 +9355,11 @@ body>#mjBoardV5{display:none!important}
  async function restore(){const gameOnly=new URLSearchParams(location.search).get('game')==='1';const {data:{session}}=await auth.auth.getSession();if(!session)return;if(!localStorage.getItem('almajlis_remember')&&!sessionStorage.getItem('almajlis_session_only')){await auth.auth.signOut();return}const route=localStorage.getItem('almajlis_auth_route');if(route==='admin'&&!gameOnly&&await adminAllowed(session.user.id)){window.location.href='admin.html';return}showGame()}
  login.addEventListener('submit',async e=>{e.preventDefault();loginMsg.textContent='جارٍ التحقق…';const {data,error}=await auth.auth.signInWithPassword({email:byId('mjLoginEmail').value.trim(),password:byId('mjLoginPassword').value});if(error){loginMsg.textContent='تعذر الدخول. تأكد من البريد وكلمة المرور.';return}try{await continueAs(data.user,byId('mjAdminMode').checked,byId('mjRemember').checked)}catch(err){loginMsg.textContent=err.message}});
  byId('mjShowSignup').onclick=()=>{login.hidden=true;signup.hidden=false};byId('mjBackLogin').onclick=()=>{signup.hidden=true;login.hidden=false;signupMsg.textContent=''};
+ byId('mjShowRecovery').onclick=()=>{login.hidden=true;recovery.hidden=false};byId('mjBackFromRecovery').onclick=()=>{recovery.hidden=true;login.hidden=false;recoveryMsg.textContent=''};
  signup.addEventListener('submit',async e=>{e.preventDefault();signupMsg.textContent='جارٍ إنشاء الحساب…';const f=new FormData(signup);pendingEmail=String(f.get('email')).trim();const {data,error}=await auth.auth.signUp({email:pendingEmail,password:String(f.get('password')),options:{data:{full_name:String(f.get('full_name')).trim(),country:String(f.get('country')).trim(),phone:String(f.get('phone')).trim()}}});if(error){signupMsg.textContent=error.message;return}if(data.session){localStorage.setItem('almajlis_remember','1');setRoute('player');showGame();return}byId('mjOtpBox').hidden=false;signupMsg.textContent='أرسلنا رمز التأكيد إلى بريدك الإلكتروني.'});
  byId('mjVerifyOtp').onclick=async()=>{const token=byId('mjOtp').value.trim();if(!token){signupMsg.textContent='أدخل رمز التأكيد';return}signupMsg.textContent='جارٍ تأكيد الرمز…';const {data,error}=await auth.auth.verifyOtp({email:pendingEmail,token,type:'signup'});if(error){signupMsg.textContent='الرمز غير صحيح أو انتهت صلاحيته.';return}localStorage.setItem('almajlis_remember','1');setRoute('player');if(data.user)showGame()};
+ recovery.addEventListener('submit',async e=>{e.preventDefault();recoveryEmail=byId('mjRecoveryEmail').value.trim();recoveryMsg.textContent='جارٍ إرسال الرمز…';const {error}=await auth.auth.resetPasswordForEmail(recoveryEmail);if(error){recoveryMsg.textContent='تعذر إرسال الرمز. تحقق من البريد وحاول لاحقًا.';return}byId('mjRecoveryCodeBox').hidden=false;recoveryMsg.textContent='أرسلنا رمز الاستعادة إلى بريدك.'});
+ byId('mjConfirmRecovery').onclick=async()=>{const token=byId('mjRecoveryOtp').value.trim(),password=byId('mjNewPassword').value;if(!token||password.length<8){recoveryMsg.textContent='أدخل الرمز وكلمة مرور من 8 أحرف على الأقل.';return}recoveryMsg.textContent='جارٍ التحقق…';const {error}=await auth.auth.verifyOtp({email:recoveryEmail,token,type:'recovery'});if(error){recoveryMsg.textContent='الرمز غير صحيح أو انتهت صلاحيته.';return}const {error:updateError}=await auth.auth.updateUser({password});if(updateError){recoveryMsg.textContent='تعذر تحديث كلمة المرور.';return}localStorage.setItem('almajlis_remember','1');setRoute('player');recoveryMsg.textContent='تم تغيير كلمة المرور بنجاح.';setTimeout(()=>{recovery.hidden=true;login.hidden=false;byId('mjLoginEmail').value=recoveryEmail;byId('mjLoginPassword').value='';loginMsg.textContent='استخدم كلمة المرور الجديدة لتسجيل الدخول.'},900)};
  restore();
 })();
 </script>
