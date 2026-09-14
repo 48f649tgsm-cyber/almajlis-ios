@@ -9306,4 +9306,32 @@ body>#mjBoardV5{display:none!important}
  window.addEventListener('pageshow',()=>{install242();render242();sync242()});
 })();
 </script>
+<!-- BUILD 244 — hidden three-second long-press admin entry; no visual/layout changes -->
+<script id="BUILD244_ADMIN_LONG_PRESS">
+(()=>{
+  let startedAt=0,armed=false,armingTimer=0,target=null;
+  const findBrand=()=>document.querySelector('#home .mjLandingCenterBrand, #home .brand, #home .logo, .mjLandingCenterBrand');
+  const cancel=()=>{clearTimeout(armingTimer);armingTimer=0;startedAt=0;armed=false};
+  const start=e=>{
+    if(e.type==='mousedown'&&e.button!==0)return;
+    target=findBrand();
+    if(!target||!target.contains(e.target))return;
+    clearTimeout(armingTimer);startedAt=Date.now();armed=false;
+    armingTimer=setTimeout(()=>{armed=true},3000);
+  };
+  const finish=e=>{
+    if(!target||!target.contains(e.target)){cancel();target=null;return}
+    const ready=armed&&Date.now()-startedAt>=2950;
+    cancel();target=null;
+    if(!ready)return;
+    e.preventDefault();e.stopPropagation();
+    const opened=window.open('admin.html','_blank','noopener');
+    if(!opened)window.location.href='admin.html';
+  };
+  document.addEventListener('pointerdown',start,{passive:true});
+  document.addEventListener('pointerup',finish,false);
+  document.addEventListener('pointercancel',()=>{cancel();target=null},{passive:true});
+  document.addEventListener('contextmenu',e=>{const b=findBrand();if(b&&b.contains(e.target)&&Date.now()-startedAt>800)e.preventDefault()});
+})();
+</script>
 </body></html>
