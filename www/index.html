@@ -9342,18 +9342,20 @@ body>#mjBoardV5{display:none!important}
   <div id="mjRecoveryMsg" class="mjAuthMsg" role="status"></div>
  </form>
 </div>
-<script src="supabase.js"></script>
+<script>document.addEventListener('submit',e=>{if(e.target&&e.target.closest&&e.target.closest('#mjAuthGate'))e.preventDefault()},true)</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script id="BUILD245_AUTH_LOGIC">
 (()=>{
+ if(!window.supabase){const msg=document.getElementById('mjLoginMsg');if(msg)msg.textContent='تعذر تحميل خدمة تسجيل الدخول. تحقق من اتصال الإنترنت ثم أعد فتح التطبيق.';return}
  const SUPABASE_URL='https://qkacbcpcezsevhrkiirb.supabase.co',SUPABASE_KEY='sb_publishable_BzxkT4zQCP8mYvjtqOqD4w_FWb4Em9h';
  const auth=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}),byId=id=>document.getElementById(id);window.ALMAJLIS_DB=auth;
  const gate=byId('mjAuthGate'),login=byId('mjLoginForm'),signup=byId('mjSignupForm'),recovery=byId('mjRecoveryForm'),loginMsg=byId('mjLoginMsg'),signupMsg=byId('mjSignupMsg'),recoveryMsg=byId('mjRecoveryMsg');let pendingEmail='',recoveryEmail='';
- const showGame=()=>{gate.classList.add('mjAuthHidden');document.documentElement.classList.add('mjAuthenticated')};
+ const showGame=()=>{gate.classList.add('mjAuthHidden');document.documentElement.classList.add('mjAuthenticated');Promise.resolve(window.syncAlmajlisContent?.()).catch(error=>console.warn('تعذر تحديث مخزون المستخدم',error))};
  const setRoute=route=>localStorage.setItem('almajlis_auth_route',route);
  async function adminAllowed(uid){const {data,error}=await auth.from('admin_users').select('user_id').eq('user_id',uid).eq('active',true).maybeSingle();return !error&&!!data}
  async function continueAs(user,asAdmin,remember){if(remember){localStorage.setItem('almajlis_remember','1')}else{localStorage.removeItem('almajlis_remember');sessionStorage.setItem('almajlis_session_only','1')}if(asAdmin){if(!(await adminAllowed(user.id))){await auth.auth.signOut();throw new Error('هذا الحساب لا يملك صلاحية الأدمن')}setRoute('admin');window.location.href='admin.html';return}setRoute('player');showGame()}
  async function restore(){const params=new URLSearchParams(location.search),gameOnly=params.get('game')==='1',forceLogin=params.get('login')==='1';if(forceLogin){await auth.auth.signOut();localStorage.removeItem('almajlis_auth_route');localStorage.removeItem('almajlis_remember');sessionStorage.removeItem('almajlis_session_only');return}const {data:{session}}=await auth.auth.getSession();if(!session)return;if(!localStorage.getItem('almajlis_remember')&&!sessionStorage.getItem('almajlis_session_only')){await auth.auth.signOut();return}const route=localStorage.getItem('almajlis_auth_route');if(route==='admin'&&!gameOnly&&await adminAllowed(session.user.id)){window.location.href='admin.html';return}showGame()}
- login.addEventListener('submit',async e=>{e.preventDefault();loginMsg.textContent='جارٍ التحقق…';const {data,error}=await auth.auth.signInWithPassword({email:byId('mjLoginEmail').value.trim(),password:byId('mjLoginPassword').value});if(error){loginMsg.textContent='تعذر الدخول. تأكد من البريد وكلمة المرور.';return}try{await continueAs(data.user,byId('mjAdminMode').checked,byId('mjRemember').checked)}catch(err){loginMsg.textContent=err.message}});
+ login.addEventListener('submit',async e=>{e.preventDefault();e.stopPropagation();const button=login.querySelector('button[type="submit"]'),email=byId('mjLoginEmail').value.trim(),password=byId('mjLoginPassword').value;if(button)button.disabled=true;loginMsg.textContent='جارٍ التحقق…';try{const {data,error}=await auth.auth.signInWithPassword({email,password});if(error){loginMsg.textContent=error.message==='Email not confirmed'?'يجب تأكيد البريد الإلكتروني أولًا.':'تعذر الدخول. تأكد من البريد وكلمة المرور.';return}if(!data?.user){loginMsg.textContent='لم تكتمل جلسة الدخول. حاول مرة أخرى.';return}await continueAs(data.user,byId('mjAdminMode').checked,byId('mjRemember').checked)}catch(err){loginMsg.textContent='تعذر الاتصال بخدمة الدخول. تحقق من الإنترنت وحاول مجددًا.';console.error('login failed',err)}finally{if(button)button.disabled=false}});
  byId('mjShowSignup').onclick=()=>{login.hidden=true;signup.hidden=false};byId('mjBackLogin').onclick=()=>{signup.hidden=true;login.hidden=false;signupMsg.textContent=''};
  byId('mjShowRecovery').onclick=()=>{login.hidden=true;recovery.hidden=false};byId('mjBackFromRecovery').onclick=()=>{recovery.hidden=true;login.hidden=false;recoveryMsg.textContent=''};
  signup.addEventListener('submit',async e=>{e.preventDefault();signupMsg.textContent='جارٍ إنشاء الحساب…';const f=new FormData(signup);pendingEmail=String(f.get('email')).trim();const {data,error}=await auth.auth.signUp({email:pendingEmail,password:String(f.get('password')),options:{data:{full_name:String(f.get('full_name')).trim(),country:String(f.get('country')).trim(),phone:String(f.get('phone')).trim()}}});if(error){signupMsg.textContent=error.message;return}if(data.session){localStorage.setItem('almajlis_remember','1');setRoute('player');showGame();return}byId('mjOtpBox').hidden=false;signupMsg.textContent='أرسلنا رمز التأكيد إلى بريدك الإلكتروني.'});
@@ -9420,28 +9422,42 @@ body>#mjBoardV5{display:none!important}
   if(start)start.disabled=true;
   if(status)status.textContent='جارٍ مزامنة أحدث الأسئلة والوسائط…';
   try{
-   const [cats,questions,answers,assets]=await Promise.all([
+   const {data:{user}}=await contentDb.auth.getUser();
+   if(!user)throw new Error('يجب تسجيل الدخول لمزامنة مخزون الأسئلة');
+   const [cats,questions,answers,assets,disabledRows]=await Promise.all([
     allRows('categories',q=>q.eq('is_active',true).order('sort_order',{ascending:true})),
     allRows('questions',q=>q.eq('status','published').order('created_at',{ascending:true})),
     allRows('answers',q=>q.order('created_at',{ascending:true})),
-    allRows('media_assets',q=>q.eq('is_active',true).order('created_at',{ascending:true})).catch(()=>[])
+    allRows('media_assets',q=>q.eq('is_active',true).order('created_at',{ascending:true})).catch(()=>[]),
+    allRows('player_disabled_questions',q=>q.eq('user_id',user.id).order('disabled_at',{ascending:false})).catch(()=>[])
    ]);
+   const disabledQuestionIds=new Set(disabledRows.map(x=>String(x.question_id)));
+   try{
+    usedIds.clear();
+    for(const row of disabledRows)usedIds.add(String(row.question_id));
+    localStorage.setItem('almajlis_used_questions_'+user.id,JSON.stringify([...disabledQuestionIds]));
+    localStorage.setItem(usedKey,JSON.stringify([...disabledQuestionIds]));
+   }catch(_){ }
    const catById=new Map(cats.map(c=>[c.id,c])),answerByQuestion=new Map(),assetByQuestion=new Map();
    for(const a of answers){const old=answerByQuestion.get(a.question_id);if(!old||a.is_primary)answerByQuestion.set(a.question_id,a)}
    for(const m of assets){if(m.question_id)assetByQuestion.set(m.question_id,m)}
    const dynamic={};
    for(const q of questions){
+    if(disabledQuestionIds.has(String(q.id)))continue;
     const cat=catById.get(q.category_id),answer=answerByQuestion.get(q.id);if(!cat||!answer)continue;
     const name=appCategoryName(cat.name_ar,cat.slug);if(!name)continue;
     const id=externalId(q.quality_notes)||String(q.id),media=publicMedia(assetByQuestion.get(q.id),q,cat);
-    const item={id,question:q.question_text,answer:answer.answer_text,points:Number(q.points),explanation:q.explanation||'',source_note:q.source_reference||'',qa_verified:'Supabase published'};
+    const item={id,db_question_id:String(q.id),question:q.question_text,answer:answer.answer_text,points:Number(q.points),explanation:q.explanation||'',source_note:q.source_reference||'',qa_verified:'Supabase published'};
     if(media)item.media=media;
     (dynamic[name]||(dynamic[name]=[])).push(item);
    }
    let replaced=0,total=0;
-   for(const [name,items] of Object.entries(dynamic)){
-    const counts={100:0,300:0,500:0};items.forEach(x=>{if(counts[x.points]!==undefined)counts[x.points]++});
-    if(items.length>=6&&counts[100]>=2&&counts[300]>=2&&counts[500]>=2){bank[name]=items;replaced++;total+=items.length}
+   for(const cat of cats){
+    const name=appCategoryName(cat.name_ar,cat.slug),items=dynamic[name]||[];
+    if(!name)continue;
+    // Even a depleted or empty personal stock must replace the embedded bank;
+    // otherwise previously consumed questions could return through the fallback.
+    bank[name]=items;replaced++;total+=items.length;
    }
    categories=Object.keys(bank);
    if(typeof renderCats==='function'&&window.catGrid)renderCats();
@@ -9453,6 +9469,15 @@ body>#mjBoardV5{display:none!important}
    window.ALMAJLIS_SUPABASE_SYNC={ok:false,error:String(error?.message||error),at:new Date().toISOString()};
   }finally{if(start)start.disabled=false}
  }
+ window.syncAlmajlisContent=syncContent;
+ async function disableCurrentQuestionForPlayer(){
+  const questionId=current?.q?.db_question_id;if(!questionId)return;
+  const {data:{user}}=await contentDb.auth.getUser();if(!user)return;
+  const {error}=await contentDb.from('player_disabled_questions').insert({user_id:user.id,question_id:questionId});
+  if(error&&error.code!=='23505')console.warn('تعذر حفظ استهلاك السؤال',error.message);
+ }
+ const originalAward=window.award;
+ if(typeof originalAward==='function')window.award=function(){const qid=current?.q?.db_question_id;const out=originalAward.apply(this,arguments);if(qid)disableCurrentQuestionForPlayer();return out};
  window.ALMAJLIS_CONTENT_READY=syncContent();
 })();
 </script>
