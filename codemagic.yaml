@@ -19,7 +19,6 @@ workflows:
       - name: Build iOS Simulator
         script: |
           cd ios/App
-
           if [ -d "App.xcworkspace" ]; then
             PROJECT_OPTION=(-workspace App.xcworkspace)
           elif [ -d "App.xcodeproj" ]; then
@@ -28,7 +27,6 @@ workflows:
             echo "Neither App.xcworkspace nor App.xcodeproj was found"
             exit 1
           fi
-
           xcodebuild "${PROJECT_OPTION[@]}" \
             -scheme App \
             -configuration Debug \
@@ -64,6 +62,12 @@ workflows:
 
       - name: Sync Capacitor iOS
         script: npx cap sync ios
+
+      - name: Set unique iOS build number
+        script: |
+          PBXPROJ="$CM_BUILD_DIR/ios/App/App.xcodeproj/project.pbxproj"
+          sed -i '' -E "s/CURRENT_PROJECT_VERSION = [^;]+;/CURRENT_PROJECT_VERSION = ${BUILD_NUMBER};/g" "$PBXPROJ"
+          grep "CURRENT_PROJECT_VERSION" "$PBXPROJ" | head -2
 
       - name: Apply Apple signing
         script: xcode-project use-profiles
