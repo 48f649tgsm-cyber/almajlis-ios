@@ -1940,7 +1940,7 @@ async function loadBank(){
 
 loadBank();
 
-function show(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');scrollTo(0,0)}
+function show(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');scrollTo(0,0);if(id==='cats')requestAnimationFrame(()=>{try{renderCats()}catch(error){console.error('Category render failed',error)}})}
 function startNewGame(){
   selected=[];
   try{resetGameLocks()}catch(e){}
@@ -3459,7 +3459,7 @@ function playWinnerComedyThen(finalCallback){
     window.loadBank=async function(){
       const r=await oldLoad.apply(this,arguments);
       sanitizeBank();
-      try{categories=Object.keys(bank);if(typeof renderCats==='function'&&window.catGrid)renderCats()}catch(e){}
+      try{categories=Object.keys(bank);if(typeof renderCats==='function'&&document.getElementById('catGrid'))renderCats()}catch(e){}
       return r;
     };
   }
@@ -3469,7 +3469,7 @@ function playWinnerComedyThen(finalCallback){
       if(window.bank&&Object.keys(bank).length){
         sanitizeBank();
         categories=Object.keys(bank);
-        if(typeof renderCats==='function'&&window.catGrid)renderCats();
+        if(typeof renderCats==='function'&&document.getElementById('catGrid'))renderCats();
         return;
       }
     }catch(e){}
@@ -3673,7 +3673,7 @@ function playWinnerComedyThen(finalCallback){
   }
   let tries=0; const gateTimer=setInterval(()=>{
     tries++;
-    try{if(window.bank&&Object.keys(bank).length){applyEditorialGate();if(typeof categories!=='undefined')categories=Object.keys(bank);if(typeof renderCats==='function'&&window.catGrid)renderCats();clearInterval(gateTimer)}}catch(e){}
+    try{if(window.bank&&Object.keys(bank).length){applyEditorialGate();if(typeof categories!=='undefined')categories=Object.keys(bank);if(typeof renderCats==='function'&&document.getElementById('catGrid'))renderCats();clearInterval(gateTimer)}}catch(e){}
     if(tries>40)clearInterval(gateTimer);
   },125);
 
@@ -8962,7 +8962,7 @@ body>#mjBoardV5{display:none!important}
     bank[name]=items;replaced++;total+=items.length;
    }
    categories=Object.keys(bank);
-   if(typeof renderCats==='function'&&window.catGrid)renderCats();
+   if(typeof renderCats==='function'&&document.getElementById('catGrid'))renderCats();
    if(!replaced)throw new Error('لم تُرجع قاعدة البيانات أي فئة مفعلة');
    if(status)status.textContent=`تمت مزامنة ${replaced} فئة و${total} سؤال من قاعدة البيانات — البنك جاهز`;
    if(start)start.disabled=false;
@@ -8978,7 +8978,7 @@ body>#mjBoardV5{display:none!important}
    if(!cachedReady){
     for(const name of Object.keys(bank))bank[name]=[];
     categories=[];
-    try{selected=[];if(typeof renderCats==='function'&&window.catGrid)renderCats()}catch(_){ }
+    try{selected=[];if(typeof renderCats==='function'&&document.getElementById('catGrid'))renderCats()}catch(_){ }
     if(start)start.disabled=true;
    }else if(start)start.disabled=false;
    const reason=String(error?.message||error||'خطأ غير معروف');
@@ -9014,12 +9014,12 @@ body>#mjBoardV5{display:none!important}
  window.ALMAJLIS_CONTENT_READY=null;
 })();
 </script>
-<script id="BUILD248_RUNTIME_FIX">
+<script id="BUILD249_RUNTIME_FIX">
 document.addEventListener('DOMContentLoaded',()=>{
- document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-248-INSTANT-CONTENT-MEDIA-CACHE-20260916');
- document.querySelector('meta[name="build-number"]')?.setAttribute('content','248');
- const b=document.getElementById('buildBadge025');if(b)b.textContent='BUILD 248';
- try{sessionStorage.setItem('almajlis_build_seen','248');sessionStorage.setItem('almajlis_active_build','248')}catch(_){}
+ document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-249-IOS-CATEGORY-RENDER-FIX-20260916');
+ document.querySelector('meta[name="build-number"]')?.setAttribute('content','249');
+ const b=document.getElementById('buildBadge025');if(b)b.textContent='BUILD 249';
+ try{sessionStorage.setItem('almajlis_build_seen','249');sessionStorage.setItem('almajlis_active_build','249')}catch(_){}
 },{once:true});
 </script>
 </body></html>
