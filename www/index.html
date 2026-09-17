@@ -9050,9 +9050,9 @@ window.categoryVisual=function(c){
  return '<img class="'+cls+'" src="'+safeSrc+'" alt="'+safeName+'" loading="eager" decoding="async">';
 };
 document.addEventListener('DOMContentLoaded',()=>{
- document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-259-PHOTO-COVERS-PRIORITY-PRELOAD-20260917');
- document.querySelector('meta[name="build-number"]')?.setAttribute('content','259');
- const badge=document.getElementById('buildBadge025');if(badge)badge.textContent='BUILD 259';
+ document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-260-IOS-TV-MIRROR-COMPAT-20260917');
+ document.querySelector('meta[name="build-number"]')?.setAttribute('content','260');
+ const badge=document.getElementById('buildBadge025');if(badge)badge.textContent='BUILD 260';
 
  function openCategories255(){
   if(!Array.isArray(categories)||!categories.length){
@@ -9094,5 +9094,56 @@ document.addEventListener('DOMContentLoaded',()=>{
  };
  try{sessionStorage.setItem('almajlis_build_seen','258');sessionStorage.setItem('almajlis_active_build','258')}catch(_){}
 },{once:true});
+</script>
+<style id="BUILD260_IOS_TV_MIRROR_STYLE">
+/* WKWebView/AirPlay compatibility: keep the layout, but avoid compositor-only
+   layers that can remain frozen on the mirrored display. */
+html.mjIosTvSafe *,html.mjIosTvSafe *::before,html.mjIosTvSafe *::after{
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  will-change:auto!important;
+}
+html.mjIosTvSafe body,
+html.mjIosTvSafe .screen,
+html.mjIosTvSafe #home,
+html.mjIosTvSafe #cats,
+html.mjIosTvSafe #boardScreen,
+html.mjIosTvSafe #questionScreen,
+html.mjIosTvSafe #mjAnswerScreen{
+  isolation:auto!important;
+  contain:none!important;
+}
+html.mjIosTvSafe #boardScreen::before,
+html.mjIosTvSafe #questionScreen::before,
+html.mjIosTvSafe .prime500Splash,
+html.mjIosTvSafe .confetti{animation:none!important}
+html.mjIosTvSafe video{transform:none!important;-webkit-transform:none!important}
+</style>
+<script id="BUILD260_IOS_TV_MIRROR_RUNTIME">
+(()=>{
+ const isiOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+ if(!isiOS)return;
+ document.documentElement.classList.add('mjIosTvSafe');
+ let repaintPending=false;
+ function repaintExternalDisplay(){
+  if(repaintPending)return;
+  repaintPending=true;
+  requestAnimationFrame(()=>{
+   const root=document.documentElement;
+   root.style.setProperty('--mj-tv-frame',String(Date.now()%100000));
+   document.body?.getBoundingClientRect();
+   root.classList.add('mjTvFrame');
+   requestAnimationFrame(()=>{root.classList.remove('mjTvFrame');repaintPending=false});
+  });
+ }
+ for(const event of ['click','touchend','input','change','orientationchange','resize','pageshow'])
+  window.addEventListener(event,repaintExternalDisplay,{passive:true});
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)repaintExternalDisplay()});
+ const observer=new MutationObserver(repaintExternalDisplay);
+ document.addEventListener('DOMContentLoaded',()=>{
+  observer.observe(document.body,{subtree:true,attributes:true,childList:true,characterData:true});
+  repaintExternalDisplay();
+ },{once:true});
+})();
 </script>
 </body></html>
