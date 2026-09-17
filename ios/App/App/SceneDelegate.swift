@@ -6,6 +6,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
     private weak var bridgeViewController: CAPBridgeViewController?
     private var captureObserver: NSObjectProtocol?
+    private var captureStateTimer: Timer?
     private var lastAppliedCaptureState: Bool?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
@@ -24,6 +25,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             queue: .main
         ) { [weak self] _ in
             self?.applyAirPlayCompatibilityMode(force: true)
+        }
+
+        // UIScreen.isCaptured is deprecated and can miss AirPlay changes on
+        // current iOS releases. Poll the scene capture trait instead; this
+        // performs no web work while the state is unchanged.
+        captureStateTimer = Timer.scheduledTimer(withTimeInterval: 0.75, repeats: true) { [weak self] _ in
+            self?.applyAirPlayCompatibilityMode()
         }
 
         // The local Capacitor page can finish loading after the scene is shown.
@@ -46,6 +54,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             NotificationCenter.default.removeObserver(captureObserver)
             self.captureObserver = nil
         }
+        captureStateTimer?.invalidate()
+        captureStateTimer = nil
     }
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
@@ -61,7 +71,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
               let rootView = bridgeViewController?.view,
               let webView = findWebView(in: rootView) else { return }
 
-        let isMirroring = screen.isCaptured
+        let isMirroring: Bool
+        if #available(iOS 17.0, *) {
+            isMirroring = window?.traitCollection.sceneCaptureState == .active
+        } else {
+            isMirroring = screen.isCaptured
+        }
         // Normal play must be a strict no-op. Cleanup is needed only after a
         // mirroring session had previously enabled the compatibility layer.
         if !isMirroring, lastAppliedCaptureState != true {
