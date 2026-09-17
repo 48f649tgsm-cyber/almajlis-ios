@@ -6,7 +6,7 @@ import WebKit
 /// iPhone Screen Mirroring, an HTML video can then take over the receiver and
 /// leave the rest of the application frozen on its last frame. Disable that
 /// route before WKWebView is created so the full app stays mirrored.
-final class MajlisBridgeViewController: CAPBridgeViewController {
+class MajlisBridgeViewController: CAPBridgeViewController {
     override open func webViewConfiguration(for instanceConfiguration: InstanceConfiguration) -> WKWebViewConfiguration {
         let configuration = super.webViewConfiguration(for: instanceConfiguration)
         configuration.allowsAirPlayForMediaPlayback = false
