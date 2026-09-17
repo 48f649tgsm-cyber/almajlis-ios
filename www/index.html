@@ -9005,25 +9005,53 @@ body>#mjBoardV5{display:none!important}
  window.ALMAJLIS_CONTENT_READY=Promise.resolve(false);
 })();
 </script>
-<script id="BUILD253_RUNTIME_FIX">
+<style id="BUILD255_START_LOGOUT_STYLE">
+#mjLogoutBtn{display:none;position:fixed;z-index:2147483000;top:max(14px,env(safe-area-inset-top));left:max(18px,env(safe-area-inset-left));min-width:150px;height:54px;padding:0 22px;border:2px solid #ffffff88;border-radius:17px;background:#334b65;color:#fff;font-family:'DIN Next Arabic','SF Arabic','Geeza Pro',Arial,sans-serif;font-size:20px;font-weight:800;box-shadow:0 10px 25px #0003;cursor:pointer}
+html.mjAuthenticated #home.screen.active #mjLogoutBtn{display:grid;place-items:center}
+#mjLogoutBtn:disabled{opacity:.58;cursor:wait}
+@media(max-height:520px) and (orientation:landscape){#mjLogoutBtn{top:max(9px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));min-width:126px;height:46px;padding:0 16px;font-size:17px}}
+</style>
+<script id="BUILD255_START_LOGOUT_RUNTIME">
 document.addEventListener('DOMContentLoaded',()=>{
- document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-254-CATEGORY-ATOMIC-SYNC-20260917');
- document.querySelector('meta[name="build-number"]')?.setAttribute('content','254');
- const b=document.getElementById('buildBadge025');if(b)b.textContent='BUILD 254';
- const start=document.querySelector('#home .mjLandingStart');
- if(start){
-  start.setAttribute('role','button');
-  start.setAttribute('tabindex','0');
-  const launch=e=>{
-   if(e.type==='keydown'&&e.key!=='Enter'&&e.key!==' ')return;
-   e.preventDefault();
-   e.stopImmediatePropagation();
-   if(typeof window.startNewGame==='function')window.startNewGame();
-  };
-  start.addEventListener('click',launch,true);
-  start.addEventListener('keydown',launch,true);
+ document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-255-START-LOGOUT-ROUTE-20260917');
+ document.querySelector('meta[name="build-number"]')?.setAttribute('content','255');
+ const badge=document.getElementById('buildBadge025');if(badge)badge.textContent='BUILD 255';
+
+ function openCategories255(){
+  selected=[];
+  score1=0;score2=0;current=null;currentTurn=1;gameQuestions={};
+  try{resetGameLocks()}catch(_){}
+  try{if(typeof show==='function')show('cats');else{document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById('cats')?.classList.add('active')}}catch(error){console.error('تعذر فتح صفحة الفئات',error)}
+  try{if(typeof renderCats==='function')renderCats()}catch(error){console.error('تعذر رسم الفئات',error)}
+  try{document.getElementById('cats')?.scrollTo(0,0)}catch(_){}
  }
- try{sessionStorage.setItem('almajlis_build_seen','254');sessionStorage.setItem('almajlis_active_build','254')}catch(_){}
+ window.startNewGame=openCategories255;
+ window.startFreshCouncil=openCategories255;
+
+ const launchSelector='#home .mjLandingStart,#home .mjLandingNew,#newGameBtn,.mjIntroStart';
+ document.addEventListener('click',event=>{
+  const button=event.target.closest?.(launchSelector);if(!button)return;
+  event.preventDefault();event.stopImmediatePropagation();openCategories255();
+ },true);
+ document.addEventListener('keydown',event=>{
+  if(event.key!=='Enter'&&event.key!==' ')return;
+  const button=event.target.closest?.(launchSelector);if(!button)return;
+  event.preventDefault();event.stopImmediatePropagation();openCategories255();
+ },true);
+
+ const home=document.getElementById('home');
+ let logout=document.getElementById('mjLogoutBtn');
+ if(home&&!logout){logout=document.createElement('button');logout.id='mjLogoutBtn';logout.type='button';logout.textContent='تسجيل الخروج';home.appendChild(logout)}
+ if(logout)logout.onclick=async()=>{
+  if(logout.disabled)return;logout.disabled=true;logout.textContent='جارٍ الخروج…';
+  try{await window.ALMAJLIS_DB?.auth?.signOut()}catch(error){console.warn('تعذر إنهاء الجلسة على الخادم',error)}
+  try{localStorage.removeItem('almajlis_auth_route');localStorage.removeItem('almajlis_remember');sessionStorage.removeItem('almajlis_session_only')}catch(_){}
+  document.documentElement.classList.remove('mjAuthenticated');
+  const gate=document.getElementById('mjAuthGate');gate?.classList.remove('mjAuthHidden');
+  document.getElementById('mjSignupForm')?.setAttribute('hidden','');document.getElementById('mjRecoveryForm')?.setAttribute('hidden','');document.getElementById('mjLoginForm')?.removeAttribute('hidden');
+  logout.disabled=false;logout.textContent='تسجيل الخروج';
+ };
+ try{sessionStorage.setItem('almajlis_build_seen','255');sessionStorage.setItem('almajlis_active_build','255')}catch(_){}
 },{once:true});
 </script>
 </body></html>
