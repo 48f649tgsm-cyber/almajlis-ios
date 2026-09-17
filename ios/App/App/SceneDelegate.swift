@@ -8,15 +8,27 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private var captureObserver: NSObjectProtocol?
     private var captureStateTimer: Timer?
     private var lastAppliedCaptureState: Bool?
+    private var mirrorFrameTimer: Timer?
+    private weak var mirrorFrameView: UIImageView?
+    private var mirrorSnapshotInFlight = false
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = scene as? UIWindowScene else { return }
 
-        let bridgeViewController = CAPBridgeViewController()
+        // Info.plist already points this scene at Main.storyboard. Reuse the
+        // bridge controller created by UIKit instead of stacking a second
+        // WKWebView/window on top of it. Keep a programmatic fallback for builds
+        // where the storyboard has not supplied the controller.
+        let bridgeViewController: CAPBridgeViewController
+        if let storyboardBridge = window?.rootViewController as? CAPBridgeViewController {
+            bridgeViewController = storyboardBridge
+        } else {
+            bridgeViewController = CAPBridgeViewController()
+            let appWindow = window ?? UIWindow(windowScene: windowScene)
+            appWindow.rootViewController = bridgeViewController
+            window = appWindow
+        }
         self.bridgeViewController = bridgeViewController
-
-        window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = bridgeViewController
         window?.makeKeyAndVisible()
 
         captureObserver = NotificationCenter.default.addObserver(
@@ -49,6 +61,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         applyAirPlayCompatibilityMode(force: true)
     }
 
+    func sceneWillResignActive(_ scene: UIScene) {
+        // Do not leave a high-frequency snapshot task running while Control
+        // Center or another app has made this scene inactive.
+        stopNativeMirrorFramePump()
+    }
+
+    func sceneDidEnterBackground(_ scene: UIScene) {
+        stopNativeMirrorFramePump()
+    }
+
     func sceneDidDisconnect(_ scene: UIScene) {
         if let captureObserver {
             NotificationCenter.default.removeObserver(captureObserver)
@@ -56,6 +78,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
         captureStateTimer?.invalidate()
         captureStateTimer = nil
+        stopNativeMirrorFramePump()
     }
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
@@ -73,7 +96,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         let isMirroring: Bool
         if #available(iOS 17.0, *) {
+            // sceneCaptureState is Apple's current API. Keep the two legacy
+            // signals as fallbacks because some AirPlay receivers report the
+            // scene trait one run-loop later than the physical screen state.
             isMirroring = window?.traitCollection.sceneCaptureState == .active
+                || screen.isCaptured
+                || UIScreen.screens.count > 1
         } else {
             isMirroring = screen.isCaptured
         }
@@ -86,6 +114,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         if !force, lastAppliedCaptureState == isMirroring { return }
         lastAppliedCaptureState = isMirroring
 
+        if !isMirroring {
+            stopNativeMirrorFramePump()
+        }
+
         let javaScript = """
         (() => {
           const active = \(isMirroring ? "true" : "false");
@@ -97,21 +129,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             if (!style) {
               style = document.createElement('style');
               style.id = styleId;
-              style.textContent = `
+              document.head.appendChild(style);
+            }
+            style.textContent = `
                 html.majlis-airplay-mode *,
                 html.majlis-airplay-mode *::before,
                 html.majlis-airplay-mode *::after {
                   -webkit-backdrop-filter: none !important;
                   backdrop-filter: none !important;
+                  filter: none !important;
                   will-change: auto !important;
                   mix-blend-mode: normal !important;
-                }
-                html.majlis-airplay-mode .homeAtmosphere *,
-                html.majlis-airplay-mode .ambientGlow,
-                html.majlis-airplay-mode body::before,
-                html.majlis-airplay-mode body::after {
                   animation: none !important;
-                  filter: none !important;
+                  transition: none !important;
                 }
                 html.majlis-airplay-mode #cats #t1,
                 html.majlis-airplay-mode #cats #t2,
@@ -119,8 +149,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                   transform: none !important;
                 }
               `;
-              document.head.appendChild(style);
-            }
             root.classList.add('majlis-airplay-mode');
           } else {
             root.classList.remove('majlis-airplay-mode');
@@ -133,7 +161,86 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         })();
         """
 
-        webView.evaluateJavaScript(javaScript, completionHandler: nil)
+        webView.evaluateJavaScript(javaScript) { [weak self, weak webView] _, _ in
+            guard let self, let webView, self.lastAppliedCaptureState == true else { return }
+            self.startNativeMirrorFramePump(for: webView)
+        }
+        // Do not depend solely on JavaScript completion: a busy WebKit process
+        // may delay that callback, which is exactly the condition this fallback
+        // is designed to bypass.
+        if isMirroring {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self, weak webView] in
+                guard let self, let webView, self.lastAppliedCaptureState == true else { return }
+                self.startNativeMirrorFramePump(for: webView)
+            }
+        }
+    }
+
+    // WKWebView uses a separately composited WebKit surface. On affected iOS /
+    // AirPlay combinations that surface can remain frozen on the receiver even
+    // though JavaScript and touch handling continue normally on the iPhone.
+    // While mirroring only, copy the current web frame into a native UIImageView.
+    // AirPlay then receives a normal UIKit layer. The image view ignores touches,
+    // and the entire pump is removed as soon as mirroring stops.
+    private func startNativeMirrorFramePump(for webView: WKWebView) {
+        if mirrorFrameView == nil, let container = webView.superview {
+            let frameView = UIImageView(frame: webView.frame)
+            frameView.translatesAutoresizingMaskIntoConstraints = false
+            frameView.contentMode = .scaleToFill
+            frameView.clipsToBounds = true
+            frameView.backgroundColor = webView.isOpaque ? .white : .clear
+            frameView.isUserInteractionEnabled = false
+            frameView.accessibilityElementsHidden = true
+            frameView.isHidden = true
+            container.addSubview(frameView)
+            NSLayoutConstraint.activate([
+                frameView.leadingAnchor.constraint(equalTo: webView.leadingAnchor),
+                frameView.trailingAnchor.constraint(equalTo: webView.trailingAnchor),
+                frameView.topAnchor.constraint(equalTo: webView.topAnchor),
+                frameView.bottomAnchor.constraint(equalTo: webView.bottomAnchor)
+            ])
+            mirrorFrameView = frameView
+        }
+
+        guard mirrorFrameTimer == nil else { return }
+        captureNativeMirrorFrame(from: webView)
+        let timer = Timer(timeInterval: 1.0 / 10.0, repeats: true) { [weak self, weak webView] _ in
+            guard let self, let webView else { return }
+            self.captureNativeMirrorFrame(from: webView)
+        }
+        mirrorFrameTimer = timer
+        RunLoop.main.add(timer, forMode: .common)
+    }
+
+    private func captureNativeMirrorFrame(from webView: WKWebView) {
+        guard lastAppliedCaptureState == true,
+              mirrorFrameView != nil,
+              !mirrorSnapshotInFlight,
+              !webView.bounds.isEmpty else { return }
+
+        mirrorSnapshotInFlight = true
+        let configuration = WKSnapshotConfiguration()
+        configuration.afterScreenUpdates = true
+        let displayScale = webView.window?.screen.scale ?? UIScreen.main.scale
+        let nativeWidth = webView.bounds.width * displayScale
+        configuration.snapshotWidth = NSNumber(value: Double(min(1600.0, nativeWidth)))
+
+        webView.takeSnapshot(with: configuration) { [weak self] image, _ in
+            guard let self else { return }
+            self.mirrorSnapshotInFlight = false
+            guard self.lastAppliedCaptureState == true, let image else { return }
+            self.mirrorFrameView?.image = image
+            self.mirrorFrameView?.isHidden = false
+            self.mirrorFrameView?.layer.setNeedsDisplay()
+        }
+    }
+
+    private func stopNativeMirrorFramePump() {
+        mirrorFrameTimer?.invalidate()
+        mirrorFrameTimer = nil
+        mirrorSnapshotInFlight = false
+        mirrorFrameView?.removeFromSuperview()
+        mirrorFrameView = nil
     }
 
     private func findWebView(in view: UIView) -> WKWebView? {
