@@ -7,7 +7,7 @@ import WebKit
 /// leave the rest of the application frozen on its last frame. Disable that
 /// route before WKWebView is created so the full app stays mirrored.
 class MajlisBridgeViewController: CAPBridgeViewController {
-    override open func webViewConfiguration(for instanceConfiguration: InstanceConfiguration) -> WKWebViewConfiguration {
+    override public func webViewConfiguration(for instanceConfiguration: InstanceConfiguration) -> WKWebViewConfiguration {
         let configuration = super.webViewConfiguration(for: instanceConfiguration)
         configuration.allowsAirPlayForMediaPlayback = false
         configuration.allowsPictureInPictureMediaPlayback = false
