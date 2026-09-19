@@ -9100,4 +9100,89 @@ document.addEventListener('DOMContentLoaded',()=>{
  try{sessionStorage.setItem('almajlis_build_seen','258');sessionStorage.setItem('almajlis_active_build','258')}catch(_){}
 },{once:true});
 </script>
+<!-- BUILD 260 — authoritative media viewer + stored career media + clear flags -->
+<style id="MAJLIS_MEDIA_FIX_260">
+/* Retire every legacy zoom layer. One authoritative viewer is installed below. */
+#mediaZoom224.show,#qv2MediaModal.show,#lineupZoom166.show{display:none!important}
+html.mjMediaOpen260,html.mjMediaOpen260 body{overflow:hidden!important}
+#mjMediaModal260{position:fixed;inset:0;z-index:2147483646;display:none;place-items:center;
+ padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));
+ background:#071018f2;box-sizing:border-box;touch-action:none}
+#mjMediaModal260.show{display:grid}
+#mjMediaModal260 img{display:block;width:auto!important;height:auto!important;max-width:94vw!important;max-height:90dvh!important;
+ margin:auto!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;object-fit:contain!important}
+#mjMediaClose260{position:absolute;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));z-index:2;
+ display:grid;place-items:center;width:52px;height:52px;padding:0;border:0;border-radius:50%;background:#fff;color:#111;
+ font:700 30px/1 Arial;box-shadow:0 5px 18px #0005}
+/* Every raster question asset is fitted completely inside its question area. */
+#questionScreen .mjQuestionBody>#qMedia{overflow:hidden!important}
+#questionScreen .mjQuestionBody>#qMedia img{display:block!important;width:auto!important;height:auto!important;max-width:96%!important;
+ max-height:40dvh!important;margin:auto!important;object-fit:contain!important;object-position:center!important}
+/* The question view must show the exact stored flag without cropping or scaling it to a fill box. */
+#questionScreen.minimalFlag #qMedia,#questionScreen.minimalFlag .mjQuestionBody>#qMedia{overflow:visible!important;max-height:42dvh!important}
+#questionScreen.minimalFlag #qMedia .mediaFrame.flagStage{display:grid!important;place-items:center!important;width:100%!important;height:100%!important;
+ max-width:none!important;max-height:42dvh!important;margin:0!important;padding:0!important;overflow:visible!important;background:transparent!important}
+#questionScreen.minimalFlag #qMedia .mediaFrame.flagStage>img{display:block!important;width:auto!important;height:auto!important;
+ max-width:min(760px,88%)!important;max-height:40dvh!important;margin:auto!important;object-fit:contain!important;object-position:center!important;
+ border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;image-rendering:auto!important}
+/* Stored player-career artwork is the source of truth. */
+#questionScreen.careerMode #qMedia .mjCareerImage260{display:grid!important;place-items:center!important;width:100%!important;height:100%!important;
+ min-height:0!important;overflow:hidden!important;background:transparent!important}
+#questionScreen.careerMode #qMedia .mjCareerImage260>img{display:block!important;width:auto!important;height:auto!important;
+ max-width:96%!important;max-height:40dvh!important;margin:auto!important;object-fit:contain!important;border:0!important;border-radius:10px!important}
+</style>
+<div id="mjMediaModal260" role="dialog" aria-modal="true" aria-label="عرض الصورة بالحجم الكامل" hidden>
+ <button id="mjMediaClose260" type="button" aria-label="إغلاق">×</button>
+ <img id="mjMediaImage260" alt="">
+</div>
+<script id="MAJLIS_MEDIA_FIX_RUNTIME_260">
+(()=>{
+ 'use strict';
+ const modal=document.getElementById('mjMediaModal260');
+ const modalImage=document.getElementById('mjMediaImage260');
+ const closeButton=document.getElementById('mjMediaClose260');
+ if(!modal||!modalImage||!closeButton)return;
+
+ function closeMedia260(){
+  modal.classList.remove('show');modal.hidden=true;modalImage.removeAttribute('src');modalImage.alt='';
+  document.documentElement.classList.remove('mjMediaOpen260');
+ }
+ function openMedia260(source){
+  const src=source.currentSrc||source.src;if(!src)return;
+  /* Close stale legacy layers before displaying one immutable source image. */
+  document.getElementById('mediaZoom224')?.classList.remove('show');
+  document.getElementById('qv2MediaModal')?.classList.remove('show');
+  document.getElementById('lineupZoom166')?.classList.remove('show');
+  modalImage.src=src;modalImage.alt=source.alt||'عرض الصورة بالحجم الكامل';
+  modal.hidden=false;modal.classList.add('show');document.documentElement.classList.add('mjMediaOpen260');
+ }
+ document.addEventListener('click',event=>{
+  const image=event.target.closest?.('#questionScreen #qMedia img');if(!image)return;
+  event.preventDefault();event.stopImmediatePropagation();openMedia260(image);
+ },true);
+ closeButton.addEventListener('click',event=>{event.preventDefault();event.stopImmediatePropagation();closeMedia260()},true);
+ modal.addEventListener('click',event=>{if(event.target===modal){event.preventDefault();event.stopImmediatePropagation();closeMedia260()}},true);
+ document.addEventListener('keydown',event=>{if(event.key==='Escape'&&modal.classList.contains('show')){event.preventDefault();closeMedia260()}},true);
+
+ const priorCareer=window.applyCareerQuestionVisual;
+ window.applyCareerQuestionVisual=function(cat,q){
+  const isCareer=cat==='مسيرة لاعب';
+  document.getElementById('questionScreen')?.classList.toggle('careerMode',isCareer);
+  if(!isCareer){if(typeof priorCareer==='function')return priorCareer(cat,q);return}
+  const media=q?.media;
+  if(media?.type==='image'&&media.src){
+   const safeSrc=String(media.src).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+   const safeAlt=String(media.alt||'المسيرة الاحترافية الكاملة').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+   const text=document.getElementById('qText'),host=document.getElementById('qMedia');
+   if(text)text.textContent='من هو اللاعب صاحب هذه المسيرة؟';
+   if(host)host.innerHTML='<div class="mjCareerImage260"><img src="'+safeSrc+'" alt="'+safeAlt+'" loading="eager" decoding="async"></div>';
+   return;
+  }
+  if(typeof priorCareer==='function')return priorCareer(cat,q);
+ };
+
+ document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-260-MEDIA-INTEGRITY-20260918');
+ document.querySelector('meta[name="build-number"]')?.setAttribute('content','260');
+})();
+</script>
 </body></html>
