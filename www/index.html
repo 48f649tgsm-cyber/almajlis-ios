@@ -981,6 +981,49 @@ body.lowPerf #boardScreen .categoryBox,body.lowPerf .broadcastScorebar{backdrop-
   text-shadow:none!important;
   letter-spacing:0!important;
 }
+#questionScreen.quranMode #qText.hasSeparatedAyah{
+  width:min(920px,95%)!important;
+  max-width:920px!important;
+  padding:0!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  overflow:visible!important;
+}
+#questionScreen.quranMode #qText.hasSeparatedAyah:before,
+#questionScreen.quranMode #qText.hasSeparatedAyah:after{display:none!important}
+#questionScreen.quranMode .quranPrompt{
+  display:block;
+  direction:rtl;
+  unicode-bidi:isolate;
+  width:100%;
+  box-sizing:border-box;
+  margin:0 auto 10px;
+  padding:clamp(12px,2vw,20px) clamp(15px,3vw,28px);
+  color:#17140f;
+  background:linear-gradient(180deg,#fffdf7,#fbf3df);
+  border:1px solid #c9a85e;
+  border-radius:20px;
+  box-shadow:0 10px 28px rgba(0,0,0,.16),inset 0 0 0 3px rgba(255,255,255,.62);
+  font-family:"Tajawal",system-ui,sans-serif!important;
+  font-size:clamp(20px,3.4vw,31px)!important;
+  line-height:1.55!important;
+  font-weight:700!important;
+  text-align:center;
+}
+#questionScreen.quranMode #qText.hasSeparatedAyah .quranAyah{
+  width:100%;
+  box-sizing:border-box;
+  margin:0 auto!important;
+  padding:clamp(13px,2.2vw,22px) clamp(15px,3vw,30px)!important;
+  background:linear-gradient(180deg,#fffefb,#f8eed2)!important;
+  border:1px solid #c9a85e!important;
+  border-radius:20px!important;
+  box-shadow:0 12px 30px rgba(0,0,0,.18),inset 0 0 0 3px rgba(255,255,255,.65)!important;
+  font-size:clamp(25px,4.2vw,41px)!important;
+  line-height:1.95!important;
+}
 #questionScreen.quranMode #answerArea{
   background:linear-gradient(180deg,#fffaf0,#fff)!important;
   border-color:#c9a85e!important;
@@ -2616,7 +2659,8 @@ function finalizeWinner(n,byTie=false){
 }
 function celebrateWinner(){
  const host=document.getElementById('winnerCelebration');host.innerHTML='';
- for(let i=0;i<42;i++){const c=document.createElement('i');c.className='confetti';c.style.left=Math.random()*100+'vw';c.style.animationDelay=Math.random()*.6+'s';c.style.setProperty('--dx',(Math.random()*180-90)+'px');host.appendChild(c)}
+ const colors=['#f59e0b','#fde047','#3b82f6','#ec4899','#8b5cf6','#22c55e','#f8fafc'];
+ for(let i=0;i<96;i++){const c=document.createElement('i');c.className='confetti';c.style.left=Math.random()*100+'vw';c.style.animationDelay=Math.random()*.75+'s';c.style.background=colors[i%colors.length];c.style.width=(7+Math.random()*7)+'px';c.style.height=(11+Math.random()*12)+'px';c.style.setProperty('--dx',(Math.random()*260-130)+'px');host.appendChild(c)}
  setTimeout(()=>host.innerHTML='',3200);
 }
 
@@ -2803,7 +2847,25 @@ async function openQuestion(cat,pts,btn){
     const catImg=(typeof CATEGORY_IMAGE_SOURCES==='object'&&CATEGORY_IMAGE_SOURCES)?CATEGORY_IMAGE_SOURCES[cat]:'';
     if(catImg){qCatLandscapeImg.src=catImg;qCatLandscapeImg.style.display='block'}else{qCatLandscapeImg.removeAttribute('src');qCatLandscapeImg.style.display='none'}
   }
-  qText.innerHTML=q.question_html||q.question;
+  const rawQuestion=String(q.question||'');
+  const ayahMarker='[[AYAH]]';
+  const ayahIndex=rawQuestion.indexOf(ayahMarker);
+  qText.classList.toggle('hasSeparatedAyah',ayahIndex>=0);
+  if(ayahIndex>=0){
+    const promptText=rawQuestion.slice(0,ayahIndex).trim();
+    const ayahText=rawQuestion.slice(ayahIndex+ayahMarker.length).trim();
+    qText.replaceChildren();
+    const promptNode=document.createElement('span');
+    promptNode.className='quranPrompt';
+    promptNode.textContent=promptText;
+    const ayahNode=document.createElement('span');
+    ayahNode.className='quranAyah';
+    ayahNode.setAttribute('lang','ar');
+    ayahNode.textContent=ayahText;
+    qText.append(promptNode,ayahNode);
+  }else{
+    qText.innerHTML=q.question_html||rawQuestion;
+  }
   questionScreen.classList.toggle('silentMode',cat==='من غير كلام');
   questionScreen.classList.toggle('iqMode',cat==='ألغاز');
   questionScreen.classList.toggle('fixErrorMode',cat==='صحح الخطأ'||q.cat==='صحح الخطأ'||q.category==='صحح الخطأ'||(q.id||'').startsWith('b141_fix_'));
@@ -8533,7 +8595,7 @@ body .screen,body .screen button,body .screen input,#mjAnswerScreen,.mjModal{
  function buildQuestionV2(){
   const host=document.getElementById('questionScreen');if(!host||document.getElementById('mjQuestionV2'))return;
   const qText=document.getElementById('qText'),qMedia=document.getElementById('qMedia'),answerBtn=document.getElementById('answerBtn');
-  const shell=document.createElement('div');shell.id='mjQuestionV2';shell.innerHTML='<header class="qv2-header"><button id="qv2Exit" class="qv2-exit" type="button">الخروج</button><button id="qv2Back" class="qv2-back" type="button">الرجوع إلى اللوحة</button><div id="qv2Turn" class="qv2-turn"></div><div class="qv2-brand">المجلس</div></header><div class="qv2-stage"><main class="qv2-frame"><div id="qv2Points" class="qv2-points"></div><div id="qv2Timer" class="qv2-timer">00:30</div><div class="qv2-body"></div><div id="qv2Category" class="qv2-category"></div></main><aside class="qv2-teams"><div class="qv2-team one"><div id="qv2Team1" class="qv2-team-name"></div><div id="qv2Score1" class="qv2-team-score">0</div></div><div class="qv2-team two"><div id="qv2Team2" class="qv2-team-name"></div><div id="qv2Score2" class="qv2-team-score">0</div></div></aside></div>';
+  const shell=document.createElement('div');shell.id='mjQuestionV2';shell.innerHTML='<header class="qv2-header"><button id="qv2Exit" class="qv2-exit" type="button">الخروج</button><button id="qv2Back" class="qv2-back" type="button">الرجوع إلى اللوحة</button><div id="qv2Turn" class="qv2-turn"></div><div class="qv2-brand">المجلس</div></header><div class="qv2-stage"><main class="qv2-frame"><div id="qv2TimeBar" class="qv2-timebar" aria-hidden="true"><i></i></div><div id="qv2Points" class="qv2-points"></div><div id="qv2Timer" class="qv2-timer">00:30</div><div class="qv2-body"></div><div id="qv2Category" class="qv2-category"></div></main><aside class="qv2-teams"><div class="qv2-team one"><div id="qv2Team1" class="qv2-team-name"></div><div id="qv2Score1" class="qv2-team-score">0</div></div><div class="qv2-team two"><div id="qv2Team2" class="qv2-team-name"></div><div id="qv2Score2" class="qv2-team-score">0</div></div></aside></div>';
   answerBtn.textContent='الجواب';shell.querySelector('.qv2-body').append(qText,qMedia);shell.querySelector('.qv2-frame').appendChild(answerBtn);host.appendChild(shell);host.querySelectorAll(':scope>.mjQuestionHeader,:scope>.mjQuestionFrame,:scope>.mjQuestionSide').forEach(x=>x.remove());
   const exitModal=document.createElement('div');exitModal.id='qv2ExitModal';exitModal.className='qv2-modal';exitModal.innerHTML='<div class="qv2-dialog" role="dialog" aria-modal="true" aria-labelledby="qv2ExitTitle"><h3 id="qv2ExitTitle">هل تريد الخروج من اللعبة؟</h3><div class="qv2-dialog-actions"><button id="qv2ExitYes" class="qv2-exit-yes" type="button">نعم</button><button id="qv2ExitNo" class="qv2-exit-no" type="button">لا</button></div></div>';document.body.appendChild(exitModal);
   const mediaModal=document.createElement('div');mediaModal.id='qv2MediaModal';mediaModal.className='qv2-media-modal';mediaModal.innerHTML='<button id="qv2MediaClose" class="qv2-media-close" type="button" aria-label="إغلاق">×</button><div id="qv2MediaContent" class="qv2-media-content"></div>';document.body.appendChild(mediaModal);
@@ -8558,7 +8620,12 @@ body .screen,body .screen button,body .screen input,#mjAnswerScreen,.mjModal{
  function fitQuestionV2(){const q=document.getElementById('qText');if(!q)return;const n=(q.textContent||'').trim().length;q.classList.remove('qv2-long','qv2-very-long');if(n>135)q.classList.add('qv2-very-long');else if(n>78)q.classList.add('qv2-long')}
  function syncQuestionV2(){
   const values={qv2Turn:'دور فريق: '+(currentTurn===1?(team1||'الفريق الأول'):(team2||'الفريق الثاني')),qv2Points:(current?.pts||100)+' نقطة',qv2Timer:document.getElementById('timer')?.textContent||'00:30',qv2Category:current?.cat||'',qv2Team1:team1||'الفريق الأول',qv2Team2:team2||'الفريق الثاني',qv2Score1:score1,qv2Score2:score2};
-  Object.entries(values).forEach(([id,value])=>{const el=document.getElementById(id);if(el)el.textContent=value});fitQuestionV2();
+  Object.entries(values).forEach(([id,value])=>{const el=document.getElementById(id);if(el)el.textContent=value});
+  const seconds=Math.max(0,parseInt(String(values.qv2Timer).split(':').pop(),10)||0),total=steal?10:30,bar=document.getElementById('qv2TimeBar');
+  if(bar){bar.style.setProperty('--mj-time-progress',String(Math.min(1,seconds/total)));bar.classList.toggle('urgent',seconds<=5&&seconds>0);bar.classList.toggle('expired',seconds<=0)}
+  document.querySelector('#mjQuestionV2 .qv2-team.one')?.classList.toggle('is-current',currentTurn===1);
+  document.querySelector('#mjQuestionV2 .qv2-team.two')?.classList.toggle('is-current',currentTurn===2);
+  fitQuestionV2();
  }
  function openMediaV2(){const source=document.getElementById('qMedia'),modal=document.getElementById('qv2MediaModal'),content=document.getElementById('qv2MediaContent');if(!source||!modal||!content||!source.children.length)return;content.innerHTML=source.innerHTML;content.querySelectorAll('video,audio').forEach(x=>x.controls=true);modal.classList.add('show')}
  function closeMediaV2(){const modal=document.getElementById('qv2MediaModal'),content=document.getElementById('qv2MediaContent');modal?.classList.remove('show');if(content)content.innerHTML=''}
@@ -9212,7 +9279,172 @@ body,.screen,.screen button,.screen input,.screen label,#mjAnswerScreen,.qv2-mod
 #result #finalScores .finalDash218{color:#fff!important;font-size:30px!important}
 #result #matchStats{display:none!important}
 #result>#resultNewGameBtn{flex:0 0 auto!important;width:min(420px,70vw)!important;height:54px!important;min-height:54px!important;margin:0 auto!important;font-size:22px!important}
+/* BUILD 261 — modern dark quiz card, scoped to the question screen only. */
+@media (orientation:landscape){
+ #questionScreen.screen.active,#questionScreen.screen.active>#mjQuestionV2{background:radial-gradient(circle at 48% 38%,#25205f 0%,#111936 48%,#08111f 100%)!important}
+ #questionScreen.screen.active>#mjQuestionV2{gap:10px!important}
+ #questionScreen .qv2-header{background:linear-gradient(90deg,rgba(30,41,82,.9),rgba(79,54,145,.78))!important;border:1px solid rgba(167,139,250,.3)!important;box-shadow:0 12px 34px rgba(2,6,23,.36)!important;backdrop-filter:blur(14px)!important;-webkit-backdrop-filter:blur(14px)!important}
+ #questionScreen .qv2-stage{grid-template-columns:minmax(0,1fr) clamp(150px,17.5vw,205px)!important;gap:14px!important}
+ #questionScreen .qv2-frame{margin:39px 4px 28px!important;padding:48px 20px 40px!important;border:1px solid rgba(129,140,248,.42)!important;border-radius:30px!important;background:linear-gradient(145deg,rgba(30,41,75,.9),rgba(15,23,42,.86))!important;box-shadow:0 24px 58px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.08)!important;backdrop-filter:blur(18px)!important;-webkit-backdrop-filter:blur(18px)!important;overflow:visible!important}
+ #questionScreen.screen.active .qv2-frame{animation:mjQuestionPop261 .28s cubic-bezier(.2,.78,.25,1) both}
+ #questionScreen .qv2-body{gap:9px!important;justify-content:center!important;overflow:hidden!important}
+ #questionScreen #mjQuestionV2 #qText{width:min(1000px,94%)!important;max-height:24dvh!important;padding:9px 18px!important;border:1px solid rgba(148,163,184,.2)!important;border-radius:18px!important;background:rgba(2,6,23,.3)!important;color:#f8fafc!important;-webkit-text-fill-color:#f8fafc!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)!important;font-family:'Tajawal Local','SF Arabic','Geeza Pro',Tahoma,Arial,sans-serif!important;font-size:clamp(19px,2.15vw,30px)!important;font-weight:700!important;line-height:1.5!important;text-shadow:0 2px 9px rgba(0,0,0,.28)!important}
+ #questionScreen #mjQuestionV2 #qText.qv2-long{font-size:clamp(17px,1.9vw,26px)!important;line-height:1.42!important}
+ #questionScreen #mjQuestionV2 #qText.qv2-very-long{font-size:clamp(15px,1.65vw,23px)!important;line-height:1.38!important}
+ #questionScreen #mjQuestionV2 #qMedia{position:relative!important;isolation:isolate!important;display:grid!important;place-items:center!important;width:min(900px,88%)!important;max-height:34dvh!important;margin:0 auto!important;padding:8px!important;border:1px solid rgba(129,140,248,.28)!important;border-radius:20px!important;background:linear-gradient(135deg,rgba(2,6,23,.78),rgba(30,41,59,.72))!important;box-shadow:0 12px 30px rgba(2,6,23,.32)!important;overflow:hidden!important;cursor:zoom-in!important}
+ #questionScreen #mjQuestionV2 #qMedia.mjHasImage261:before{content:""!important;position:absolute!important;z-index:-2!important;inset:-24px!important;background-image:var(--mj-media-bg)!important;background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important;filter:blur(22px) saturate(.78)!important;opacity:.34!important;transform:scale(1.1)!important}
+ #questionScreen #mjQuestionV2 #qMedia.mjHasImage261:after{content:""!important;position:absolute!important;z-index:-1!important;inset:0!important;background:linear-gradient(135deg,rgba(2,6,23,.5),rgba(30,41,59,.3))!important;pointer-events:none!important}
+ #questionScreen #mjQuestionV2 #qMedia img,#questionScreen #mjQuestionV2 #qMedia video{position:relative!important;z-index:1!important;display:block!important;width:auto!important;height:auto!important;max-width:82%!important;max-height:31dvh!important;margin:auto!important;border:0!important;border-radius:14px!important;background:transparent!important;box-shadow:0 10px 26px rgba(0,0,0,.28)!important;object-fit:contain!important;object-position:center!important}
+ #questionScreen.minimalFlag #mjQuestionV2 #qMedia img{max-width:72%!important;max-height:30dvh!important}
+ #questionScreen .qv2-points{top:-35px!important;right:7%!important;min-width:165px!important;height:58px!important;border:1px solid rgba(251,191,36,.48)!important;border-radius:18px!important;background:linear-gradient(135deg,#7c4a08,#d48708)!important;color:#fff3c4!important;box-shadow:0 10px 24px rgba(245,158,11,.24)!important;font-size:clamp(17px,1.75vw,23px)!important;font-weight:800!important}
+ #questionScreen .qv2-category{right:7%!important;bottom:-27px!important;min-width:170px!important;height:54px!important;border:1px solid rgba(167,139,250,.38)!important;border-radius:17px!important;background:linear-gradient(135deg,#4338ca,#7e22ce)!important;color:#fff!important;box-shadow:0 10px 25px rgba(79,70,229,.28)!important;font-size:clamp(15px,1.5vw,20px)!important;font-weight:700!important}
+ #questionScreen .qv2-timer{top:-36px!important;width:66px!important;height:66px!important;border:5px solid #e2e8f0!important;background:linear-gradient(145deg,#334155,#111827)!important;color:#fff!important;box-shadow:0 8px 24px rgba(0,0,0,.38)!important;font-size:clamp(16px,1.6vw,21px)!important}
+ #questionScreen .qv2-timebar{--mj-time-progress:1;position:absolute!important;z-index:4!important;top:14px!important;left:5%!important;right:5%!important;height:8px!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:999px!important;background:rgba(2,6,23,.64)!important;box-shadow:inset 0 1px 4px rgba(0,0,0,.5)!important;overflow:hidden!important}
+ #questionScreen .qv2-timebar>i{display:block!important;width:100%!important;height:100%!important;border-radius:inherit!important;background:linear-gradient(90deg,#22c55e,#38bdf8,#3b82f6)!important;box-shadow:0 0 13px rgba(56,189,248,.72)!important;transform:scaleX(var(--mj-time-progress))!important;transform-origin:right center!important;transition:transform 1s linear,background .2s ease,box-shadow .2s ease!important}
+ #questionScreen .qv2-timebar.urgent>i{background:linear-gradient(90deg,#fb7185,#ef4444,#dc2626)!important;box-shadow:0 0 17px rgba(239,68,68,.92)!important;animation:mjTimerPulse261 .62s ease-in-out infinite alternate!important}
+ #questionScreen .qv2-timebar.expired>i{background:#7f1d1d!important;box-shadow:none!important}
+ #questionScreen #mjQuestionV2 #answerBtn{left:4%!important;bottom:-27px!important;width:180px!important;height:54px!important;border:1px solid rgba(129,140,248,.4)!important;border-radius:17px!important;background:linear-gradient(90deg,#4f46e5,#7c3aed)!important;box-shadow:0 12px 28px rgba(79,70,229,.34)!important;font-family:'Tajawal Local','SF Arabic','Geeza Pro',Tahoma,Arial,sans-serif!important;font-size:clamp(16px,1.65vw,21px)!important;font-weight:800!important;transition:transform .16s ease,filter .16s ease!important}
+ #questionScreen #mjQuestionV2 #answerBtn:active{transform:scale(.97)!important;filter:brightness(1.1)!important}
+ #questionScreen .qv2-teams{padding:16px 0!important}
+ #questionScreen .qv2-team{position:relative;border:1px solid rgba(148,163,184,.16)!important;border-radius:20px!important;background:rgba(15,23,42,.54)!important;box-shadow:0 13px 34px rgba(0,0,0,.25)!important;backdrop-filter:blur(12px)!important;-webkit-backdrop-filter:blur(12px)!important;padding:8px!important}
+ #questionScreen .qv2-team-name{background:#1e293b!important;font-family:'Tajawal Local','SF Arabic','Geeza Pro',Tahoma,Arial,sans-serif!important;font-size:clamp(13px,1.35vw,18px)!important;font-weight:700!important}
+ #questionScreen .qv2-team.one .qv2-team-score{background:linear-gradient(145deg,#2563eb,#1d4ed8)!important}
+ #questionScreen .qv2-team.two .qv2-team-score{background:linear-gradient(145deg,#ec4899,#be185d)!important}
+ #questionScreen .qv2-team.is-current{border-color:rgba(251,191,36,.72)!important;box-shadow:0 0 0 2px rgba(245,158,11,.18),0 0 27px rgba(245,158,11,.32)!important;animation:mjTeamPulse261 1.8s ease-in-out infinite}
+}
+@keyframes mjQuestionPop261{from{opacity:0;transform:scale(.975) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes mjTeamPulse261{0%,100%{filter:brightness(1)}50%{filter:brightness(1.12)}}
+@keyframes mjTimerPulse261{from{filter:brightness(.92)}to{filter:brightness(1.35)}}
+/* Fullscreen media keeps the game visible as a blurred atmospheric backdrop. */
+#mjMediaModal260{background:rgba(2,6,23,.76)!important;backdrop-filter:blur(10px) saturate(.78)!important;-webkit-backdrop-filter:blur(10px) saturate(.78)!important}
+/* Audio bars animate only while the player is running. */
+#questionScreen #qMedia .waveform i{animation-play-state:paused!important;background:linear-gradient(180deg,#60a5fa,#8b5cf6)!important;box-shadow:0 0 8px rgba(96,165,250,.4)!important}
+#questionScreen #qMedia .audioStage.is-playing .waveform i{animation-play-state:running!important}
+#boardScreen .point.launching{animation:mjQuestionTile261 .36s cubic-bezier(.2,.75,.25,1) both!important;transform-style:preserve-3d!important}
+#boardScreen .point.used,#boardScreen .point[data-used="1"]{background:#1f2937!important;color:#64748b!important;-webkit-text-fill-color:#64748b!important;opacity:.48!important;text-decoration:line-through!important;pointer-events:none!important;box-shadow:none!important}
+@keyframes mjQuestionTile261{0%{transform:perspective(700px) rotateY(0) scale(1)}55%{transform:perspective(700px) rotateY(12deg) scale(1.07)}100%{transform:perspective(700px) rotateY(0) scale(1)}}
 @media (orientation:landscape) and (max-height:620px){#questionScreen .mjQuestionBody>#qText{max-height:23dvh!important}#questionScreen .mjQuestionBody>#qMedia{max-height:30dvh!important}#questionScreen .mjQuestionBody>#qMedia img{max-height:28dvh!important}#result.screen.active{display:grid!important;grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr)!important;grid-template-rows:1fr auto!important;gap:14px 22px!important}#result .winner{grid-column:1!important;grid-row:1/3!important}#result .winnerImageWrap{width:100%!important;height:52dvh!important;max-height:52dvh!important}#result #finalScores{grid-column:2!important;grid-row:1!important;width:100%!important}#result>#resultNewGameBtn{grid-column:2!important;grid-row:2!important;width:100%!important}}
+
+/* BUILD 261 media geometry repair — the available space, not a fixed vh cap,
+   controls question images. This block intentionally overrides every legacy
+   media size rule above it. */
+@media (orientation:landscape){
+ #questionScreen #mjQuestionV2 .qv2-body{
+  display:grid!important;
+  grid-template-rows:auto minmax(0,1fr)!important;
+  align-items:stretch!important;
+  justify-items:center!important;
+  gap:8px!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  overflow:hidden!important;
+ }
+ #questionScreen #mjQuestionV2 .qv2-body>#qText{
+  grid-row:1!important;
+  align-self:start!important;
+  flex:none!important;
+  width:min(1080px,96%)!important;
+  max-height:min(24dvh,180px)!important;
+  margin:0 auto!important;
+  overflow:auto!important;
+ }
+ #questionScreen #mjQuestionV2 .qv2-body>#qMedia{
+  grid-row:2!important;
+  align-self:stretch!important;
+  flex:none!important;
+  display:grid!important;
+  place-items:center!important;
+  width:min(1080px,96%)!important;
+  height:var(--mj-qmedia-height,100%)!important;
+  min-height:0!important;
+  max-height:none!important;
+  margin:0 auto!important;
+  padding:6px!important;
+  overflow:hidden!important;
+ }
+ #questionScreen #mjQuestionV2 .qv2-body>#qMedia>*:not(style):not(script),
+ #questionScreen #mjQuestionV2 .qv2-body>#qMedia .mediaFrame,
+ #questionScreen #mjQuestionV2 .qv2-body>#qMedia .flagStage,
+ #questionScreen #mjQuestionV2 .qv2-body>#qMedia .lineupStage,
+ #questionScreen #mjQuestionV2 .qv2-body>#qMedia .wikiPlayerStage{
+  box-sizing:border-box!important;
+  display:grid!important;
+  place-items:center!important;
+  width:100%!important;
+  height:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  max-width:100%!important;
+  max-height:100%!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+ }
+ #questionScreen #mjQuestionV2 .qv2-body>#qMedia img,
+ #questionScreen #mjQuestionV2 .qv2-body>#qMedia video,
+ #questionScreen #mjQuestionV2 .qv2-body>#qMedia .mediaFrame img,
+ #questionScreen #mjQuestionV2 .qv2-body>#qMedia .flagStage img,
+ #questionScreen #mjQuestionV2 .qv2-body>#qMedia .lineupStage img,
+ #questionScreen #mjQuestionV2 .qv2-body>#qMedia .wikiPlayerStage img{
+  position:relative!important;
+  z-index:1!important;
+  display:block!important;
+  width:auto!important;
+  height:auto!important;
+  min-width:0!important;
+  min-height:0!important;
+  max-width:100%!important;
+  max-height:100%!important;
+  margin:auto!important;
+  padding:0!important;
+  object-fit:contain!important;
+  object-position:center center!important;
+  transform:none!important;
+ }
+ #questionScreen.minimalFlag #mjQuestionV2 .qv2-body>#qMedia img{
+  max-width:100%!important;
+  max-height:100%!important;
+ }
+}
+</style>
+<style id="MAJLIS_BUILD_261_QURAN_SEPARATOR">
+/* BUILD 261 — safe rendering for question_text: prompt[[AYAH]]verse. */
+@media (orientation:landscape){
+ #questionScreen.quranMode #mjQuestionV2 .qv2-body>#qText.hasSeparatedAyah{
+  width:min(920px,96%)!important;
+  max-width:920px!important;
+  max-height:min(34dvh,270px)!important;
+  margin:0 auto!important;
+  padding:0!important;
+  overflow:auto!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  text-shadow:none!important;
+ }
+ #questionScreen.quranMode #mjQuestionV2 #qText.hasSeparatedAyah>.quranPrompt{
+  color:#17140f!important;
+  -webkit-text-fill-color:#17140f!important;
+  font-family:'Tajawal Local','Tajawal','SF Arabic','Geeza Pro',Tahoma,Arial,sans-serif!important;
+  font-size:clamp(17px,1.85vw,25px)!important;
+  line-height:1.5!important;
+ }
+ #questionScreen.quranMode #mjQuestionV2 #qText.hasSeparatedAyah>.quranAyah{
+  color:#17130d!important;
+  -webkit-text-fill-color:#17130d!important;
+  font-family:'KFGQPC Uthman Taha Naskh','Amiri Quran','Noto Naskh Arabic','Traditional Arabic','Geeza Pro',serif!important;
+  font-size:clamp(23px,2.65vw,36px)!important;
+  line-height:1.9!important;
+  font-weight:500!important;
+ }
+}
+@media (orientation:landscape) and (max-height:520px){
+ #questionScreen.quranMode #mjQuestionV2 .qv2-body>#qText.hasSeparatedAyah{max-height:38dvh!important}
+ #questionScreen.quranMode #mjQuestionV2 #qText.hasSeparatedAyah>.quranPrompt{padding:8px 13px!important;font-size:clamp(14px,3.3vh,19px)!important;line-height:1.35!important}
+ #questionScreen.quranMode #mjQuestionV2 #qText.hasSeparatedAyah>.quranAyah{padding:9px 13px!important;font-size:clamp(18px,4.3vh,25px)!important;line-height:1.65!important}
+}
 </style>
 <script id="MAJLIS_BUILD_261_RUNTIME">
 (()=>{'use strict';
@@ -9227,8 +9459,34 @@ body,.screen,.screen button,.screen input,.screen label,#mjAnswerScreen,.qv2-mod
   mediaHost.style.setProperty('--mj-media-bg','url("'+safe+'")');
   mediaHost.classList.add('mjHasImage261');
  }
+ function fitQuestionMedia261(){
+  if(!mediaHost||!document.getElementById('questionScreen')?.classList.contains('active'))return;
+  const body=mediaHost.closest('.qv2-body');
+  const text=body?.querySelector(':scope>#qText');
+  if(!body||!text)return;
+  requestAnimationFrame(()=>{
+   const bodyHeight=body.getBoundingClientRect().height;
+   const textHeight=text.getBoundingClientRect().height;
+   const available=Math.max(92,Math.floor(bodyHeight-textHeight-8));
+   mediaHost.style.setProperty('--mj-qmedia-height',available+'px');
+  });
+ }
  if(mediaHost){new MutationObserver(applyMediaBackdrop261).observe(mediaHost,{childList:true,subtree:true,attributes:true,attributeFilter:['src']});mediaHost.addEventListener('load',applyMediaBackdrop261,true);applyMediaBackdrop261()}
- document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-261-POLISH-20260919');
+ if(mediaHost){
+  const mediaObserver=new MutationObserver(()=>{applyMediaBackdrop261();fitQuestionMedia261()});
+  mediaObserver.observe(mediaHost,{childList:true,subtree:true,attributes:true,attributeFilter:['src','class']});
+  const qText261=document.getElementById('qText');
+  if(qText261)new MutationObserver(fitQuestionMedia261).observe(qText261,{childList:true,subtree:true,characterData:true});
+  window.addEventListener('resize',fitQuestionMedia261,{passive:true});
+  window.addEventListener('orientationchange',fitQuestionMedia261,{passive:true});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)fitQuestionMedia261()});
+  mediaHost.addEventListener('load',fitQuestionMedia261,true);
+  fitQuestionMedia261();
+ }
+ document.addEventListener('play',event=>{const audio=event.target.closest?.('#questionScreen #qMedia audio');if(audio)audio.closest('.audioStage')?.classList.add('is-playing')},true);
+ document.addEventListener('pause',event=>{const audio=event.target.closest?.('#questionScreen #qMedia audio');if(audio)audio.closest('.audioStage')?.classList.remove('is-playing')},true);
+ document.addEventListener('ended',event=>{const audio=event.target.closest?.('#questionScreen #qMedia audio');if(audio)audio.closest('.audioStage')?.classList.remove('is-playing')},true);
+ document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-261-MEDIA-GEOMETRY-FIX-20260919');
  document.querySelector('meta[name="build-number"]')?.setAttribute('content','261');
  try{sessionStorage.setItem('almajlis_build_seen','261');sessionStorage.setItem('almajlis_active_build','261')}catch(_){ }
 })();
