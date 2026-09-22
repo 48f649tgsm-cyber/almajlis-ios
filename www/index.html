@@ -3501,7 +3501,11 @@ function playWinnerComedyThen(finalCallback){
     if(cat==='مسيرة لاعب'){
       const t=String(q.question_html||q.question||'');
       const yearCount=(t.match(/(?:19|20)\d{2}/g)||[]).length;
-      return yearCount>=4 && /من هو اللاعب|من اللاعب/.test(String(q.question||''));
+      /* Supabase V2 career questions intentionally keep the prompt short. The
+         complete clubs/years path is the paired image, so requiring years in
+         question_text incorrectly discarded all 60 valid image questions. */
+      const storedCareerImage=q.media&&q.media.type==='image'&&!!q.media.src;
+      return (storedCareerImage||yearCount>=4) && /من هو اللاعب|من اللاعب/.test(String(q.question||''));
     }
     if(cat==='النادي المشترك'){
       const p=((q.entities||{}).players||[]), clubs=((q.entities||{}).clubs||[]), mediaPlayers=(q.media&&q.media.players)||[];
@@ -9041,6 +9045,8 @@ body>#mjBoardV5{display:none!important}
    for(const m of assets){if(m.question_id)assetByQuestion.set(m.question_id,m)}
    const dynamic={};
    for(const q of questions){
+    /* A question already used by this player stays disabled until an admin
+       explicitly restores it. Never recycle player history automatically. */
     if(disabledQuestionIds.has(String(q.id)))continue;
     const cat=catById.get(q.category_id),answer=answerByQuestion.get(q.id);if(!cat||!answer)continue;
     const name=appCategoryName(cat.name_ar,cat.slug);if(!name)continue;
@@ -9106,8 +9112,19 @@ body>#mjBoardV5{display:none!important}
   const {error}=await contentDb.from('player_disabled_questions').insert({user_id:user.id,question_id:questionId});
   if(error&&error.code!=='23505')console.warn('تعذر حفظ استهلاك السؤال',error.message);
  }
- const originalAward=window.award;
- if(typeof originalAward==='function')window.award=function(){const qid=current?.q?.db_question_id;const out=originalAward.apply(this,arguments);if(qid)disableCurrentQuestionForPlayer();return out};
+ /* Pressing the Answer button is the exact consumption event. Persist it
+    immediately for the signed-in player; awarding points must not control
+    whether the question is disabled. */
+ const originalReveal=window.reveal;
+ if(typeof originalReveal==='function')window.reveal=function(){
+  const q=current?.q;
+  if(q?.id){
+   usedIds.add(q.id);
+   try{localStorage.setItem(usedKey,JSON.stringify([...usedIds]))}catch(_){ }
+  }
+  if(q?.db_question_id)disableCurrentQuestionForPlayer();
+  return originalReveal.apply(this,arguments);
+ };
  // Do not query protected content before Supabase restores authentication.
  // The auth callback/getSession paths above start the refresh only after a real session exists.
  window.ALMAJLIS_CONTENT_READY=Promise.resolve(false);
@@ -9719,6 +9736,6 @@ function startWinnerCelebration263(){
  try{sessionStorage.setItem('almajlis_build_seen','264');sessionStorage.setItem('almajlis_active_build','264')}catch(_){ }
 })();
 </script>
-<link rel="stylesheet" href="./build265.css">
-<script src="./build265.js"></script>
+<link rel="stylesheet" href="./build266.css">
+<script src="./build266.js"></script>
 </body></html>

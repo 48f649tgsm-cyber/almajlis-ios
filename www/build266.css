@@ -1,0 +1,63 @@
+/* BUILD 266 — unified visual, category scrolling and career repair */
+:root{--mj265-navy:#172b40;--mj265-coral:#c76658;--mj265-coral2:#df9c91;--mj265-gold:#e5b955;--mj265-cream:#fff9f5}
+html,body,button,input{font-family:'Tajawal Local','SF Arabic','Geeza Pro',Tahoma,Arial,sans-serif!important}
+.prime500Splash,#prime500Splash,#questionScreen.challenge500:after{display:none!important;visibility:hidden!important;content:none!important;animation:none!important}
+
+/* Category selection remains in the normal document flow. */
+@media(orientation:landscape){
+ html:has(#cats.screen.active),body:has(#cats.screen.active){height:100%!important;overflow:hidden!important;background:var(--mj265-cream)!important}
+ #cats.screen.active{display:block!important;width:100%!important;height:100dvh!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior-y:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important}
+ #cats.screen.active>#mjCategoriesV2{display:block!important;width:100%!important;height:auto!important;min-height:100dvh!important;overflow:visible!important;background:radial-gradient(circle at 82% 0,#fff 0,#fff8f3 43%,#f4edf0 100%)!important}
+ #cats #mjCategoriesV2 .mjv2-main{grid-template-columns:minmax(0,1fr) clamp(112px,12vw,142px)!important;gap:14px!important;height:auto!important;min-height:100dvh!important;overflow:visible!important}
+ #cats #mjCategoriesV2 .mjv2-grid{gap:13px!important;padding:5px 5px 18px!important}
+ #cats #mjCategoriesV2 .mjv2-cat{height:170px!important;grid-template-rows:minmax(0,1fr) 40px!important;border:1px solid rgba(199,102,88,.28)!important;border-radius:22px!important;background:#e8edf1!important;box-shadow:0 10px 25px rgba(31,48,65,.12)!important;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease!important;contain:layout paint style!important}
+ #cats #mjCategoriesV2 .mjv2-cat:active{transform:scale(.975)!important}
+ #cats #mjCategoriesV2 .mjv2-cat.is-selected{border:3px solid #42a65a!important;box-shadow:0 0 0 4px rgba(66,166,90,.13),0 13px 28px rgba(31,48,65,.16)!important}
+ #cats #mjCategoriesV2 .mjv2-image{background:linear-gradient(145deg,#d8e2ea,#f5e8e4)!important}
+ #cats #mjCategoriesV2 .mjv2-image img{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important}
+ #cats #mjCategoriesV2 .mjv2-name{height:40px!important;background:linear-gradient(90deg,var(--mj265-coral),#d98678)!important;font-size:clamp(12px,1.18vw,16px)!important;font-weight:700!important}
+ #cats #mjCategoriesV2 .mjv2-grid{height:auto!important;min-height:100dvh!important;overflow:visible!important;touch-action:pan-y!important}
+ #cats #mjCategoriesV2 .mjv2-rail{position:sticky!important;top:max(8px,env(safe-area-inset-top))!important;align-self:start!important;height:calc(100dvh - 20px)!important;border:1px solid rgba(199,102,88,.35)!important;background:rgba(255,255,255,.76)!important;box-shadow:0 12px 30px rgba(62,45,48,.12)!important;backdrop-filter:blur(12px)!important;-webkit-backdrop-filter:blur(12px)!important}
+ #cats #mjCategoriesV2>.mjv2-footer{height:94px!important;min-height:94px!important;margin:22px 0 6px!important;padding:10px 14px!important;border:1px solid rgba(199,102,88,.22)!important;border-radius:24px!important;background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(238,229,231,.94))!important;box-shadow:0 14px 34px rgba(39,52,67,.13)!important}
+ #cats #mjCategoriesV2 .mjv2-team input{border:1px solid rgba(38,58,78,.15)!important;box-shadow:inset 0 1px 2px rgba(20,35,50,.06)!important}
+ #cats #mjCategoriesV2 #startBtn{background:linear-gradient(135deg,var(--mj265-coral),#d98270)!important;box-shadow:0 10px 22px rgba(177,75,62,.25)!important}
+}
+
+/* One authoritative image geometry: complete, centered and never cropped. */
+#questionScreen #qMedia,#questionScreen .mjQuestionBody>#qMedia{position:relative!important;isolation:isolate!important;display:grid!important;place-items:center!important;min-height:0!important;overflow:hidden!important;border-radius:18px!important}
+#questionScreen #qMedia .mediaFrame,#questionScreen #qMedia .mjCareerImage260{position:relative!important;isolation:isolate!important;display:grid!important;place-items:center!important;width:min(980px,98%)!important;height:100%!important;min-height:0!important;max-height:100%!important;margin:auto!important;padding:8px!important;overflow:hidden!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:18px!important;background:linear-gradient(145deg,#172b40,#0d1824)!important;box-shadow:0 12px 32px rgba(18,32,47,.18)!important}
+#questionScreen #qMedia .mediaFrame.hasMediaBackdrop:before,#questionScreen #qMedia .mjCareerImage260.hasMediaBackdrop:before{content:"";position:absolute;inset:-24px;z-index:-2;background-image:var(--mj265-media-bg);background-position:center;background-size:cover;filter:blur(24px) saturate(.85);opacity:.34;transform:scale(1.12)}
+#questionScreen #qMedia .mediaFrame.hasMediaBackdrop:after,#questionScreen #qMedia .mjCareerImage260.hasMediaBackdrop:after{content:"";position:absolute;inset:0;z-index:-1;background:rgba(7,16,24,.56)}
+#questionScreen #qMedia img,#questionScreen .mjQuestionBody>#qMedia img,#questionScreen #qMedia .mediaFrame>img,#questionScreen #qMedia .mjCareerImage260>img{position:relative!important;z-index:1!important;display:block!important;width:auto!important;height:auto!important;max-width:100%!important;max-height:100%!important;margin:auto!important;padding:0!important;border:0!important;border-radius:12px!important;object-fit:contain!important;object-position:center!important;box-shadow:0 5px 20px rgba(0,0,0,.25)!important;cursor:zoom-in!important}
+#questionScreen.minimalFlag #qMedia .mediaFrame.flagStage{background:#f3f4f4!important}
+#questionScreen.minimalFlag #qMedia .mediaFrame.flagStage:after{background:rgba(244,245,245,.4)!important}
+#questionScreen #qText,#questionScreen #qText *{font-family:'Tajawal Local','SF Arabic','Geeza Pro',Tahoma,Arial,sans-serif!important;font-size:clamp(19px,2.15vw,30px)!important;font-weight:700!important;line-height:1.46!important;letter-spacing:0!important}
+#questionScreen #qText.qv2-long,#questionScreen #qText.qLong{font-size:clamp(17px,1.85vw,26px)!important;line-height:1.4!important}
+#questionScreen #qText.qv2-very-long{font-size:clamp(15px,1.65vw,23px)!important;line-height:1.36!important}
+#questionScreen .quranAyah{font-family:'Amiri Quran','Noto Naskh Arabic','Traditional Arabic',serif!important;font-size:clamp(20px,2.35vw,33px)!important;line-height:1.8!important}
+
+/* Career images use the stored Supabase artwork only. */
+#questionScreen.careerMode #qMedia{height:100%!important;max-height:none!important}
+#questionScreen.careerMode #qMedia .mjCareerImage260{width:min(1100px,99%)!important;padding:6px!important}
+#questionScreen.careerMode #qMedia .mjCareerImage260>img{max-width:100%!important;max-height:100%!important;border-radius:10px!important}
+.mj265MediaError{display:grid;place-items:center;min-height:120px;padding:22px;color:#fff;font-weight:700;text-align:center}
+
+/* Refined landscape victory screen, in the established game palette. */
+#result.screen.active{background:radial-gradient(circle at 50% 35%,#314c64 0,#182c40 48%,#0b1723 100%)!important;color:#fff!important}
+#result.screen:before{background:linear-gradient(135deg,rgba(199,102,88,.28),transparent 42%,rgba(229,185,85,.12))!important}
+#result.screen:after{border-color:rgba(229,185,85,.42)!important;box-shadow:inset 0 0 90px rgba(4,10,17,.3)!important}
+#result .winnerImageWrap{border:1px solid rgba(255,231,183,.45)!important;background:linear-gradient(145deg,#b85249,#d78170)!important;box-shadow:0 25px 70px rgba(0,0,0,.32),inset 0 1px rgba(255,255,255,.28)!important}
+#result .winnerKicker263{color:#ffe3a0!important}
+#result #winnerName{font-family:'Tajawal Local','SF Arabic','Geeza Pro',Tahoma,Arial,sans-serif!important;color:#fff!important}
+#result #finalScores{border-color:rgba(255,255,255,.16)!important;background:rgba(255,255,255,.09)!important;box-shadow:0 22px 60px rgba(0,0,0,.28)!important;color:#fff!important}
+#result .finalDivider263,#result .finalTie263{color:#f2ca70!important}
+#result .finalTeam263.isWinner263{box-shadow:0 0 0 3px var(--mj265-gold),0 18px 42px rgba(0,0,0,.34)!important}
+#result #resultNewGameBtn{background:linear-gradient(135deg,#e0ae45,#f0cc76)!important;color:#2b1b08!important}
+#result #resultHomeBtn263{background:linear-gradient(135deg,#c76658,#9f403c)!important}
+
+@media(orientation:landscape) and (max-height:560px){
+ #questionScreen #qText,#questionScreen #qText *{font-size:clamp(17px,1.9vw,25px)!important;line-height:1.38!important}
+ #questionScreen #qMedia .mediaFrame,#questionScreen #qMedia .mjCareerImage260{padding:5px!important}
+ #cats #mjCategoriesV2 .mjv2-cat{height:154px!important;grid-template-rows:minmax(0,1fr) 36px!important}
+ #cats #mjCategoriesV2 .mjv2-name{height:36px!important}
+}
