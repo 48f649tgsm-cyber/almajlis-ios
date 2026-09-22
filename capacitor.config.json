@@ -2,7 +2,7 @@
   "appId": "com.abdullahalibrahim.almajlis",
   "appName": "المجلس",
   "webDir": "www",
-  "backgroundColor": "#101827",
+  "backgroundColor": "#fffaf7",
   "ios": {
     "contentInset": "never",
     "scrollEnabled": false,
