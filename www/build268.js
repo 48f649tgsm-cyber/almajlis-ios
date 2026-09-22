@@ -73,18 +73,16 @@
 
  document.addEventListener('DOMContentLoaded',()=>{
   wireBoard();refreshCareerCard();
-  const board=document.getElementById('board');
-  if(board)new MutationObserver(()=>{wireBoard();refreshCareerCard()}).observe(board,{childList:true,subtree:true});
-  const host=document.getElementById('mjBoardV5');
-  if(host?.shadowRoot)new MutationObserver(wireBoard).observe(host.shadowRoot,{childList:true,subtree:true});
   const previousRender=window.renderCats;
   if(typeof previousRender==='function')window.renderCats=function(){const out=previousRender.apply(this,arguments);refreshCareerCard();return out};
+  const previousBoardRender=window.renderBoard;
+  if(typeof previousBoardRender==='function')window.renderBoard=function(){const out=previousBoardRender.apply(this,arguments);wireBoard();return out};
   document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-268-BOARD-CAREER-20260922');
   document.querySelector('meta[name="build-number"]')?.setAttribute('content','268');
   document.querySelector('#draw .note')?.replaceChildren(document.createTextNode('الإصدار: BUILD 268'));
   try{sessionStorage.setItem('almajlis_build_seen','268');sessionStorage.setItem('almajlis_active_build','268')}catch(_){ }
  },{once:true});
 
- window.addEventListener('pageshow',()=>{wireBoard();refreshCareerCard()});
+ window.addEventListener('pageshow',()=>{wireBoard();refreshCareerCard()},{passive:true});
  window.ALMAJLIS_BUILD_268={careerInventory,wireBoard,launchDirect,escape:esc};
 })();
