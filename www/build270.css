@@ -1,0 +1,25 @@
+/* BUILD 270 — iOS WKWebView memory/GPU stability authority */
+html,body,#boardScreen,#questionScreen,#mjQuestionV2,#mjBoardV5{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+#questionScreen *,#boardScreen *{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+#questionScreen #qMedia:before,
+#questionScreen #qMedia:after,
+#questionScreen #qMedia.mjHasImage261:before,
+#questionScreen #qMedia .mediaFrame.hasMediaBackdrop:before,
+#questionScreen #qMedia .mjCareerImage260.hasMediaBackdrop:before{
+ display:none!important;content:none!important;background:none!important;background-image:none!important;
+ filter:none!important;-webkit-filter:none!important;transform:none!important;opacity:0!important
+}
+#questionScreen #qMedia{
+ isolation:auto!important;contain:layout paint!important;background:#111b31!important;
+ box-shadow:none!important;filter:none!important;-webkit-filter:none!important
+}
+#questionScreen #qMedia .mediaFrame,
+#questionScreen #qMedia .mjCareerImage260{background:#111b31!important;filter:none!important;-webkit-filter:none!important;box-shadow:none!important}
+#questionScreen #qMedia img,#questionScreen #qMedia video{
+ display:block!important;width:auto!important;height:auto!important;max-width:96%!important;max-height:42dvh!important;
+ object-fit:contain!important;object-position:center!important;filter:none!important;-webkit-filter:none!important;
+ transform:translateZ(0)!important;will-change:auto!important
+}
+#boardScreen.screen:not(.active),#questionScreen.screen:not(.active){content-visibility:hidden!important}
+body>#mjBoardV5{contain:strict!important}
+body:not(:has(#boardScreen.screen.active))>#mjBoardV5{display:none!important;visibility:hidden!important}
