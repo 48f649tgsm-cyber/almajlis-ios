@@ -34,9 +34,13 @@
   launching=true;
   if(visibleButton){visibleButton.disabled=true;visibleButton.dataset.launching='1'}
   try{
-   if(typeof window.openQuestion!=='function')throw new Error('openQuestion unavailable');
-   await window.openQuestion(category,Number(points),legacy);
-   if(!document.getElementById('questionScreen')?.classList.contains('active'))throw new Error('question screen did not open');
+   const opener=window.ALMAJLIS_STABLE_QUESTION_272?.open||window.ALMAJLIS_DIRECT_OPEN_269;
+   if(typeof opener!=='function')throw new Error('authoritative question opener unavailable');
+   const opened=await opener(category,Number(points),legacy);
+   const stableHost=document.getElementById('mjStableQuestion272');
+   const stableVisible=stableHost&&stableHost.style.display!=='none';
+   const legacyVisible=document.getElementById('questionScreen')?.classList.contains('active');
+   if(opened!==true||(!stableVisible&&!legacyVisible))throw new Error('question screen did not open');
   }catch(error){
    console.error('BUILD 268 question launch failed',error);
    legacy.dataset.loading='0';
