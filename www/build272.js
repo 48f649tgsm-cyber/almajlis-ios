@@ -37,7 +37,7 @@
  function updateTimer(){const timer=root().querySelector('.timer');timer.textContent='00:'+String(Math.max(0,state.seconds)).padStart(2,'0');timer.classList.toggle('urgent',state.seconds<=5&&state.seconds>0)}
  function helperStore(){return window.ALMAJLIS_HELP_275?.state||{used:{1:{two:false,block:false,double:false},2:{two:false,block:false,double:false}}}}
  function helperIcon(type){
-  if(type==='two')return '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M22 55c-5-3-8-8-9-14l-1-8c-.4-3 1.4-5 4-5 2 0 3.6 1.3 4.3 3.2L23 38V13c0-3 2-5 5-5s5 2 5 5v18V8c0-3 2-5 5-5s5 2 5 5v28-9c0-3 2-5 5-5s5 2 5 5v13c0 11-8 19-19 19h-4c-3 0-6-1-8-4Z"/></svg>';
+  if(type==='two')return '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M25 37 16.5 13C15 9 17 5 20.5 4s6.5 1 7.7 4.6L35 31M35 31l5-23c.9-4 3.6-6.4 7-5.7 3.6.7 5.2 3.9 4.4 7.7L46 38"/><path d="M25 36c-3-5-6-8-9-9-3-1-6 1-6 4 0 2 2 4 5 7l5 6M46 36c4 1 7 4 8 8 1 8-5 16-14 17H29c-8-1-14-6-16-14l-2-9M24 43c3-4 8-5 12-2M31 48c3-4 8-5 12-2M28 60v-5M43 60v-5"/></svg>';
   if(type==='block')return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M6 6l12 12"/></svg>';
   return '<span class="x2">×2</span>';
  }
