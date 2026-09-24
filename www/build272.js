@@ -90,6 +90,24 @@
    .team[data-team="1"] .score{background:#e7eff2!important;color:#274452!important}
    .team[data-team="2"] .score{background:#f4e9e3!important;color:#754d3f!important}
   `;root.appendChild(choiceStyle);
+  const decisionCloneStyle=document.createElement('style');
+  decisionCloneStyle.textContent=`
+   .decision-screen,.decision-screen.show{padding:0;display:none;background:#fff}
+   .decision-screen.show{display:block}
+   .decision-screen>.screen{width:100%;height:100dvh}
+   .decision-screen .stage{grid-template-columns:minmax(0,1fr) clamp(185px,19vw,235px);gap:13px}
+   .decision-screen .card{margin:34px 3px 25px;padding:43px 18px 35px;justify-content:flex-start;align-items:center;border:1.5px solid #202b35;background:#f4f4f4}
+   .decision-screen .team{grid-template-rows:34px 58px 46px;max-height:none;min-height:0;align-self:auto}
+   .decision-screen .selection{flex:0 0 auto;width:min(900px,94%);display:flex;flex-direction:column;align-items:center;gap:12px;padding:12px 16px;border:1.5px solid #df7568;border-radius:16px;background:#fff}
+   .decision-screen .selection-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(18px,3vw,42px);width:100%;direction:rtl}
+   .decision-screen .selection button{display:grid;place-items:center;min-width:0;min-height:clamp(56px,10dvh,84px);padding:9px 16px;border:1.5px solid #d5aca4;border-radius:15px;background:#fff;color:#263b43;font-size:clamp(18px,2.2vw,30px);font-weight:800;line-height:1.25;text-align:center;overflow-wrap:anywhere;cursor:pointer}
+   .decision-screen .selection .selection-one{border-color:#9bafb9;background:#f3f7f8}
+   .decision-screen .selection .selection-two{border-color:#d8b8ae;background:#fcf7f4}
+   .decision-screen .selection .selection-none{width:min(360px,72%);min-height:clamp(48px,8dvh,65px)}
+   .decision-screen .help{pointer-events:none}
+   @media(max-height:530px){.decision-screen .card{margin:29px 2px 21px;padding:37px 14px 31px}.decision-screen .selection{gap:8px;padding:8px 10px}.decision-screen .selection button{min-height:45px}.decision-screen .selection .selection-none{min-height:42px}}
+  `;
+  root.appendChild(decisionCloneStyle);
 
   document.body.appendChild(host);
   root.querySelector('.reveal').onclick=reveal;
@@ -118,13 +136,26 @@
  function openDecision(){
   if(!current||!state.revealed)return;
   const r=root(),decision=r.querySelector('.decision-screen');
-  r.querySelector('.decision-one').textContent=team1||'الفريق الأول';
-  r.querySelector('.decision-two').textContent=team2||'الفريق الثاني';
-  r.querySelector('.decision-t1').textContent=team1||'الفريق الأول';
-  r.querySelector('.decision-t2').textContent=team2||'الفريق الثاني';
-  r.querySelector('.decision-s1').textContent=score1;
-  r.querySelector('.decision-s2').textContent=score2;
-  r.querySelector('.decision-turn').textContent=r.querySelector('.turn').textContent;
+  // Copy the actual answer screen so that its header, question, media and score rail
+  // remain identical; only the answer card and its button change.
+  const screen=r.querySelector('.screen').cloneNode(true);
+  screen.querySelector('.answer')?.remove();
+  screen.querySelector('.reveal')?.remove();
+  screen.querySelector('.who-button')?.remove();
+  if(current.q?.answerOnlyMedia)screen.querySelector('.media')?.replaceChildren();
+  const selection=document.createElement('div');selection.className='selection';
+  selection.innerHTML='<div class="selection-pair"><button class="selection-one" type="button"></button><button class="selection-two" type="button"></button></div><button class="selection-none" type="button">لا أحد</button>';
+  selection.querySelector('.selection-one').textContent=team1||'الفريق الأول';
+  selection.querySelector('.selection-two').textContent=team2||'الفريق الثاني';
+  screen.querySelector('.card').appendChild(selection);
+  screen.querySelector('.back').textContent='العودة إلى الجواب';
+  screen.querySelector('.back').onclick=closeDecision;
+  screen.querySelector('.exit').onclick=()=>{if(confirm('هل تريد الخروج من اللعبة؟')){closeDecision();stopTimer();hide();if(window.ALMAJLIS_STABILITY_273?.goHome){window.ALMAJLIS_STABILITY_273.goHome()}else{window.show?.('home')}}};
+  selection.querySelector('.selection-one').onclick=()=>givePoints(1);
+  selection.querySelector('.selection-two').onclick=()=>givePoints(2);
+  selection.querySelector('.selection-none').onclick=()=>givePoints(0);
+  screen.querySelector('.media').onclick=event=>{const image=event.target.closest('img');if(!image)return;const modal=r.querySelector('.media-modal');modal.querySelector('img').src=image.currentSrc||image.src;modal.classList.add('show')};
+  decision.replaceChildren(screen);
   decision.classList.add('show');
  }
  function closeDecision(){const r=root();r.querySelector('.decision-screen').classList.remove('show');r.querySelector('.answer').classList.remove('choosing');r.querySelector('.who-button').textContent='من أجاب؟'}
