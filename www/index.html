@@ -8915,7 +8915,7 @@ body>#mjBoardV5{display:none!important}
   qatar:'qatar',kuwait:'kuwait',saudi:'saudi-arabia','saudi-arabia':'saudi-arabia',syria:'syria',
   'country-flags':'country-flags','map-shape':'map-shape','player-career':'player-career',
   'national-anthems':'national-anthems','national-anthem':'national-anthems',anthems:'national-anthems',
-  'world-currencies':'world-currencies','tourist-landmarks':'tourist-landmarks'
+  'world-currencies':'world-currencies','tourist-landmarks':'tourist-landmarks','ai-football':'ai-football'
  };
  const appCategoryName=(name,slug)=>{
   const n=String(name||'').trim(),s=String(slug||'').toLowerCase();
@@ -8946,7 +8946,7 @@ body>#mjBoardV5{display:none!important}
   const notes=String(q.quality_notes||''),id=externalId(notes),slug=String(cat.slug||'').toLowerCase(),name=String(cat.name_ar||'');
   let file=(notes.match(/(?:^|\|)\s*media=([^|\s]+)/i)||[])[1]||'';
   let folder=folderBySlug[slug]||'';
-  if(!folder){if(name==='قطر')folder='qatar';else if(name==='الكويت')folder='kuwait';else if(name==='السعودية')folder='saudi';else if(name==='سوريا')folder='syria';else if(name==='أعلام دول')folder='country-flags';else if(name==='شكل الخريطة')folder='map-shape';else if(name==='مسيرة لاعب')folder='player-career';else if(name==='عملات العالم')folder='world-currencies';else if(name.includes('نشيد'))folder='national-anthems'}
+  if(!folder){if(name==='AI كروية')folder='ai-football';else if(name==='قطر')folder='qatar';else if(name==='الكويت')folder='kuwait';else if(name==='السعودية')folder='saudi';else if(name==='سوريا')folder='syria';else if(name==='أعلام دول')folder='country-flags';else if(name==='شكل الخريطة')folder='map-shape';else if(name==='مسيرة لاعب')folder='player-career';else if(name==='عملات العالم')folder='world-currencies';else if(name.includes('نشيد'))folder='national-anthems'}
   if(!file&&id)file=id+(id.includes('qatar')?'.jpg':id.startsWith('anthem_')?'.mp3':'.webp');
   return file&&folder?{file,folder}:null;
  }
@@ -8954,7 +8954,7 @@ body>#mjBoardV5{display:none!important}
   /* Player-career questions are explicitly paired through quality_notes.
      Prefer that immutable filename over a stale media_assets row. */
   const linked=mediaFile(q,cat);
-  if(appCategoryName(cat?.name_ar,cat?.slug)==='مسيرة لاعب'&&linked){
+  if(['مسيرة لاعب','AI كروية'].includes(appCategoryName(cat?.name_ar,cat?.slug))&&linked){
    const path=`questions/${linked.folder}/${linked.file}`;
    const src=contentDb.storage.from('question-media').getPublicUrl(path).data.publicUrl;
    return {type:'image',src,alt:'المسيرة الاحترافية الكاملة',cacheKey:'question-media/'+path};
@@ -9062,8 +9062,15 @@ body>#mjBoardV5{display:none!important}
     const id=externalId(q.quality_notes)||String(q.id),media=publicMedia(assetByQuestion.get(q.id),q,cat);
     const item={id,db_question_id:String(q.id),question:q.question_text,answer:answer.answer_text,points:Number(q.points),explanation:q.explanation||'',source_note:q.source_reference||'',qa_verified:'Supabase published',answerOnlyMedia:/\|\s*answer_media=1\s*(?:\||$)/i.test(String(q.quality_notes||''))};
     if(media)item.media=media;
+    if(name==='AI كروية'){
+     const answerFile=(String(q.quality_notes||'').match(/(?:^|\|)\s*answer_photo=([^|\s]+)/i)||[])[1];
+     if(answerFile&&/^ai_football_(100|300|500)_\d{2}_answer\.jpeg$/.test(answerFile))
+      item.answerPhotoSrc=contentDb.storage.from('question-media').getPublicUrl('questions/ai-football/'+answerFile).data.publicUrl;
+    }
     (dynamic[name]||(dynamic[name]=[])).push(item);
    }
+   const bundledAi=window.ALMAJLIS_AI_FOOTBALL_286;
+   if(Array.isArray(bundledAi)){const known=new Set(questions.map(row=>String(row.id)));dynamic['AI كروية']=bundledAi.filter(item=>!disabledQuestionIds.has(item.id)).map(item=>({...item,db_question_id:known.has(item.id)?item.id:null}));}
    let replaced=0,total=0;
    const nextBank={};
    for(const cat of cats){
@@ -9767,4 +9774,6 @@ function startWinnerCelebration263(){
 <script src="./build282.js"></script>
 <script src="./build283.js"></script>
 <script src="./build284.js"></script>
+<script src="./build285.js"></script>
+<script src="./build286.js"></script>
 </body></html>
