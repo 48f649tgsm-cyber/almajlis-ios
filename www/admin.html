@@ -66,7 +66,8 @@ async function get(name,order='created_at'){
 const MEDIA_FOLDERS={
   'qatar':'qatar','kuwait':'kuwait','saudi-arabia':'saudi','saudi':'saudi','syria':'syria',
   'country-flags':'country-flags','map-shape':'map-shape','player-career':'player-career',
-  'national-anthems':'national-anthems','national-anthem':'national-anthems','anthems':'national-anthems'
+  'national-anthems':'national-anthems','national-anthem':'national-anthems','anthems':'national-anthems',
+  'world-currencies':'world-currencies'
 };
 function linkedMediaDescriptor(q,c){
   const notes=String(q.quality_notes||''),slug=String(c?.slug||'').toLowerCase(),name=String(c?.name_ar||'');
@@ -74,7 +75,7 @@ function linkedMediaDescriptor(q,c){
   const external=(notes.match(/\|\s*((?:kw|sa|sy|flag|map|career|anthem)_v\d+_[0-9]+_[0-9]+)\s*(?:\||$)/i)||[])[1]
     ||(notes.match(/\|\s*((?:b159|b176)_qatar_[0-9]+_[0-9]+)\s*(?:\||$)/i)||[])[1]||'';
   let folder=MEDIA_FOLDERS[slug]||'';
-  if(!folder){if(name==='قطر')folder='qatar';else if(name==='الكويت')folder='kuwait';else if(name==='السعودية')folder='saudi';else if(name==='سوريا')folder='syria';else if(name==='أعلام دول')folder='country-flags';else if(name==='شكل الخريطة')folder='map-shape';else if(name==='مسيرة لاعب')folder='player-career';else if(name.includes('نشيد'))folder='national-anthems'}
+  if(!folder){if(name==='قطر')folder='qatar';else if(name==='الكويت')folder='kuwait';else if(name==='السعودية')folder='saudi';else if(name==='سوريا')folder='syria';else if(name==='أعلام دول')folder='country-flags';else if(name==='شكل الخريطة')folder='map-shape';else if(name==='مسيرة لاعب')folder='player-career';else if(name==='عملات العالم')folder='world-currencies';else if(name.includes('نشيد'))folder='national-anthems'}
   if(!file&&external){const ext=external.includes('qatar')?'.jpg':external.startsWith('anthem_')?'.mp3':'.webp';file=external+ext}
   if(!file||!folder)return null;
   const kind=/\.mp3$/i.test(file)?'audio':/\.(mp4|webm|mov)$/i.test(file)?'video':'image';

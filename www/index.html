@@ -1949,7 +1949,7 @@ function showMimeRevealFromUrl(){
 }
 function mimeRevealUrl(q){
   const payload=btoa(unescape(encodeURIComponent(JSON.stringify({t:q.mime.type,n:q.mime.title}))));
-  return location.origin+location.pathname+'?mime='+encodeURIComponent(payload);
+  return 'https://qkacbcpcezsevhrkiirb.supabase.co/storage/v1/object/public/question-media/system/mime-card.html?v=281&mime='+encodeURIComponent(payload);
 }
 function renderMimeQR(q){
   const url=mimeRevealUrl(q);
@@ -2380,6 +2380,12 @@ async function startGame(){
       return;
     }
 
+    try{
+      if(typeof window.ALMAJLIS_PRELOAD_MATCH==='function')await window.ALMAJLIS_PRELOAD_MATCH(gameQuestions,startBtn);
+    }catch(mediaPrepError){
+      console.warn('Match media preload recovery',mediaPrepError);
+    }
+
     // Do not allow a non-essential visual/audio helper to abort match preparation.
     try{resetMatchExperience()}catch(e){console.warn('resetMatchExperience',e)}
     try{renderBoard()}catch(e){
@@ -2711,12 +2717,14 @@ function renderQuestionMedia(q){
   if(m.type==='wiki_player'){
     const title=String(m.wiki||q.answer||'').trim();
     const variant=m.variant==='illustrated'?' illustratedPlayer':' realPlayer';
+    if(m.resolvedSrc)return `<div class="wikiPlayerStage${variant}"><img src="${String(m.resolvedSrc).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" alt="صورة اللاعب" loading="eager" fetchpriority="high" decoding="async"></div>`;
     return `<div class="wikiPlayerStage${variant}" data-wiki-player="${encodeURIComponent(title)}" data-player-variant="${m.variant==='illustrated'?'illustrated':'photo'}"><div class="wikiPlayerLoading">جاري تحميل صورة اللاعب…</div></div>`;
   }
   if(m.type==='image'){
     const flagClass=cat==='أعلام دول'?' flagStage':'';
-    return `<div class="mediaFrame${flagClass}">
-      <img src="${m.src}" alt="${m.alt||''}" style="width:100%;max-height:290px;object-fit:contain;border-radius:16px">
+    return `<div class="mediaFrame filledImage${flagClass}">
+      <img class="mediaBackdrop" src="${m.src}" alt="" aria-hidden="true" loading="eager" decoding="async">
+      <img class="mediaMain" src="${m.src}" alt="${m.alt||''}" loading="eager" fetchpriority="high" decoding="async">
     </div>`;
   }
   if(m.type==='audio'){
@@ -2733,7 +2741,7 @@ function renderQuestionMedia(q){
   }
   if(m.type==='player_gallery'){
     const ps=(m.players||[]);
-    const cards=ps.map((p,i)=>`<div class="playerCard" data-wiki="${encodeURIComponent(p.wiki||p.name||'')}"><div class="playerFallback">جاري تحميل صورة ${p.name||('اللاعب '+(i+1))}…</div><div class="playerNum">${p.name||('اللاعب '+(i+1))}</div></div>`).join('');
+    const cards=ps.map((p,i)=>p.resolvedSrc?`<div class="playerCard"><img src="${String(p.resolvedSrc).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" alt="صورة لاعب" loading="eager" fetchpriority="high" decoding="async"><div class="playerNum">${p.name||('اللاعب '+(i+1))}</div></div>`:`<div class="playerCard" data-wiki="${encodeURIComponent(p.wiki||p.name||'')}"><div class="playerFallback">جاري تحميل صورة ${p.name||('اللاعب '+(i+1))}…</div><div class="playerNum">${p.name||('اللاعب '+(i+1))}</div></div>`).join('');
     setTimeout(hydratePlayerGallery,0);
     return `<div class="playerGallery">${cards}</div>`;
   }
@@ -8906,7 +8914,8 @@ body>#mjBoardV5{display:none!important}
  const folderBySlug={
   qatar:'qatar',kuwait:'kuwait',saudi:'saudi-arabia','saudi-arabia':'saudi-arabia',syria:'syria',
   'country-flags':'country-flags','map-shape':'map-shape','player-career':'player-career',
-  'national-anthems':'national-anthems','national-anthem':'national-anthems',anthems:'national-anthems'
+  'national-anthems':'national-anthems','national-anthem':'national-anthems',anthems:'national-anthems',
+  'world-currencies':'world-currencies'
  };
  const appCategoryName=(name,slug)=>{
   const n=String(name||'').trim(),s=String(slug||'').toLowerCase();
@@ -8937,7 +8946,7 @@ body>#mjBoardV5{display:none!important}
   const notes=String(q.quality_notes||''),id=externalId(notes),slug=String(cat.slug||'').toLowerCase(),name=String(cat.name_ar||'');
   let file=(notes.match(/(?:^|\|)\s*media=([^|\s]+)/i)||[])[1]||'';
   let folder=folderBySlug[slug]||'';
-  if(!folder){if(name==='قطر')folder='qatar';else if(name==='الكويت')folder='kuwait';else if(name==='السعودية')folder='saudi';else if(name==='سوريا')folder='syria';else if(name==='أعلام دول')folder='country-flags';else if(name==='شكل الخريطة')folder='map-shape';else if(name==='مسيرة لاعب')folder='player-career';else if(name.includes('نشيد'))folder='national-anthems'}
+  if(!folder){if(name==='قطر')folder='qatar';else if(name==='الكويت')folder='kuwait';else if(name==='السعودية')folder='saudi';else if(name==='سوريا')folder='syria';else if(name==='أعلام دول')folder='country-flags';else if(name==='شكل الخريطة')folder='map-shape';else if(name==='مسيرة لاعب')folder='player-career';else if(name==='عملات العالم')folder='world-currencies';else if(name.includes('نشيد'))folder='national-anthems'}
   if(!file&&id)file=id+(id.includes('qatar')?'.jpg':id.startsWith('anthem_')?'.mp3':'.webp');
   return file&&folder?{file,folder}:null;
  }
@@ -9051,7 +9060,7 @@ body>#mjBoardV5{display:none!important}
     const cat=catById.get(q.category_id),answer=answerByQuestion.get(q.id);if(!cat||!answer)continue;
     const name=appCategoryName(cat.name_ar,cat.slug);if(!name)continue;
     const id=externalId(q.quality_notes)||String(q.id),media=publicMedia(assetByQuestion.get(q.id),q,cat);
-    const item={id,db_question_id:String(q.id),question:q.question_text,answer:answer.answer_text,points:Number(q.points),explanation:q.explanation||'',source_note:q.source_reference||'',qa_verified:'Supabase published'};
+    const item={id,db_question_id:String(q.id),question:q.question_text,answer:answer.answer_text,points:Number(q.points),explanation:q.explanation||'',source_note:q.source_reference||'',qa_verified:'Supabase published',answerOnlyMedia:/\|\s*answer_media=1\s*(?:\||$)/i.test(String(q.quality_notes||''))};
     if(media)item.media=media;
     (dynamic[name]||(dynamic[name]=[])).push(item);
    }
@@ -9753,4 +9762,7 @@ function startWinnerCelebration263(){
 <script src="./build277.js"></script>
 <script src="./build278.js"></script>
 <script src="./build279.js"></script>
+<script src="./build280.js"></script>
+<script src="./build281.js"></script>
+<script src="./build282.js"></script>
 </body></html>
