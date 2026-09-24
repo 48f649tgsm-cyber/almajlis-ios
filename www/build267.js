@@ -1,6 +1,7 @@
 /* BUILD 267 — verified career inventory + direct category covers */
 (()=>{'use strict';
  const coverMap=Object.freeze({
+  'عملات العالم':'./world-currencies.webp',
   'عالم النباتات':'./plant-world.webp',
   'ملاعب عالمية':'./world-stadiums.webp',
   'معالم سياحية':'./tourist-landmarks.webp',
