@@ -95,7 +95,7 @@
   root.querySelector('.reveal').onclick=reveal;
   root.querySelector('.back').onclick=returnToBoard;
   root.querySelector('.exit').onclick=()=>{if(confirm('هل تريد الخروج من اللعبة؟')){stopTimer();hide();if(window.ALMAJLIS_STABILITY_273?.goHome){window.ALMAJLIS_STABILITY_273.goHome()}else{window.show?.('home')}}};
-  root.querySelector('.who-button').onclick=()=>root().querySelector('.answer').classList.contains('choosing')?closeDecision():openDecision();
+  root.querySelector('.who-button').onclick=openDecision;
   root.querySelector('.decision-one').onclick=()=>givePoints(1);root.querySelector('.decision-two').onclick=()=>givePoints(2);root.querySelector('.decision-none').onclick=()=>givePoints(0);root.querySelector('.decision-back').onclick=closeDecision;root.querySelector('.answer-one').onclick=()=>givePoints(1);root.querySelector('.answer-two').onclick=()=>givePoints(2);root.querySelector('.answer-none').onclick=()=>givePoints(0);
   const mediaModal=root.querySelector('.media-modal');root.querySelector('.media').onclick=event=>{const image=event.target.closest('img');if(!image)return;mediaModal.querySelector('img').src=image.currentSrc||image.src;mediaModal.classList.add('show')};mediaModal.onclick=event=>{if(event.target===mediaModal||event.target.closest('.modal-close'))mediaModal.classList.remove('show')};
   root.querySelector('.media').addEventListener('error',event=>{
@@ -115,8 +115,19 @@
  function root(){return createHost().shadowRoot}
  function stopTimer(){clearInterval(state.interval);state.interval=0}
  function hide(){stopTimer();const host=document.getElementById('mjStableQuestion272');if(host)host.style.display='none'}
- function openDecision(){if(!current||!state.revealed)return;const r=root();r.querySelector('.answer-one').textContent=team1||'الفريق الأول';r.querySelector('.answer-two').textContent=team2||'الفريق الثاني';r.querySelector('.answer').classList.add('choosing');r.querySelector('.who-button').textContent='العودة إلى الجواب'}
- function closeDecision(){const r=root();r.querySelector('.answer').classList.remove('choosing');r.querySelector('.who-button').textContent='من أجاب؟'}
+ function openDecision(){
+  if(!current||!state.revealed)return;
+  const r=root(),decision=r.querySelector('.decision-screen');
+  r.querySelector('.decision-one').textContent=team1||'الفريق الأول';
+  r.querySelector('.decision-two').textContent=team2||'الفريق الثاني';
+  r.querySelector('.decision-t1').textContent=team1||'الفريق الأول';
+  r.querySelector('.decision-t2').textContent=team2||'الفريق الثاني';
+  r.querySelector('.decision-s1').textContent=score1;
+  r.querySelector('.decision-s2').textContent=score2;
+  r.querySelector('.decision-turn').textContent=r.querySelector('.turn').textContent;
+  decision.classList.add('show');
+ }
+ function closeDecision(){const r=root();r.querySelector('.decision-screen').classList.remove('show');r.querySelector('.answer').classList.remove('choosing');r.querySelector('.who-button').textContent='من أجاب؟'}
  function setText(selector,value){const node=root().querySelector(selector);if(node)node.textContent=value}
  function updateTimer(){const timer=root().querySelector('.timer');timer.textContent='00:'+String(Math.max(0,state.seconds)).padStart(2,'0');timer.classList.toggle('urgent',state.seconds<=5&&state.seconds>0)}
  function helperStore(){return window.ALMAJLIS_HELP_275?.state||{used:{1:{two:false,block:false,double:false},2:{two:false,block:false,double:false}}}}
