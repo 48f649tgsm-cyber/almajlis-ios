@@ -25,7 +25,7 @@
  async function preloadMatch(source,button){
   const items=questions(source);if(!items.length)return;
   const old=button?.textContent||'جاري تجهيز المباراة…';let completed=0,cursor=0;
-  async function worker(){while(cursor<items.length){const q=items[cursor++];await resolveDynamic(q);const m=q.media;if(m?.src)await preloadUrl(m.src,m.type);if(m?.resolvedSrc)await preloadUrl(m.resolvedSrc,'image');for(const p of m?.players||[])if(p.resolvedSrc)await preloadUrl(p.resolvedSrc,'image');completed++;if(button)button.textContent='جاري تجهيز الصور… '+completed+'/'+items.length}}
+  async function worker(){while(cursor<items.length){const q=items[cursor++];await resolveDynamic(q);const m=q.media;if(q.answerPhotoSrc)await preloadUrl(q.answerPhotoSrc,'image');if(m?.src)await preloadUrl(m.src,m.type);if(m?.resolvedSrc)await preloadUrl(m.resolvedSrc,'image');for(const p of m?.players||[])if(p.resolvedSrc)await preloadUrl(p.resolvedSrc,'image');completed++;if(button)button.textContent='جاري تجهيز الصور… '+completed+'/'+items.length}}
   await Promise.all(Array.from({length:Math.min(6,items.length)},worker));if(button)button.textContent=old;
  }
  window.ALMAJLIS_PRELOAD_MATCH=preloadMatch;

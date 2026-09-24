@@ -24,8 +24,33 @@
    @media(max-height:530px){.screen{grid-template-rows:50px minmax(0,1fr)}.nav{top:5px;height:39px}.card{margin:29px 2px 21px;padding:37px 14px 31px}.question{font-size:clamp(16px,3.8vh,23px);max-height:21dvh}.media{height:36dvh;max-height:36dvh}.media img,.media video{max-height:100%!important}.points{top:-27px;height:48px}.timer{top:-28px;width:56px;height:56px}.category,.reveal{bottom:-21px;height:43px}}
   </style><main class="screen"><header><button class="nav exit" type="button">الخروج</button><button class="nav back" type="button">الرجوع إلى اللوحة</button><div class="turn"></div><div class="brand">المجلس</div></header><section class="stage"><article class="card"><div class="points"></div><div class="timer">00:30</div><div class="question"></div><div class="media"></div><div class="answer"><small>الإجابة الصحيحة</small><b></b></div><div class="category"></div><button class="reveal" type="button">إظهار الجواب</button><button class="who-button" type="button">من أجاب؟</button></article><aside><div class="team" data-team="1"><div class="name t1"></div><div class="score s1">0</div><div class="helps"></div></div><div class="team" data-team="2"><div class="name t2"></div><div class="score s2">0</div><div class="helps"></div></div></aside></section></main><div class="media-modal" role="dialog" aria-modal="true" aria-label="عرض الصورة مكبرة"><button class="modal-close" type="button" aria-label="إغلاق">×</button><img alt="الصورة المكبرة"></div><section class="decision-screen" role="dialog" aria-modal="true" aria-label="من أجاب"><button class="decision-back" type="button">العودة إلى الجواب</button><div class="decision-card"><h1>من أجاب؟</h1><button class="decision-team decision-one" type="button"></button><button class="decision-team decision-two" type="button"></button><button class="decision-none" type="button">لا أحد</button></div></section>`;
   const mediaFit=document.createElement('style');
-  mediaFit.textContent=`.card{justify-content:flex-start}.media{flex:1 1 0;height:auto;max-height:none;min-height:0;width:min(1040px,98%);background:#f8f7f3}.media .mediaFrame,.media .filledImage,.media .flagStage,.media .lineupStage,.media .mjCareerImage260{width:100%!important;height:100%!important;min-height:0!important;max-width:100%!important;max-height:100%!important;overflow:hidden!important}.media .mediaMain,.media .mediaFrame>img,.media .mjCareerImage260 img{display:block!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;object-position:center!important}.media .lineupStage{display:flex!important;flex-direction:column!important;overflow:auto!important}.media .lineupStage .footballPitch{min-height:0;flex:1 1 auto}.media .mediaBackdrop{display:none!important}.career-question .question{flex:none}.career-question .media{flex:1 1 0}`;
+  mediaFit.textContent=`.card{justify-content:flex-start}.media{flex:1 1 0;height:auto;max-height:none;min-height:0;width:min(1040px,98%);background:#f8f7f3;display:flex!important;align-items:stretch;justify-content:center}.media .mediaFrame,.media .filledImage,.media .flagStage,.media .lineupStage,.media .mjCareerImage260{width:100%!important;height:100%!important;min-height:0!important;max-width:100%!important;max-height:100%!important;overflow:hidden!important}.media .filledImage{position:relative!important;display:block!important}.media .filledImage .mediaMain{position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;object-position:center!important}.media .mediaFrame>img:not(.mediaMain):not(.mediaBackdrop),.media .mjCareerImage260 img{display:block!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;object-position:center!important}.media .lineupStage{display:flex!important;flex-direction:column!important;justify-content:flex-start!important;overflow:hidden!important;padding:7px!important}.media .lineupStage .lineupHeader,.media .lineupStage .lineupHint{flex:none!important}.media .lineupStage .footballPitch{min-height:0!important;max-height:100%!important;height:auto!important;width:min(100%,650px)!important;aspect-ratio:auto!important;flex:1 1 0!important;margin:0 auto!important}.media .mediaBackdrop{display:none!important}.media .letterGrid{display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;grid-template-rows:repeat(4,minmax(0,1fr))!important;align-content:center!important;gap:min(1.2vh,10px)!important;width:min(100%,650px)!important;height:100%!important;padding:10px!important;margin:auto!important}.media .letterCell{display:grid!important;place-items:center!important;min-height:0!important;aspect-ratio:auto!important;border-radius:10px!important;border:1px solid #c9d7de!important;background:#edf5f8!important;color:#243442!important;font-size:clamp(16px,3.4vh,30px)!important;font-weight:800!important}.media .letterCell.active{background:#f37b4a!important;color:#fff!important;border-color:#bd4c23!important}.career-question .question{flex:none}.career-question .media{flex:1 1 0}`;
   root.appendChild(mediaFit);
+  const allMediaFit=document.createElement('style');
+  allMediaFit.textContent=`
+   .media:empty{display:none!important}
+   .media .mediaFrame,.media .wikiPlayerStage,.media .playerGallery,.media .silentPuzzle{box-sizing:border-box;min-width:0;min-height:0;max-width:100%;max-height:100%}
+   .media .filledImage{flex:1 1 auto;min-width:0;min-height:0}
+   .media .filledImage .mediaMain{min-width:0;min-height:0;filter:none!important}
+   .media .wikiPlayerStage{position:relative;display:grid;place-items:center;width:100%!important;height:100%!important;overflow:hidden}
+   .media .wikiPlayerStage img{width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important}
+   .media .playerGallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%;height:100%;align-items:stretch;overflow:hidden;padding:8px}
+   .media .playerCard{min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden;border:1px solid #ccc;border-radius:12px;background:#fff}
+   .media .playerCard img{width:100%!important;height:100%!important;min-height:0!important;flex:1 1 0;object-fit:contain!important;object-position:center!important}
+   .media .playerNum{flex:none;text-align:center;padding:5px;font-size:clamp(10px,1.7vw,16px);font-weight:700}
+   .media .playerFallback{flex:1;display:grid;place-items:center;text-align:center;padding:8px}
+   .media .audioStage{display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;text-align:center;background:#faf6ee}
+   .media .audioStage audio{display:block;max-width:100%;flex:none}.media .waveform{display:flex;align-items:center;justify-content:center;gap:3px;height:32px;max-width:100%;overflow:hidden}.media .waveform i{width:4px;flex:none;border-radius:4px;background:#bd8b2f}
+   .media video{display:block;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important}
+   .media .silentPuzzle{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:auto}.media .silentRow{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}.media .silentToken{font-size:clamp(20px,5vh,42px)}
+   .media .lineupStage{background:#10233b;color:#fff}.media .lineupHeader{display:flex;justify-content:space-between;gap:8px;align-items:center;width:100%;color:#fff}.media .lineupHeader b,.media .lineupHeader span{display:block}.media .lineupHeader em{font-style:normal}.media .lineupHint{text-align:center;color:#fff}
+   .media .lineupStage .footballPitch{position:relative;overflow:hidden;border:2px solid #fff;border-radius:12px;background:repeating-linear-gradient(0deg,#277744 0 12%,#2e824b 12% 24%)}
+   .media .lineupStage .lineupRows{position:absolute;inset:5%;display:flex;flex-direction:column-reverse;justify-content:space-between}.media .lineupStage .lineupRow{display:grid;grid-template-columns:repeat(var(--row-count),minmax(0,1fr));align-items:center;justify-items:center;min-height:14%}.media .lineupPlayer{min-width:0;text-align:center}.media .lineupPlayer .shirt{display:block;color:#fff}.media .lineupPlayer b{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:clamp(9px,1.6vh,14px);color:#fff;background:#152939}
+   .media .mjCareerImage260,.media .mjCareerImage260 img{min-width:0;min-height:0;max-width:100%!important;max-height:100%!important;object-fit:contain!important}
+   .media .mediaError{display:grid;place-items:center;width:100%;padding:14px;text-align:center;color:#8b2020}.media .filledImage .mediaError{position:absolute;inset:0;background:#fff9f7}
+   @media(max-height:530px){.media .lineupStage .lineupHeader,.media .lineupStage .lineupHint{font-size:clamp(10px,2vh,14px);padding:2px}.media .playerGallery{gap:5px;padding:5px}}
+  `;
+  root.appendChild(allMediaFit);
   document.body.appendChild(host);
   root.querySelector('.reveal').onclick=reveal;
   root.querySelector('.back').onclick=returnToBoard;
@@ -33,6 +58,17 @@
   root.querySelector('.who-button').onclick=openDecision;
   root.querySelector('.decision-one').onclick=()=>givePoints(1);root.querySelector('.decision-two').onclick=()=>givePoints(2);root.querySelector('.decision-none').onclick=()=>givePoints(0);root.querySelector('.decision-back').onclick=closeDecision;
   const mediaModal=root.querySelector('.media-modal');root.querySelector('.media').onclick=event=>{const image=event.target.closest('img');if(!image)return;mediaModal.querySelector('img').src=image.currentSrc||image.src;mediaModal.classList.add('show')};mediaModal.onclick=event=>{if(event.target===mediaModal||event.target.closest('.modal-close'))mediaModal.classList.remove('show')};
+  root.querySelector('.media').addEventListener('error',event=>{
+   const image=event.target;if(!(image instanceof HTMLImageElement)||!image.classList.contains('mediaMain'))return;
+   const cacheKey=current?.q?.media?.cacheKey||'';
+   if(!image.dataset.networkRetry&&image.src.startsWith('blob:')&&cacheKey.startsWith('question-media/')){
+    image.dataset.networkRetry='1';image.src='https://qkacbcpcezsevhrkiirb.supabase.co/storage/v1/object/public/'+cacheKey;return;
+   }
+   const holder=image.closest('.filledImage');if(holder&&!holder.querySelector('.mediaError')){
+    const error=document.createElement('div');error.className='mediaError';error.textContent='تعذر تحميل الصورة. تحقّق من توفر ملف الوسيط.';
+    image.style.setProperty('display','none','important');holder.appendChild(error);
+   }
+  },true);
   installHelpButtons(root);
   return host;
  }
@@ -74,7 +110,10 @@
  }
  function startTimer(){stopTimer();updateTimer();state.interval=setInterval(()=>{state.seconds--;updateTimer();if(state.seconds>0)return;stopTimer();if(!state.steal){state.steal=true;state.activeTeam=state.activeTeam===1?2:1;state.seconds=30;setText('.turn','فرصة لفريق: '+(state.activeTeam===1?team1:team2));syncHelpButtons();startTimer()}else{setText('.turn','انتهى الوقت — يمكن إظهار الجواب')}},1000)}
  function questionMarkup(q){const raw=String(q?.question||''),marker='[[AYAH]]',at=raw.indexOf(marker);if(at>=0)return esc(raw.slice(0,at).trim())+'<span class="ayah">'+esc(raw.slice(at+marker.length).trim())+'</span>';return q?.question_html||esc(raw)}
- function mediaMarkup(cat,q){try{return cat==='من غير كلام'&&q?.mime&&typeof renderMimeQR==='function'?renderMimeQR(q):(typeof renderQuestionMedia==='function'?renderQuestionMedia(q):'')}catch(error){console.error('BUILD 272 media',error);return '<div>تعذر تجهيز الوسيط</div>'}}
+ function mediaMarkup(cat,q){try{
+  if(cat==='حروف اسلامي')return renderQuestionMedia({media:{type:'letter_grid',highlight:String(q?.answer||'').trim().charAt(0)}});
+  return cat==='من غير كلام'&&q?.mime&&typeof renderMimeQR==='function'?renderMimeQR(q):(typeof renderQuestionMedia==='function'?renderQuestionMedia(q):'');
+ }catch(error){console.error('BUILD 272 media',error);return '<div>تعذر تجهيز الوسيط</div>'}}
 
  async function open(cat,pts,button){
   if(!button||button.dataset.used==='1')return false;
@@ -87,12 +126,20 @@
    try{sessionStorage.removeItem('almajlis_opening_question_270')}catch(_){ }
    setText('.turn','دور فريق: '+(currentTurn===1?team1:team2));setText('.points',pts+' نقطة');setText('.category',cat);setText('.t1',team1);setText('.t2',team2);setText('.s1',score1);setText('.s2',score2);
    const question=r.querySelector('.question');question.innerHTML=questionMarkup(q);question.classList.toggle('long',(question.textContent||'').length>135);
-   r.querySelector('.media').innerHTML=q.answerOnlyMedia?'':mediaMarkup(cat,q);r.querySelector('.screen').classList.toggle('career-question',cat==='مسيرة لاعب');if(cat==='مسيرة لاعب')question.textContent='من هو اللاعب؟';r.querySelector('.answer').classList.remove('show');r.querySelector('.answer b').textContent=q.answer||'';r.querySelector('.reveal').style.display='block';r.querySelector('.who-button').classList.remove('show');r.querySelector('.decision-screen').classList.remove('show');r.querySelector('.media-modal').classList.remove('show');
+   r.querySelector('.media').innerHTML=q.answerOnlyMedia?'':mediaMarkup(cat,q);r.querySelector('.screen').classList.toggle('career-question',cat==='مسيرة لاعب');if(cat==='مسيرة لاعب')question.textContent='من هو اللاعب؟';r.querySelector('.answer').classList.remove('show');r.querySelector('.answer').querySelector('img.ai-answer-photo')?.remove();r.querySelector('.answer b').textContent=q.answer||'';r.querySelector('.reveal').style.display='block';r.querySelector('.who-button').classList.remove('show');r.querySelector('.decision-screen').classList.remove('show');r.querySelector('.media-modal').classList.remove('show');
    r.querySelector('.decision-one').textContent=team1||'الفريق الأول';r.querySelector('.decision-two').textContent=team2||'الفريق الثاني';
    syncHelpButtons();startTimer();return true;
   }catch(error){pool.unshift(q);current=null;hide();window.show?.('boardScreen');console.error('BUILD 272 isolated open',error);return false}
  }
- function reveal(){if(!current)return;state.revealed=true;stopTimer();const r=root();if(current.q?.answerOnlyMedia)r.querySelector('.media').innerHTML=mediaMarkup(current.cat,current.q);r.querySelector('.answer').classList.add('show');r.querySelector('.reveal').style.display='none';r.querySelector('.who-button').classList.add('show');syncHelpButtons()}
+ function reveal(){if(!current)return;state.revealed=true;stopTimer();const r=root();if(current.q?.answerOnlyMedia)r.querySelector('.media').innerHTML=mediaMarkup(current.cat,current.q);
+ if(current.cat==='AI كروية'&&current.q?.answerPhotoSrc){
+  r.querySelector('.media').innerHTML='';
+  const answer=r.querySelector('.answer'),photo=document.createElement('img');
+  photo.className='ai-answer-photo';photo.src=current.q.answerPhotoSrc;photo.alt=current.q.answer||'صورة اللاعب';
+  photo.style.cssText='display:block;max-width:100%;max-height:42dvh;min-height:0;object-fit:contain;margin:8px auto 0;border-radius:11px';
+  answer.querySelector('img.ai-answer-photo')?.remove();answer.appendChild(photo);
+ }
+ r.querySelector('.answer').classList.add('show');r.querySelector('.reveal').style.display='none';r.querySelector('.who-button').classList.add('show');syncHelpButtons()}
  function returnToBoard(){if(current?.q&&current?.btn?.dataset.used!=='1'){const pool=gameQuestions?.[current.cat]?.[current.basePts||current.pts];if(Array.isArray(pool)&&!pool.some(q=>q?.id===current.q.id))pool.unshift(current.q)}if(state.doubleTeam){const helpers=helperStore();helpers.pendingDoubleTeam=state.doubleTeam;window.ALMAJLIS_HELP_275?.save?.();window.ALMAJLIS_HELP_275?.syncBoard?.()}current=null;hide();window.show?.('boardScreen')}
  function givePoints(team){if(!current||!state.revealed)return;closeDecision();if(team&&state.doubleTeam===team)current.pts=Number(current.basePts||current.pts)*2;hide();try{window.award?.(team)}catch(error){console.error('BUILD 272 award',error);window.show?.('boardScreen')}}
 
