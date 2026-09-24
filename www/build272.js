@@ -75,13 +75,28 @@
    .decision-none{width:min(340px,65%);min-height:clamp(57px,11vh,86px);color:#263b41;border-color:#b7c3c4;background:#fff;font-size:clamp(20px,2.5vw,32px)}
    @media(max-height:530px){.decision-screen{grid-template-rows:50px minmax(0,1fr)}.decision-screen header{height:50px}.decision-screen .card{margin:29px 2px 21px}.decision-team,.decision-none{min-height:clamp(54px,16vh,82px)}.decision-card{gap:10px}}
   `;root.appendChild(teamUi);
+  const choices=document.createElement('div');choices.className='answer-choices';
+  choices.innerHTML='<div class="answer-teams"><button class="answer-team answer-one" type="button"></button><button class="answer-team answer-two" type="button"></button></div><button class="answer-none" type="button">لا أحد</button>';
+  root.querySelector('.answer').appendChild(choices);
+  const choiceStyle=document.createElement('style');choiceStyle.textContent=`
+   .answer .answer-choices{display:none;flex-direction:column;align-items:center;gap:12px;width:100%}
+   .answer.choosing{width:min(900px,94%);padding:12px 16px}
+   .answer.choosing>small,.answer.choosing>b,.answer.choosing>img{display:none!important}
+   .answer.choosing .answer-choices{display:flex}
+   .answer-teams{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(10px,2vw,24px);width:100%}
+   .answer-team,.answer-none{min-width:0;min-height:clamp(56px,11vh,85px);padding:8px 12px;border:1.5px solid #d5aca4;border-radius:15px;background:#fff;color:#263b43;font-size:clamp(19px,2.4vw,31px);font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:none}
+   .answer-one{border-color:#9bafb9;background:#f3f7f8}.answer-two{border-color:#d8b8ae;background:#fcf7f4}
+   .answer-none{width:min(300px,60%);min-height:clamp(48px,8vh,65px);background:#fff}
+   .team[data-team="1"] .score{background:#e7eff2!important;color:#274452!important}
+   .team[data-team="2"] .score{background:#f4e9e3!important;color:#754d3f!important}
+  `;root.appendChild(choiceStyle);
 
   document.body.appendChild(host);
   root.querySelector('.reveal').onclick=reveal;
   root.querySelector('.back').onclick=returnToBoard;
   root.querySelector('.exit').onclick=()=>{if(confirm('هل تريد الخروج من اللعبة؟')){stopTimer();hide();if(window.ALMAJLIS_STABILITY_273?.goHome){window.ALMAJLIS_STABILITY_273.goHome()}else{window.show?.('home')}}};
-  root.querySelector('.who-button').onclick=openDecision;
-  root.querySelector('.decision-one').onclick=()=>givePoints(1);root.querySelector('.decision-two').onclick=()=>givePoints(2);root.querySelector('.decision-none').onclick=()=>givePoints(0);root.querySelector('.decision-back').onclick=closeDecision;
+  root.querySelector('.who-button').onclick=()=>root().querySelector('.answer').classList.contains('choosing')?closeDecision():openDecision();
+  root.querySelector('.decision-one').onclick=()=>givePoints(1);root.querySelector('.decision-two').onclick=()=>givePoints(2);root.querySelector('.decision-none').onclick=()=>givePoints(0);root.querySelector('.decision-back').onclick=closeDecision;root.querySelector('.answer-one').onclick=()=>givePoints(1);root.querySelector('.answer-two').onclick=()=>givePoints(2);root.querySelector('.answer-none').onclick=()=>givePoints(0);
   const mediaModal=root.querySelector('.media-modal');root.querySelector('.media').onclick=event=>{const image=event.target.closest('img');if(!image)return;mediaModal.querySelector('img').src=image.currentSrc||image.src;mediaModal.classList.add('show')};mediaModal.onclick=event=>{if(event.target===mediaModal||event.target.closest('.modal-close'))mediaModal.classList.remove('show')};
   root.querySelector('.media').addEventListener('error',event=>{
    const image=event.target;if(!(image instanceof HTMLImageElement)||!image.classList.contains('mediaMain'))return;
@@ -100,8 +115,8 @@
  function root(){return createHost().shadowRoot}
  function stopTimer(){clearInterval(state.interval);state.interval=0}
  function hide(){stopTimer();const host=document.getElementById('mjStableQuestion272');if(host)host.style.display='none'}
- function openDecision(){if(!current||!state.revealed)return;const r=root();r.querySelector('.decision-turn').textContent=r.querySelector('.turn').textContent;r.querySelector('.decision-t1').textContent=team1||'الفريق الأول';r.querySelector('.decision-t2').textContent=team2||'الفريق الثاني';r.querySelector('.decision-s1').textContent=score1;r.querySelector('.decision-s2').textContent=score2;r.querySelector('.decision-screen').classList.add('show')}
- function closeDecision(){root().querySelector('.decision-screen').classList.remove('show')}
+ function openDecision(){if(!current||!state.revealed)return;const r=root();r.querySelector('.answer-one').textContent=team1||'الفريق الأول';r.querySelector('.answer-two').textContent=team2||'الفريق الثاني';r.querySelector('.answer').classList.add('choosing');r.querySelector('.who-button').textContent='العودة إلى الجواب'}
+ function closeDecision(){const r=root();r.querySelector('.answer').classList.remove('choosing');r.querySelector('.who-button').textContent='من أجاب؟'}
  function setText(selector,value){const node=root().querySelector(selector);if(node)node.textContent=value}
  function updateTimer(){const timer=root().querySelector('.timer');timer.textContent='00:'+String(Math.max(0,state.seconds)).padStart(2,'0');timer.classList.toggle('urgent',state.seconds<=5&&state.seconds>0)}
  function helperStore(){return window.ALMAJLIS_HELP_275?.state||{used:{1:{two:false,block:false,double:false},2:{two:false,block:false,double:false}}}}
@@ -151,7 +166,7 @@
    try{sessionStorage.removeItem('almajlis_opening_question_270')}catch(_){ }
    setText('.turn','دور فريق: '+(currentTurn===1?team1:team2));setText('.points',pts+' نقطة');setText('.category',cat);setText('.t1',team1);setText('.t2',team2);setText('.s1',score1);setText('.s2',score2);
    const question=r.querySelector('.question');question.innerHTML=questionMarkup(q);question.classList.toggle('long',(question.textContent||'').length>135);
-   r.querySelector('.media').innerHTML=q.answerOnlyMedia?'':mediaMarkup(cat,q);r.querySelector('.screen').classList.toggle('career-question',cat==='مسيرة لاعب');if(cat==='مسيرة لاعب')question.textContent='من هو اللاعب؟';r.querySelector('.answer').classList.remove('show');r.querySelector('.answer').querySelector('img.ai-answer-photo')?.remove();r.querySelector('.answer b').textContent=q.answer||'';r.querySelector('.reveal').style.display='block';r.querySelector('.who-button').classList.remove('show');r.querySelector('.decision-screen').classList.remove('show');r.querySelector('.media-modal').classList.remove('show');
+   r.querySelector('.media').innerHTML=q.answerOnlyMedia?'':mediaMarkup(cat,q);r.querySelector('.screen').classList.toggle('career-question',cat==='مسيرة لاعب');if(cat==='مسيرة لاعب')question.textContent='من هو اللاعب؟';r.querySelector('.answer').classList.remove('show','choosing');r.querySelector('.who-button').textContent='من أجاب؟';r.querySelector('.answer').querySelector('img.ai-answer-photo')?.remove();r.querySelector('.answer b').textContent=q.answer||'';r.querySelector('.reveal').style.display='block';r.querySelector('.who-button').classList.remove('show');r.querySelector('.decision-screen').classList.remove('show');r.querySelector('.media-modal').classList.remove('show');
    r.querySelector('.decision-one').textContent=team1||'الفريق الأول';r.querySelector('.decision-two').textContent=team2||'الفريق الثاني';
    syncHelpButtons();startTimer();return true;
   }catch(error){pool.unshift(q);current=null;hide();window.show?.('boardScreen');console.error('BUILD 272 isolated open',error);return false}
