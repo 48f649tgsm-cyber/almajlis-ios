@@ -2721,11 +2721,16 @@ function renderQuestionMedia(q){
     return `<div class="wikiPlayerStage${variant}" data-wiki-player="${encodeURIComponent(title)}" data-player-variant="${m.variant==='illustrated'?'illustrated':'photo'}"><div class="wikiPlayerLoading">جاري تحميل صورة اللاعب…</div></div>`;
   }
   if(m.type==='image'){
-    const flagClass=cat==='أعلام دول'?' flagStage':'';
+    const flagClass=cat==='أعلام دول'?' flagStage':cat==='شكل الخريطة'?' mapStage':'';
     return `<div class="mediaFrame filledImage${flagClass}">
-      <img class="mediaBackdrop" src="${m.src}" alt="" aria-hidden="true" loading="eager" decoding="async">
+      ${cat==='شكل الخريطة'?'':`<img class="mediaBackdrop" src="${m.src}" alt="" aria-hidden="true" loading="eager" decoding="async">`}
       <img class="mediaMain" src="${m.src}" alt="${m.alt||''}" loading="eager" fetchpriority="high" decoding="async">
     </div>`;
+  }
+  if(m.type==='video'){
+    const src=String(m.src||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+    const silent=current?.cat==='من سجل الهدف'||m.silent===true;
+    return `<div class="mediaFrame goalVideoStage"><video src="${src}" ${silent?'autoplay muted loop':'controls'} playsinline webkit-playsinline preload="metadata" aria-label="${silent?'فيديو السؤال المموّه والصامت':'فيديو السؤال'}"></video></div>`;
   }
   if(m.type==='audio'){
     if(!m.src)return `<div class="mediaError">المقطع الصوتي غير متوفر.</div>`;
@@ -7430,7 +7435,7 @@ document.addEventListener('DOMContentLoaded',()=>{window.updateSelectionStatus21
  function setupQuestion(){const screen=document.getElementById('questionScreen');if(!screen)return;const h=document.createElement('header');h.className='mjQuestionHeader';h.append(navButton('الخروج',exitGame),navButton('النتيجة',resultModal));const turn=document.createElement('div');turn.id='mjQTurn';turn.className='mjBoardTurn';h.append(turn,navButton('▦ الرجوع إلى اللوحة',returnUnscoredQuestionToBoard));const frame=document.createElement('main');frame.className='mjQuestionFrame';frame.innerHTML='<div class="mjQuestionToolbar"><div id="mjQTimer">00:30</div><div id="mjQPoints">100 نقطة</div></div><div class="mjQuestionBody"></div>';const body=frame.querySelector('.mjQuestionBody');body.append(document.getElementById('qText'),document.getElementById('qMedia'));const revealBtn=document.getElementById('answerBtn');revealBtn.className='btn mjReveal';revealBtn.textContent='إظهار الجواب';frame.appendChild(revealBtn);const side=document.createElement('aside');side.className='mjQuestionSide';side.innerHTML='<div class="mjSideCategory"><img id="mjQCatImg" alt=""><strong id="mjQCatName"></strong></div><div class="mjSideTeam one"><span>الفريق</span><b id="mjQTeam1"></b><strong id="mjQScore1">0</strong></div><div class="mjSideTeam two"><span>الفريق</span><b id="mjQTeam2"></b><strong id="mjQScore2">0</strong></div>';screen.prepend(h,frame,side)}
  function setupAnswer(){const s=document.createElement('section');s.id='mjAnswerScreen';s.className='screen';s.innerHTML='<header class="mjQuestionHeader"><button id="mjABack" class="mjNavBtn" type="button">الرجوع إلى السؤال</button><div id="mjATurn" class="mjBoardTurn"></div><div class="mjBoardBrand">المجلس</div></header><main class="mjAnswerCard"><div id="mjAnswerText" class="mjAnswerText"></div><div id="mjAnswerMedia" class="mjAnswerMedia"></div></main><footer class="mjDecision"><strong>من جاوب؟</strong><button id="mjA1" type="button"></button><button id="mjA2" type="button"></button><button id="mjANone" class="none" type="button">لا أحد</button></footer>';document.querySelector('.app').appendChild(s);s.querySelector('#mjABack').onclick=()=>show('questionScreen');s.querySelector('#mjA1').onclick=()=>award(1);s.querySelector('#mjA2').onclick=()=>award(2);s.querySelector('#mjANone').onclick=()=>award(0)}
  function sync(){const bn=document.getElementById('mjBoardTurn');if(bn)bn.textContent='الدور الآن: '+(currentTurn===1?team1:team2)+' — اختر الفئة والسؤال';const qt=document.getElementById('mjQTurn');if(qt)qt.textContent='دور فريق: '+(currentTurn===1?team1:team2);const cn=document.getElementById('mjQCatName');if(cn)cn.textContent=current?.cat||'';const ci=document.getElementById('mjQCatImg');if(ci&&current){ci.src=CATEGORY_IMAGE_SOURCES[current.cat]||''}const qp=document.getElementById('mjQPoints');if(qp)qp.textContent=(current?.pts||100)+' نقطة';const raw=document.getElementById('timer')?.textContent||'00:30',tm=document.getElementById('mjQTimer');if(tm){tm.textContent=raw;const seconds=Math.max(0,Math.min(30,parseInt(raw.split(':').pop(),10)||0));tm.style.setProperty('--timer-progress',(seconds/30*360)+'deg')}const n1=document.getElementById('mjQTeam1'),n2=document.getElementById('mjQTeam2'),s1=document.getElementById('mjQScore1'),s2=document.getElementById('mjQScore2');if(n1)n1.textContent=team1||'الفريق الأول';if(n2)n2.textContent=team2||'الفريق الثاني';if(s1)s1.textContent=score1;if(s2)s2.textContent=score2}
- function openAnswer(){if(!current)return;clearInterval(timerId);document.getElementById('mjAnswerText').textContent=current.q?.answer||'';document.getElementById('mjAnswerMedia').innerHTML=current.cat==='تشكيلات فرق'?'':document.getElementById('qMedia').innerHTML;document.getElementById('mjATurn').textContent=(current.cat||'')+' — '+current.pts+' نقطة';document.getElementById('mjA1').textContent=(team1||'الفريق الأول')+' +'+current.pts;document.getElementById('mjA2').textContent=(team2||'الفريق الثاني')+' +'+current.pts;show('mjAnswerScreen')}
+ function openAnswer(){if(!current)return;clearInterval(timerId);document.getElementById('mjAnswerText').textContent=current.q?.answer||'';const questionVideo=document.querySelector('#questionScreen #qMedia video');if(questionVideo)questionVideo.pause();const answerHost=document.getElementById('mjAnswerMedia');if(current.cat==='من سجل الهدف'&&current.q?.answerMedia?.type==='video'){const video=document.createElement('video');video.src=current.q.answerMedia.src;video.controls=true;video.autoplay=true;video.playsInline=true;video.preload='metadata';video.muted=false;video.setAttribute('aria-label','فيديو الهدف الأصلي مع الصوت');answerHost.replaceChildren(video);video.play().catch(()=>{});}else{answerHost.innerHTML=current.cat==='تشكيلات فرق'?'':document.getElementById('qMedia').innerHTML;}document.getElementById('mjATurn').textContent=(current.cat||'')+' — '+current.pts+' نقطة';document.getElementById('mjA1').textContent=(team1||'الفريق الأول')+' +'+current.pts;document.getElementById('mjA2').textContent=(team2||'الفريق الثاني')+' +'+current.pts;show('mjAnswerScreen')}
  document.addEventListener('DOMContentLoaded',()=>{setupCategories();setupBoard();setupQuestion();setupAnswer();document.querySelectorAll('#buildBadge025,#selectionStatus218').forEach(x=>x.remove());const rc=window.renderCats;window.renderCats=function(){const out=rc.apply(this,arguments);paintSelected();return out};const rb=window.renderBoard;window.renderBoard=function(){const out=rb.apply(this,arguments);sync();return out};const us=window.updateScores;window.updateScores=function(){const out=us.apply(this,arguments);wireScore(document.getElementById('s1'),1);wireScore(document.getElementById('s2'),2);sync();return out};const oq=window.openQuestion;window.openQuestion=async function(){const out=await oq.apply(this,arguments);sync();return out};const pt=window.paintTimer;window.paintTimer=function(){const out=pt.apply(this,arguments);sync();return out};window.startNewGame=function(){selected=[];score1=0;score2=0;current=null;currentTurn=1;gameQuestions={};try{resetGameLocks()}catch(e){};renderCats();show('cats')};window.startFreshCouncil=window.startNewGame;window.draw=function(){if(selected.length!==6||unavailableSelectedCategories().length){renderCats();show('cats');showGameToast('اختر 6 فئات متاحة أولًا');return}team1=t1.value.trim()||'الأول';team2=t2.value.trim()||'الثاني';currentTurn=Math.random()<.5?1:2;startGame()};window.reveal=openAnswer;renderCats();updateScores();sync()});
 })();
 </script>
@@ -8915,7 +8920,8 @@ body>#mjBoardV5{display:none!important}
   qatar:'qatar',kuwait:'kuwait',saudi:'saudi-arabia','saudi-arabia':'saudi-arabia',syria:'syria',
   'country-flags':'country-flags','map-shape':'map-shape','player-career':'player-career',
   'national-anthems':'national-anthems','national-anthem':'national-anthems',anthems:'national-anthems',
-  'world-currencies':'world-currencies','tourist-landmarks':'tourist-landmarks','ai-football':'ai-football'
+  'world-currencies':'world-currencies','tourist-landmarks':'tourist-landmarks','space':'space','world-stadiums':'world-stadiums',
+  'ai-football':'ai-football','football-ai':'ai-football','charades':'silent-acting'
  };
  const appCategoryName=(name,slug)=>{
   const n=String(name||'').trim(),s=String(slug||'').toLowerCase();
@@ -8945,7 +8951,8 @@ body>#mjBoardV5{display:none!important}
  function mediaFile(q,cat){
   const notes=String(q.quality_notes||''),id=externalId(notes),slug=String(cat.slug||'').toLowerCase(),name=String(cat.name_ar||'');
   let file=(notes.match(/(?:^|\|)\s*media=([^|\s]+)/i)||[])[1]||'';
-  let folder=folderBySlug[slug]||'';
+  if(/^(none|null|false|text-only)$/i.test(file))file='';
+  let folder=folderBySlug[slug]||(/^[a-z0-9-]+$/.test(slug)&&file?slug:'');
   if(!folder){if(name==='AI كروية')folder='ai-football';else if(name==='قطر')folder='qatar';else if(name==='الكويت')folder='kuwait';else if(name==='السعودية')folder='saudi';else if(name==='سوريا')folder='syria';else if(name==='أعلام دول')folder='country-flags';else if(name==='شكل الخريطة')folder='map-shape';else if(name==='مسيرة لاعب')folder='player-career';else if(name==='عملات العالم')folder='world-currencies';else if(name.includes('نشيد'))folder='national-anthems'}
   if(!file&&id)file=id+(id.includes('qatar')?'.jpg':id.startsWith('anthem_')?'.mp3':'.webp');
   return file&&folder?{file,folder}:null;
@@ -8954,23 +8961,24 @@ body>#mjBoardV5{display:none!important}
   /* Player-career questions are explicitly paired through quality_notes.
      Prefer that immutable filename over a stale media_assets row. */
   const linked=mediaFile(q,cat);
-  if(['مسيرة لاعب','AI كروية'].includes(appCategoryName(cat?.name_ar,cat?.slug))&&linked){
+  const explicitMedia=/(?:^|\|)\s*media=[^|\s]+/i.test(String(q.quality_notes||''));
+  if(linked&&(explicitMedia||['مسيرة لاعب','AI كروية','الفضاء','معالم سياحية','ملاعب عالمية'].includes(appCategoryName(cat?.name_ar,cat?.slug)))){
    const path=`questions/${linked.folder}/${linked.file}`;
    const src=contentDb.storage.from('question-media').getPublicUrl(path).data.publicUrl;
-   return {type:'image',src,alt:'المسيرة الاحترافية الكاملة',cacheKey:'question-media/'+path};
+   return {type:/\.(mp3|wav|m4a|aac|ogg)$/i.test(linked.file)?'audio':/\.(mp4|webm|mov|m4v)$/i.test(linked.file)?'video':'image',src,alt:asset?.alt_text_ar||'وسيط السؤال',cacheKey:'question-media/'+path};
   }
   if(asset){
-   let src=asset.public_url||(asset.storage_path?contentDb.storage.from(asset.storage_bucket||'question-media').getPublicUrl(asset.storage_path).data.publicUrl:'');
-   if(src)src+=(src.includes('?')?'&':'?')+'build=261';
+   let src=asset.storage_path?contentDb.storage.from(asset.storage_bucket||'question-media').getPublicUrl(asset.storage_path).data.publicUrl:(asset.public_url||'');
+   if(src)src+=(src.includes('?')?'&':'?')+'build=288';
    if(src){const probe=String(asset.storage_path||src);return {type:/\.(mp3|wav|m4a|aac|ogg)(?:\?|$)/i.test(probe)?'audio':/\.(mp4|webm|mov|m4v)(?:\?|$)/i.test(probe)?'video':'image',src,alt:asset.alt_text_ar||'وسيط السؤال',cacheKey:(asset.storage_bucket||'question-media')+'/'+asset.storage_path}}
   }
   if(!linked)return null;
   const path=`questions/${linked.folder}/${linked.file}`;
-  const src=contentDb.storage.from('question-media').getPublicUrl(path).data.publicUrl+'?build=261';
+  const src=contentDb.storage.from('question-media').getPublicUrl(path).data.publicUrl+'?build=288';
   return {type:/\.mp3$/i.test(linked.file)?'audio':/\.(mp4|webm|mov)$/i.test(linked.file)?'video':'image',src,alt:'وسيط السؤال',cacheKey:'question-media/'+path};
  }
- const CONTENT_SNAPSHOT_KEY='almajlis_content_snapshot_v261';
- const MEDIA_CACHE_NAME='almajlis-question-media-v261';
+ const CONTENT_SNAPSHOT_KEY='almajlis_content_snapshot_v288';
+ const MEDIA_CACHE_NAME='almajlis-question-media-v288';
  const mediaCacheUrl=key=>new URL('__almajlis_media_cache__/'+encodeURIComponent(key),location.href).href;
  function allMedia(sourceBank){
   const list=[];
@@ -9051,7 +9059,24 @@ body>#mjBoardV5{display:none!important}
    }catch(_){ }
    const catById=new Map(cats.map(c=>[c.id,c])),answerByQuestion=new Map(),assetByQuestion=new Map();
    for(const a of answers){const old=answerByQuestion.get(a.question_id);if(!old||a.is_primary)answerByQuestion.set(a.question_id,a)}
-   for(const m of assets){if(m.question_id)assetByQuestion.set(m.question_id,m)}
+   const goalAssetsByQuestion=new Map(),assetRowsByQuestion=new Map();
+   for(const m of assets){
+    if(!m.question_id)continue;
+    const rows=assetRowsByQuestion.get(m.question_id)||[];
+    rows.push(m);assetRowsByQuestion.set(m.question_id,rows);
+    if(m.title==='question_sketch'||m.title==='answer_original'){
+      const pair=goalAssetsByQuestion.get(m.question_id)||{};
+      pair[m.title]=m;
+      goalAssetsByQuestion.set(m.question_id,pair);
+    }
+   }
+   for(const [qid,rows] of assetRowsByQuestion){
+    const questionAsset=rows.find(m=>m.title==='question_sketch')
+      ||rows.find(m=>/^(question|prompt)(_|$)/i.test(String(m.title||'')))
+      ||rows.find(m=>!/(^answer|_answer|answer_original)/i.test(String(m.title||'')))
+      ||null;
+    if(questionAsset)assetByQuestion.set(qid,questionAsset);
+   }
    const dynamic={};
    for(const q of questions){
     /* A question already used by this player stays disabled until an admin
@@ -9059,9 +9084,14 @@ body>#mjBoardV5{display:none!important}
     if(disabledQuestionIds.has(String(q.id)))continue;
     const cat=catById.get(q.category_id),answer=answerByQuestion.get(q.id);if(!cat||!answer)continue;
     const name=appCategoryName(cat.name_ar,cat.slug);if(!name)continue;
-    const id=externalId(q.quality_notes)||String(q.id),media=publicMedia(assetByQuestion.get(q.id),q,cat);
+    const id=externalId(q.quality_notes)||String(q.id),goalPair=goalAssetsByQuestion.get(q.id);
+    const media=publicMedia(goalPair?.question_sketch||assetByQuestion.get(q.id),q,cat);
     const item={id,db_question_id:String(q.id),question:q.question_text,answer:answer.answer_text,points:Number(q.points),explanation:q.explanation||'',source_note:q.source_reference||'',qa_verified:'Supabase published',answerOnlyMedia:/\|\s*answer_media=1\s*(?:\||$)/i.test(String(q.quality_notes||''))};
     if(media)item.media=media;
+    if(name==='من سجل الهدف'&&goalPair?.question_sketch&&goalPair?.answer_original){
+      item.media=publicMedia(goalPair.question_sketch,q,cat);
+      item.answerMedia=publicMedia(goalPair.answer_original,q,cat);
+    }
     if(name==='AI كروية'){
      const answerFile=(String(q.quality_notes||'').match(/(?:^|\|)\s*answer_photo=([^|\s]+)/i)||[])[1];
      if(answerFile&&/^ai_football_(100|300|500)_\d{2}_answer\.jpeg$/.test(answerFile))
@@ -9778,4 +9808,32 @@ function startWinnerCelebration263(){
 <script src="./build286.js"></script>
 <link rel="stylesheet" href="./build287.css">
 <script src="./build287.js"></script>
+<script id="ALMAJLIS_BUILD_288_MEDIA_MARKER">
+document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-288-ALL-MEDIA-20260926');
+document.querySelector('meta[name="build-number"]')?.setAttribute('content','288');
+try{sessionStorage.setItem('almajlis_build_seen','288');sessionStorage.setItem('almajlis_active_build','288')}catch(_){ }
+</script>
+<script id="ALMAJLIS_MEDIA_ERROR_NOTICE">
+document.addEventListener('error',event=>{
+ const media=event.target;
+ if(!(media instanceof HTMLImageElement||media instanceof HTMLVideoElement||media instanceof HTMLAudioElement))return;
+ const host=media.closest?.('#questionScreen #qMedia,#mjAnswerScreen #mjAnswerMedia');
+ if(!host||media.classList.contains('mediaBackdrop'))return;
+ const frame=media.closest('.mediaFrame')||host;
+ if(frame.querySelector('.mediaError'))return;
+ const notice=document.createElement('div');notice.className='mediaError';
+ notice.textContent='تعذر تحميل الوسيط المرتبط بهذا السؤال. أبلغ عن السؤال لمراجعته.';
+ frame.replaceChildren(notice);
+},true);
+</script>
+<style id="ALMAJLIS_GOAL_AND_MAP_MEDIA_FIX">
+#questionScreen #qMedia:has(.mapStage),#questionScreen #mjQuestionV2 #qMedia:has(.mapStage),
+#questionScreen #qMedia .mapStage,#questionScreen #mjQuestionV2 #qMedia .mapStage{background:#fff!important}
+#questionScreen #qMedia:has(.mapStage)::before,#questionScreen #qMedia:has(.mapStage)::after{display:none!important;content:none!important}
+#questionScreen #qMedia .mapStage .mediaBackdrop{display:none!important}
+#questionScreen #qMedia .mapStage .mediaMain{filter:none!important;mix-blend-mode:normal!important;opacity:1!important}
+#questionScreen #qMedia .goalVideoStage{display:grid;place-items:center;width:100%;height:100%;background:#fff!important}
+#questionScreen #qMedia .goalVideoStage video{display:block;width:100%;height:100%;max-height:36dvh;object-fit:contain;background:#fff}
+#mjAnswerScreen #mjAnswerMedia video{display:block;width:min(780px,92vw);max-height:48dvh;object-fit:contain;margin:8px auto 0;background:#111;border-radius:12px}
+</style>
 </body></html>
