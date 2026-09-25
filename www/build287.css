@@ -1,0 +1,38 @@
+/* BUILD 287 — full text for image-free «من هو اللاعب» questions. */
+@media (orientation: landscape) {
+  #questionScreen.whoTextOnly287 #mjQuestionV2 .qv2-frame {
+    margin: 37px 4px 25px!important;
+    padding: 9px 11px!important;
+  }
+  #questionScreen.whoTextOnly287 #mjQuestionV2 .qv2-body {
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:0!important;
+    min-height:0!important;
+    overflow:hidden!important;
+  }
+  #questionScreen.whoTextOnly287 #mjQuestionV2 .qv2-body > #qMedia {
+    display:none!important;
+  }
+  #questionScreen.whoTextOnly287 #mjQuestionV2 .qv2-body > #qText {
+    position:static!important;
+    display:block!important;
+    flex:none!important;
+    align-self:center!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-height:0!important;
+    height:auto!important;
+    max-height:100%!important;
+    margin:0!important;
+    padding:0 3px!important;
+    border:0!important;
+    line-height:1.29!important;
+    text-align:center!important;
+    text-wrap:wrap!important;
+    white-space:normal!important;
+    overflow:hidden!important;
+  }
+}
