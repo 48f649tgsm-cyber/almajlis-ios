@@ -7435,7 +7435,7 @@ document.addEventListener('DOMContentLoaded',()=>{window.updateSelectionStatus21
  function setupQuestion(){const screen=document.getElementById('questionScreen');if(!screen)return;const h=document.createElement('header');h.className='mjQuestionHeader';h.append(navButton('الخروج',exitGame),navButton('النتيجة',resultModal));const turn=document.createElement('div');turn.id='mjQTurn';turn.className='mjBoardTurn';h.append(turn,navButton('▦ الرجوع إلى اللوحة',returnUnscoredQuestionToBoard));const frame=document.createElement('main');frame.className='mjQuestionFrame';frame.innerHTML='<div class="mjQuestionToolbar"><div id="mjQTimer">00:30</div><div id="mjQPoints">100 نقطة</div></div><div class="mjQuestionBody"></div>';const body=frame.querySelector('.mjQuestionBody');body.append(document.getElementById('qText'),document.getElementById('qMedia'));const revealBtn=document.getElementById('answerBtn');revealBtn.className='btn mjReveal';revealBtn.textContent='إظهار الجواب';frame.appendChild(revealBtn);const side=document.createElement('aside');side.className='mjQuestionSide';side.innerHTML='<div class="mjSideCategory"><img id="mjQCatImg" alt=""><strong id="mjQCatName"></strong></div><div class="mjSideTeam one"><span>الفريق</span><b id="mjQTeam1"></b><strong id="mjQScore1">0</strong></div><div class="mjSideTeam two"><span>الفريق</span><b id="mjQTeam2"></b><strong id="mjQScore2">0</strong></div>';screen.prepend(h,frame,side)}
  function setupAnswer(){const s=document.createElement('section');s.id='mjAnswerScreen';s.className='screen';s.innerHTML='<header class="mjQuestionHeader"><button id="mjABack" class="mjNavBtn" type="button">الرجوع إلى السؤال</button><div id="mjATurn" class="mjBoardTurn"></div><div class="mjBoardBrand">المجلس</div></header><main class="mjAnswerCard"><div id="mjAnswerText" class="mjAnswerText"></div><div id="mjAnswerMedia" class="mjAnswerMedia"></div></main><footer class="mjDecision"><strong>من جاوب؟</strong><button id="mjA1" type="button"></button><button id="mjA2" type="button"></button><button id="mjANone" class="none" type="button">لا أحد</button></footer>';document.querySelector('.app').appendChild(s);s.querySelector('#mjABack').onclick=()=>show('questionScreen');s.querySelector('#mjA1').onclick=()=>award(1);s.querySelector('#mjA2').onclick=()=>award(2);s.querySelector('#mjANone').onclick=()=>award(0)}
  function sync(){const bn=document.getElementById('mjBoardTurn');if(bn)bn.textContent='الدور الآن: '+(currentTurn===1?team1:team2)+' — اختر الفئة والسؤال';const qt=document.getElementById('mjQTurn');if(qt)qt.textContent='دور فريق: '+(currentTurn===1?team1:team2);const cn=document.getElementById('mjQCatName');if(cn)cn.textContent=current?.cat||'';const ci=document.getElementById('mjQCatImg');if(ci&&current){ci.src=CATEGORY_IMAGE_SOURCES[current.cat]||''}const qp=document.getElementById('mjQPoints');if(qp)qp.textContent=(current?.pts||100)+' نقطة';const raw=document.getElementById('timer')?.textContent||'00:30',tm=document.getElementById('mjQTimer');if(tm){tm.textContent=raw;const seconds=Math.max(0,Math.min(30,parseInt(raw.split(':').pop(),10)||0));tm.style.setProperty('--timer-progress',(seconds/30*360)+'deg')}const n1=document.getElementById('mjQTeam1'),n2=document.getElementById('mjQTeam2'),s1=document.getElementById('mjQScore1'),s2=document.getElementById('mjQScore2');if(n1)n1.textContent=team1||'الفريق الأول';if(n2)n2.textContent=team2||'الفريق الثاني';if(s1)s1.textContent=score1;if(s2)s2.textContent=score2}
- function openAnswer(){if(!current)return;clearInterval(timerId);document.getElementById('mjAnswerText').textContent=current.q?.answer||'';const questionVideo=document.querySelector('#questionScreen #qMedia video');if(questionVideo)questionVideo.pause();const answerHost=document.getElementById('mjAnswerMedia');if(current.cat==='من سجل الهدف'&&current.q?.answerMedia?.type==='video'){const video=document.createElement('video');video.src=current.q.answerMedia.src;video.controls=true;video.autoplay=true;video.playsInline=true;video.preload='metadata';video.muted=false;video.setAttribute('aria-label','فيديو الهدف الأصلي مع الصوت');answerHost.replaceChildren(video);video.play().catch(()=>{});}else{answerHost.innerHTML=current.cat==='تشكيلات فرق'?'':document.getElementById('qMedia').innerHTML;}document.getElementById('mjATurn').textContent=(current.cat||'')+' — '+current.pts+' نقطة';document.getElementById('mjA1').textContent=(team1||'الفريق الأول')+' +'+current.pts;document.getElementById('mjA2').textContent=(team2||'الفريق الثاني')+' +'+current.pts;show('mjAnswerScreen')}
+ function openAnswer(){if(!current)return;clearInterval(timerId);document.getElementById('mjAnswerText').textContent=current.q?.answer||'';const questionVideo=document.querySelector('#questionScreen #qMedia video');if(questionVideo)questionVideo.pause();const answerHost=document.getElementById('mjAnswerMedia');if(current.cat==='من سجل الهدف'&&current.q?.answerMedia?.type==='video'){const video=document.createElement('video');video.src=current.q.answerMedia.src;video.controls=true;video.autoplay=true;video.playsInline=true;video.preload='metadata';video.muted=false;video.setAttribute('aria-label','فيديو الهدف الأصلي مع الصوت');answerHost.replaceChildren(video);video.play().catch(()=>{});}else if(current.cat==='من سجل الهدف'){answerHost.textContent='الفيديو الأصلي غير مرتبط بهذا السؤال بعد.';}else{answerHost.innerHTML=current.cat==='تشكيلات فرق'?'':document.getElementById('qMedia').innerHTML;}document.getElementById('mjATurn').textContent=(current.cat||'')+' — '+current.pts+' نقطة';document.getElementById('mjA1').textContent=(team1||'الفريق الأول')+' +'+current.pts;document.getElementById('mjA2').textContent=(team2||'الفريق الثاني')+' +'+current.pts;show('mjAnswerScreen')}
  document.addEventListener('DOMContentLoaded',()=>{setupCategories();setupBoard();setupQuestion();setupAnswer();document.querySelectorAll('#buildBadge025,#selectionStatus218').forEach(x=>x.remove());const rc=window.renderCats;window.renderCats=function(){const out=rc.apply(this,arguments);paintSelected();return out};const rb=window.renderBoard;window.renderBoard=function(){const out=rb.apply(this,arguments);sync();return out};const us=window.updateScores;window.updateScores=function(){const out=us.apply(this,arguments);wireScore(document.getElementById('s1'),1);wireScore(document.getElementById('s2'),2);sync();return out};const oq=window.openQuestion;window.openQuestion=async function(){const out=await oq.apply(this,arguments);sync();return out};const pt=window.paintTimer;window.paintTimer=function(){const out=pt.apply(this,arguments);sync();return out};window.startNewGame=function(){selected=[];score1=0;score2=0;current=null;currentTurn=1;gameQuestions={};try{resetGameLocks()}catch(e){};renderCats();show('cats')};window.startFreshCouncil=window.startNewGame;window.draw=function(){if(selected.length!==6||unavailableSelectedCategories().length){renderCats();show('cats');showGameToast('اختر 6 فئات متاحة أولًا');return}team1=t1.value.trim()||'الأول';team2=t2.value.trim()||'الثاني';currentTurn=Math.random()<.5?1:2;startGame()};window.reveal=openAnswer;renderCats();updateScores();sync()});
 })();
 </script>
@@ -9064,9 +9064,9 @@ body>#mjBoardV5{display:none!important}
     if(!m.question_id)continue;
     const rows=assetRowsByQuestion.get(m.question_id)||[];
     rows.push(m);assetRowsByQuestion.set(m.question_id,rows);
-    if(m.title==='question_sketch'||m.title==='answer_original'){
+    if(/^(question_sketch|answer_original)$/i.test(String(m.title||''))||/(?:^|[-_])(question[-_]sketch|answer[-_]original)(?:\.|[-_]|$)/i.test(String(m.storage_path||''))){
       const pair=goalAssetsByQuestion.get(m.question_id)||{};
-      pair[m.title]=m;
+      pair[/answer[-_]original/i.test(String(m.title||'')+' '+String(m.storage_path||''))?'answer_original':'question_sketch']=m;
       goalAssetsByQuestion.set(m.question_id,pair);
     }
    }
@@ -9809,9 +9809,9 @@ function startWinnerCelebration263(){
 <link rel="stylesheet" href="./build287.css">
 <script src="./build287.js"></script>
 <script id="ALMAJLIS_BUILD_288_MEDIA_MARKER">
-document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-288-ALL-MEDIA-20260926');
-document.querySelector('meta[name="build-number"]')?.setAttribute('content','288');
-try{sessionStorage.setItem('almajlis_build_seen','288');sessionStorage.setItem('almajlis_active_build','288')}catch(_){ }
+document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-289-MAP-GOAL-VIDEO-20260926');
+document.querySelector('meta[name="build-number"]')?.setAttribute('content','289');
+try{sessionStorage.setItem('almajlis_build_seen','289');sessionStorage.setItem('almajlis_active_build','289')}catch(_){ }
 </script>
 <script id="ALMAJLIS_MEDIA_ERROR_NOTICE">
 document.addEventListener('error',event=>{
@@ -9836,4 +9836,42 @@ document.addEventListener('error',event=>{
 #questionScreen #qMedia .goalVideoStage video{display:block;width:100%;height:100%;max-height:36dvh;object-fit:contain;background:#fff}
 #mjAnswerScreen #mjAnswerMedia video{display:block;width:min(780px,92vw);max-height:48dvh;object-fit:contain;margin:8px auto 0;background:#111;border-radius:12px}
 </style>
+
+<style id="ALMAJLIS_289_MAP_GOAL">
+#questionScreen #qMedia:has(.mapStage),#questionScreen #mjQuestionV2 #qMedia:has(.mapStage),
+#questionScreen #qMedia .mapStage,#questionScreen #mjQuestionV2 #qMedia .mapStage,
+#questionScreen #qMedia .mapStage .mediaMain{background:#fff!important}
+#questionScreen #qMedia .mapStage .mediaMain{filter:none!important;mix-blend-mode:normal!important;opacity:1!important}
+#questionScreen #qMedia .mapStage .mediaBackdrop{display:none!important}
+#mjGoalVideo289[hidden]{display:none!important}
+#mjGoalVideo289{position:fixed;inset:0;z-index:2147483647;background:#000;display:flex;align-items:center;justify-content:center;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);box-sizing:border-box}
+#mjGoalVideo289 video{width:100%;height:100%;object-fit:contain;background:#000}
+#mjGoalClose289{position:absolute;z-index:2;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));border:0;border-radius:12px;padding:10px 18px;background:#fff;color:#111;font:700 18px Arial;cursor:pointer}
+.mjGoalExpand289{position:absolute;z-index:5;top:8px;left:8px;border:0;border-radius:9px;padding:7px 12px;background:#111e;color:#fff;font:700 15px Arial;cursor:pointer}
+#questionScreen #qMedia .goalVideoStage,#mjAnswerScreen #mjAnswerMedia:has(video){position:relative}
+</style>
+<script id="ALMAJLIS_289_GOAL_VIEWER">
+(()=>{
+ 'use strict';
+ const overlay=document.createElement('div');overlay.id='mjGoalVideo289';overlay.hidden=true;
+ const close=document.createElement('button');close.id='mjGoalClose289';close.type='button';close.textContent='إغلاق ×';
+ const enlarged=document.createElement('video');enlarged.controls=true;enlarged.playsInline=true;
+ overlay.append(close,enlarged);document.body.append(overlay);
+ let origin=null,wasPlaying=false;
+ function dismiss(){enlarged.pause();enlarged.removeAttribute('src');enlarged.load();overlay.hidden=true;if(origin?.isConnected){origin.currentTime=0;if(wasPlaying)origin.play().catch(()=>{})}origin=null}
+ close.addEventListener('click',dismiss);
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!overlay.hidden)dismiss()});
+ function expand(video){if(!video?.src)return;origin=video;wasPlaying=!video.paused;video.pause();enlarged.src=video.currentSrc||video.src;enlarged.muted=video.muted;enlarged.loop=video.loop;enlarged.currentTime=video.currentTime||0;overlay.hidden=false;enlarged.play().catch(()=>{})}
+ function ensureButtons(){
+  for(const video of document.querySelectorAll('#questionScreen #qMedia .goalVideoStage video,#mjAnswerScreen #mjAnswerMedia video')){
+   const host=video.parentElement;if(host.querySelector('.mjGoalExpand289'))continue;
+   const button=document.createElement('button');button.className='mjGoalExpand289';button.type='button';button.textContent='⛶ تكبير الفيديو';button.setAttribute('aria-label','تكبير الفيديو لملء الشاشة');
+   button.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();expand(video)});host.append(button);
+  }
+ }
+ new MutationObserver(ensureButtons).observe(document.body,{childList:true,subtree:true});ensureButtons();
+ document.addEventListener('click',e=>{if(overlay.hidden&&e.target.matches?.('#questionScreen #qMedia .goalVideoStage video')){e.stopImmediatePropagation();expand(e.target)}},true);
+ document.querySelector('#mjABack')?.addEventListener('click',()=>{if(!overlay.hidden)dismiss()});
+})();
+</script>
 </body></html>
