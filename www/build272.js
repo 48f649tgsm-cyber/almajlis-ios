@@ -53,28 +53,27 @@
   root.appendChild(allMediaFit);
   const goalStyle=document.createElement('style');
   goalStyle.textContent=`
-   .media.goal-media{position:relative;overflow:hidden;background:#f8f7f3}
-   .goal-stage{position:relative;display:grid;place-items:center;width:100%;height:100%;min-width:0;min-height:0;background:#111}
-   .goal-stage video{display:block!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;background:#111}
-   .goal-controls{position:absolute;z-index:5;left:9px;top:9px;display:flex;gap:7px;direction:rtl;padding:6px;border-radius:11px;background:#142531eb}
-   .goal-controls[hidden],.goal-stage video[hidden]{display:none!important}
-   .goal-controls button,.goal-reopen{min-height:37px;padding:5px 12px;border:0;border-radius:8px;background:#fff;color:#172733;font:700 clamp(12px,1.4vw,16px) Arial;white-space:nowrap;cursor:pointer}
-   .goal-reopen{position:absolute;z-index:6;left:50%;top:50%;transform:translate(-50%,-50%);background:#172733;color:#fff}
-   .goal-video-modal{position:fixed;inset:0;z-index:100;display:none;place-items:center;background:#000;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
-   .goal-video-modal.show{display:grid}.goal-video-modal video{display:block;width:100%;height:100%;object-fit:contain;background:#000}
-   .goal-video-modal .goal-controls{left:50%;top:auto;bottom:max(10px,env(safe-area-inset-bottom));transform:translateX(-50%)}
-   .screen.goal-answer .answer{padding:5px 10px;max-height:16dvh;overflow:auto}.screen.goal-answer .answer b{font-size:clamp(16px,1.55vw,23px);line-height:1.2}
-   .screen.goal-answer .media{flex:1 1 auto;min-height:0}
+   .screen.goal-question .media,.screen.goal-answer .media{flex:1 1 0;min-height:0;max-height:none;background:#f8f7f3}
+   .media.goal-media{position:relative;overflow:hidden;display:flex!important;align-items:center;justify-content:center}
+   .goal-stage{position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:100%;min-width:0;min-height:0;background:#111;overflow:hidden}
+   .goal-stage video{display:block!important;width:auto!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;background:#111;border-radius:0!important;margin:0 auto!important}
+   .goal-stage video[hidden]{display:none!important}
+   .goal-controls{position:absolute;z-index:5;inset:0;pointer-events:none}
+   .goal-controls[hidden]{display:none!important}
+   .goal-controls button{position:absolute;display:grid;place-items:center;width:37px;height:37px;padding:0;border:0;border-radius:50%;background:#111b;color:#fff;font:700 22px Arial;cursor:pointer;pointer-events:auto;line-height:1}
+   .goal-controls .goal-play{top:50%;left:50%;transform:translate(-50%,-50%);width:51px;height:51px;font-size:28px}
+   .goal-controls .goal-zoom{bottom:9px;right:9px}.goal-controls .goal-close{top:9px;right:9px}
+   .goal-reopen{position:absolute;z-index:6;left:50%;top:50%;transform:translate(-50%,-50%);border:0;border-radius:50%;width:52px;height:52px;background:#172733;color:#fff;font-size:26px}
+   .goal-video-modal{position:fixed;inset:0;z-index:100;display:none;place-items:center;background:#000;overflow:hidden;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+   .goal-video-modal.show{display:grid}.goal-video-modal .goal-stage{width:100%;height:100%;max-width:100%;max-height:100%;background:#000}
+   .goal-video-modal .goal-stage video{width:auto!important;height:100%!important;max-width:100%!important;max-height:100%!important}
+   .goal-video-modal .goal-controls .goal-zoom{background:#111b}
+   .screen.goal-answer .answer{flex:0 0 auto;min-height:76px;max-height:24dvh;overflow:auto;padding:8px 12px;line-height:1.25}
+   .screen.goal-answer .answer b{font-size:clamp(17px,1.55vw,23px);line-height:1.2}
    .screen.player-question .question{flex:1 1 auto;max-height:none;min-height:0;overflow:hidden;line-height:1.28}
    .screen.player-question .question.long{max-height:none}
   `;root.appendChild(goalStyle);
-  const goalViewer=document.createElement('div');goalViewer.className='goal-video-modal';goalViewer.setAttribute('role','dialog');goalViewer.setAttribute('aria-modal','true');goalViewer.setAttribute('aria-label','عرض فيديو الهدف مكبرًا');
-  goalViewer.innerHTML='<video playsinline controls></video><div class="goal-controls"><button type="button" class="goal-modal-play">⏸ إيقاف</button><button type="button" class="goal-modal-close">× إغلاق والعودة</button></div>';
-  root.appendChild(goalViewer);
-  goalViewer.querySelector('.goal-modal-close').onclick=closeGoalViewer;
-  goalViewer.querySelector('.goal-modal-play').onclick=()=>toggleGoalPlayback(goalViewer.querySelector('video'),goalViewer.querySelector('.goal-modal-play'));
-  goalViewer.querySelector('video').addEventListener('play',()=>paintGoalButton(goalViewer.querySelector('video'),goalViewer.querySelector('.goal-modal-play')));
-  goalViewer.querySelector('video').addEventListener('pause',()=>paintGoalButton(goalViewer.querySelector('video'),goalViewer.querySelector('.goal-modal-play')));
+  const goalViewer=document.createElement('div');goalViewer.className='goal-video-modal';goalViewer.setAttribute('role','dialog');goalViewer.setAttribute('aria-modal','true');goalViewer.setAttribute('aria-label','عرض فيديو الهدف مكبرًا');root.appendChild(goalViewer);
   const teamUi=document.createElement('style');
   teamUi.textContent=`
    :host{--team-one:#245f5a;--team-two:#a65a4b;--team-ink:#243d43}
@@ -155,21 +154,20 @@
   return host;
  }
  function root(){return createHost().shadowRoot}
- let goalOrigin=null,goalWasPlaying=false;
- function paintGoalButton(video,button){if(button)button.textContent=video?.paused?'▶ تشغيل':'⏸ إيقاف'}
+ let goalOrigin=null,goalHome=null;
+ function paintGoalButton(video,button){if(button){button.textContent=video?.paused?'▶':'Ⅱ';button.setAttribute('aria-label',video?.paused?'تشغيل الفيديو':'إيقاف الفيديو')}}
  function toggleGoalPlayback(video,button){if(!video)return;if(video.paused)video.play().catch(()=>{});else video.pause();paintGoalButton(video,button)}
  function closeGoalViewer(){
-  const modal=root().querySelector('.goal-video-modal'),large=modal.querySelector('video');
-  large.pause();large.removeAttribute('src');large.load();modal.classList.remove('show');
-  if(goalOrigin?.isConnected&&goalWasPlaying&&!goalOrigin.hidden)goalOrigin.play().catch(()=>{});
-  goalOrigin=null;
+  const modal=root().querySelector('.goal-video-modal');
+  if(goalOrigin&&goalHome&&goalHome.isConnected){goalHome.append(goalOrigin);goalOrigin.querySelector('.goal-zoom')?.setAttribute('aria-label','تكبير الفيديو')}
+  modal.classList.remove('show');goalOrigin=null;goalHome=null;
  }
  function expandGoalVideo(video){
-  if(!video?.src)return;
-  const modal=root().querySelector('.goal-video-modal'),large=modal.querySelector('video');
-  goalOrigin=video;goalWasPlaying=!video.paused;video.pause();large.src=video.currentSrc||video.src;large.muted=video.muted;large.loop=video.loop;
-  try{large.currentTime=video.currentTime||0}catch(_){ }
-  modal.classList.add('show');large.play().catch(()=>{});
+  if(!video)return;
+  const stage=video.closest('.goal-stage'),modal=root().querySelector('.goal-video-modal');
+  if(goalOrigin===stage){closeGoalViewer();return}
+  goalOrigin=stage;goalHome=stage.parentElement;modal.append(stage);modal.classList.add('show');
+  stage.querySelector('.goal-zoom').setAttribute('aria-label','تصغير والعودة إلى السؤال');
  }
  function goalOriginalUrl(q){
   if(q?.answerMedia?.type==='video'&&q.answerMedia.src)return q.answerMedia.src;
@@ -179,21 +177,22 @@
   return '';
  }
  function renderGoalMedia(host,src,original){
-  host.replaceChildren();host.classList.add('goal-media');
+  closeGoalViewer();host.querySelectorAll('video').forEach(v=>v.pause());host.replaceChildren();host.classList.add('goal-media');
   if(!src){host.textContent='الفيديو الأصلي غير مرتبط بهذا السؤال.';return}
   const stage=document.createElement('div');stage.className='goal-stage';
-  const video=document.createElement('video');video.src=src;video.controls=true;video.playsInline=true;video.preload='auto';video.muted=!original;video.loop=!original;
+  const video=document.createElement('video');video.src=src;video.controls=false;video.playsInline=true;video.setAttribute('playsinline','');video.preload='metadata';video.muted=!original;video.loop=!original;
   video.setAttribute('aria-label',original?'الفيديو الأصلي بالصوت والصورة':'فيديو السؤال المموّه');
   const bar=document.createElement('div');bar.className='goal-controls';
-  const play=document.createElement('button');play.type='button';play.textContent='▶ تشغيل';play.onclick=()=>toggleGoalPlayback(video,play);
-  const zoom=document.createElement('button');zoom.type='button';zoom.textContent='⛶ تكبير';zoom.onclick=()=>expandGoalVideo(video);
-  const close=document.createElement('button');close.type='button';close.textContent='× إغلاق';close.onclick=()=>{
-   video.pause();video.hidden=true;bar.hidden=true;
-   const reopen=document.createElement('button');reopen.type='button';reopen.className='goal-reopen';reopen.textContent='▶ عرض الفيديو';
+  const play=document.createElement('button');play.type='button';play.className='goal-play';play.textContent='▶';play.setAttribute('aria-label','تشغيل الفيديو');play.onclick=()=>toggleGoalPlayback(video,play);
+  const zoom=document.createElement('button');zoom.type='button';zoom.className='goal-zoom';zoom.textContent='⛶';zoom.setAttribute('aria-label','تكبير الفيديو');zoom.onclick=()=>expandGoalVideo(video);
+  const close=document.createElement('button');close.type='button';close.className='goal-close';close.textContent='×';close.setAttribute('aria-label','إغلاق الفيديو');close.onclick=()=>{
+   if(goalOrigin===stage)closeGoalViewer();video.pause();video.hidden=true;bar.hidden=true;
+   const reopen=document.createElement('button');reopen.type='button';reopen.className='goal-reopen';reopen.textContent='▶';reopen.setAttribute('aria-label','عرض الفيديو');
    reopen.onclick=()=>{video.hidden=false;bar.hidden=false;reopen.remove();video.play().catch(()=>{})};stage.append(reopen);
   };
   bar.append(play,zoom,close);stage.append(video,bar);host.append(stage);
   video.addEventListener('play',()=>paintGoalButton(video,play));video.addEventListener('pause',()=>paintGoalButton(video,play));
+  video.addEventListener('loadedmetadata',()=>{if(video.videoWidth&&video.videoHeight)video.style.aspectRatio=video.videoWidth+'/'+video.videoHeight});
   video.play().catch(()=>{});
  }
  function fitPlayerQuestion(){
@@ -289,7 +288,7 @@
    else mediaHost.innerHTML=q.answerOnlyMedia?'':mediaMarkup(cat,q);
    r.querySelector('.screen').classList.toggle('career-question',cat==='مسيرة لاعب');
    r.querySelector('.screen').classList.toggle('player-question',cat==='من هو اللاعب');
-   r.querySelector('.screen').classList.remove('goal-answer');
+   r.querySelector('.screen').classList.remove('goal-answer');r.querySelector('.screen').classList.toggle('goal-question',cat==='من سجل الهدف');
    if(cat==='مسيرة لاعب')question.textContent='من هو اللاعب؟';r.querySelector('.answer').classList.remove('show','choosing');r.querySelector('.who-button').textContent='من أجاب؟';r.querySelector('.answer').querySelector('img.ai-answer-photo')?.remove();r.querySelector('.answer b').textContent=q.answer||'';r.querySelector('.reveal').style.display='block';r.querySelector('.who-button').classList.remove('show');r.querySelector('.decision-screen').classList.remove('show');r.querySelector('.media-modal').classList.remove('show');
    r.querySelector('.decision-one').textContent=team1||'الفريق الأول';r.querySelector('.decision-two').textContent=team2||'الفريق الثاني';
    if(cat==='من هو اللاعب')requestAnimationFrame(fitPlayerQuestion);
