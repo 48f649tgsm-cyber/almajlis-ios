@@ -183,6 +183,7 @@
   const video=document.createElement('video');video.src=src;video.controls=false;video.playsInline=true;video.setAttribute('playsinline','');video.preload='metadata';video.muted=!original;video.loop=!original;
   video.setAttribute('aria-label',original?'الفيديو الأصلي بالصوت والصورة':'فيديو السؤال المموّه');
   const bar=document.createElement('div');bar.className='goal-controls';
+  stage.addEventListener('click',event=>{if(event.target.closest('button'))return;bar.hidden=!bar.hidden});
   const play=document.createElement('button');play.type='button';play.className='goal-play';play.textContent='▶';play.setAttribute('aria-label','تشغيل الفيديو');play.onclick=()=>toggleGoalPlayback(video,play);
   const zoom=document.createElement('button');zoom.type='button';zoom.className='goal-zoom';zoom.textContent='⛶';zoom.setAttribute('aria-label','تكبير الفيديو');zoom.onclick=()=>expandGoalVideo(video);
   const close=document.createElement('button');close.type='button';close.className='goal-close';close.textContent='×';close.setAttribute('aria-label','إغلاق الفيديو');close.onclick=()=>{
