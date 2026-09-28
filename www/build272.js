@@ -56,7 +56,7 @@
    .screen.goal-question .media,.screen.goal-answer .media{flex:1 1 0;min-height:0;max-height:none;background:#f8f7f3}
    .media.goal-media{position:relative;overflow:hidden;display:flex!important;align-items:center;justify-content:center}
    .goal-stage{position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:100%;min-width:0;min-height:0;background:#111;overflow:hidden}
-   .goal-stage video{display:block!important;width:auto!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;background:#111;border-radius:0!important;margin:0 auto!important}
+   .goal-stage video{display:block!important;flex:none!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;object-position:center center!important;background:#111;border-radius:0!important;margin:0 auto!important;transform:none!important}
    .goal-stage video[hidden]{display:none!important}
    .goal-controls{position:absolute;z-index:5;inset:0;pointer-events:none}
    .goal-controls[hidden]{display:none!important}
@@ -66,7 +66,7 @@
    .goal-reopen{position:absolute;z-index:6;left:50%;top:50%;transform:translate(-50%,-50%);border:0;border-radius:50%;width:52px;height:52px;background:#172733;color:#fff;font-size:26px}
    .goal-video-modal{position:fixed;inset:0;z-index:100;display:none;place-items:center;background:#000;overflow:hidden;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
    .goal-video-modal.show{display:grid}.goal-video-modal .goal-stage{width:100%;height:100%;max-width:100%;max-height:100%;background:#000}
-   .goal-video-modal .goal-stage video{width:auto!important;height:100%!important;max-width:100%!important;max-height:100%!important}
+   .goal-video-modal .goal-stage video{max-width:100%!important;max-height:100%!important;object-fit:contain!important;object-position:center center!important}
    .goal-video-modal .goal-controls .goal-zoom{background:#111b}
    .screen.goal-answer .answer{flex:0 0 auto;min-height:76px;max-height:24dvh;overflow:auto;padding:8px 12px;line-height:1.25}
    .screen.goal-answer .answer b{font-size:clamp(17px,1.55vw,23px);line-height:1.2}
@@ -159,7 +159,7 @@
  function toggleGoalPlayback(video,button){if(!video)return;if(video.paused)video.play().catch(()=>{});else video.pause();paintGoalButton(video,button)}
  function closeGoalViewer(){
   const modal=root().querySelector('.goal-video-modal');
-  if(goalOrigin&&goalHome&&goalHome.isConnected){goalHome.append(goalOrigin);goalOrigin.querySelector('.goal-zoom')?.setAttribute('aria-label','تكبير الفيديو')}
+  if(goalOrigin&&goalHome&&goalHome.isConnected){const restored=goalOrigin.querySelector('video');goalHome.append(goalOrigin);goalOrigin.querySelector('.goal-zoom')?.setAttribute('aria-label','تكبير الفيديو');requestAnimationFrame(()=>fitGoalVideo(restored))}
   modal.classList.remove('show');goalOrigin=null;goalHome=null;
  }
  function expandGoalVideo(video){
@@ -167,7 +167,17 @@
   const stage=video.closest('.goal-stage'),modal=root().querySelector('.goal-video-modal');
   if(goalOrigin===stage){closeGoalViewer();return}
   goalOrigin=stage;goalHome=stage.parentElement;modal.append(stage);modal.classList.add('show');
+  requestAnimationFrame(()=>fitGoalVideo(video));
   stage.querySelector('.goal-zoom').setAttribute('aria-label','تصغير والعودة إلى السؤال');
+ }
+ function fitGoalVideo(video){
+  const stage=video?.closest('.goal-stage');if(!stage)return;
+  const width=stage.clientWidth,height=stage.clientHeight;
+  const naturalWidth=video.videoWidth,naturalHeight=video.videoHeight;
+  if(!width||!height||!naturalWidth||!naturalHeight)return;
+  const scale=Math.min(width/naturalWidth,height/naturalHeight);
+  video.style.setProperty('width',Math.floor(naturalWidth*scale)+'px','important');
+  video.style.setProperty('height',Math.floor(naturalHeight*scale)+'px','important');
  }
  function goalOriginalUrl(q){
   if(q?.answerMedia?.type==='video'&&q.answerMedia.src)return q.answerMedia.src;
@@ -177,7 +187,7 @@
   return '';
  }
  function renderGoalMedia(host,src,original){
-  closeGoalViewer();host.querySelectorAll('video').forEach(v=>v.pause());host.replaceChildren();host.classList.add('goal-media');
+  closeGoalViewer();host.querySelectorAll('.goal-stage').forEach(stage=>stage.goalResize?.disconnect());host.querySelectorAll('video').forEach(v=>v.pause());host.replaceChildren();host.classList.add('goal-media');
   if(!src){host.textContent='الفيديو الأصلي غير مرتبط بهذا السؤال.';return}
   const stage=document.createElement('div');stage.className='goal-stage';
   const video=document.createElement('video');video.src=src;video.controls=false;video.playsInline=true;video.setAttribute('playsinline','');video.preload='metadata';video.muted=!original;video.loop=!original;
@@ -193,7 +203,9 @@
   };
   bar.append(play,zoom,close);stage.append(video,bar);host.append(stage);
   video.addEventListener('play',()=>paintGoalButton(video,play));video.addEventListener('pause',()=>paintGoalButton(video,play));
-  video.addEventListener('loadedmetadata',()=>{if(video.videoWidth&&video.videoHeight)video.style.aspectRatio=video.videoWidth+'/'+video.videoHeight});
+  video.addEventListener('loadedmetadata',()=>fitGoalVideo(video));
+  if(typeof ResizeObserver==='function'){stage.goalResize=new ResizeObserver(()=>fitGoalVideo(video));stage.goalResize.observe(stage)}
+  else window.addEventListener('resize',()=>fitGoalVideo(video),{passive:true});
   video.play().catch(()=>{});
  }
  function fitPlayerQuestion(){
