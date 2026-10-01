@@ -9556,10 +9556,11 @@ body,.screen,.screen button,.screen input,.screen label,#mjAnswerScreen,.qv2-mod
   if(!mediaHost)return;
   const image=mediaHost.querySelector('img');
   const src=image?.currentSrc||image?.src||'';
-  if(!src){mediaHost.classList.remove('mjHasImage261');mediaHost.style.removeProperty('--mj-media-bg');return}
+  if(!src){if(mediaHost.classList.contains('mjHasImage261'))mediaHost.classList.remove('mjHasImage261');if(mediaHost.style.getPropertyValue('--mj-media-bg'))mediaHost.style.removeProperty('--mj-media-bg');return}
   const safe=String(src).replace(/(["\\])/g,'\\$1');
-  mediaHost.style.setProperty('--mj-media-bg','url("'+safe+'")');
-  mediaHost.classList.add('mjHasImage261');
+  const nextBackground='url("'+safe+'")';
+  if(mediaHost.style.getPropertyValue('--mj-media-bg')!==nextBackground)mediaHost.style.setProperty('--mj-media-bg',nextBackground);
+  if(!mediaHost.classList.contains('mjHasImage261'))mediaHost.classList.add('mjHasImage261');
  }
  function fitQuestionMedia261(){
   if(!mediaHost||!document.getElementById('questionScreen')?.classList.contains('active'))return;
@@ -9870,7 +9871,7 @@ document.addEventListener('error',event=>{
 #goalViewer292 button{position:absolute;top:max(10px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));z-index:3;background:#fff;color:#111;border:0;border-radius:12px;padding:10px 17px;font:bold 18px Arial}
 </style>
 
-<script>document.querySelector('#draw .note')?.replaceChildren(document.createTextNode('الإصدار: BUILD 301'));</script>
+<script>document.querySelector('#draw .note')?.replaceChildren(document.createTextNode('الإصدار: BUILD 302'));</script>
 <style id="TEAM_LINEUP_FLAGS_293">
 #questionScreen.lineupMode #qMedia:has(.filledImage){width:min(900px,98%)!important;max-width:none!important;max-height:49dvh!important;overflow:hidden!important}
 #questionScreen.lineupMode #qMedia .filledImage{width:100%!important;height:100%!important;max-height:49dvh!important;background:transparent!important}
@@ -9883,4 +9884,4 @@ document.addEventListener('error',event=>{
 #mjAnswerScreen.screen.active .mjAnswerMedia video{width:100%!important;height:50dvh!important;max-height:55dvh!important;object-fit:contain!important}
 #questionScreen #qMedia .mapStage,#questionScreen #qMedia .mapStage img{background:#fff!important}
 #questionScreen #qMedia .goalVideoStage video{max-height:46dvh!important}
-</style><script id="MAJLIS_301_BUILD_MARK">(()=>{function mark(){document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-301-VIDEO-CONTAIN');document.querySelector('meta[name="build-number"]')?.setAttribute('content','301');document.querySelector('#draw .note')?.replaceChildren(document.createTextNode('الإصدار: BUILD 301'));try{sessionStorage.setItem('almajlis_build_seen','301');sessionStorage.setItem('almajlis_active_build','301')}catch(_){}}document.addEventListener('DOMContentLoaded',mark,{once:true});window.addEventListener('pageshow',mark,{passive:true})})();</script></body></html>
+</style><script id="MAJLIS_302_BUILD_MARK">(()=>{function mark(){document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-302-MEDIA-OBSERVER-STABILITY');document.querySelector('meta[name="build-number"]')?.setAttribute('content','302');document.querySelector('#draw .note')?.replaceChildren(document.createTextNode('الإصدار: BUILD 302'));try{sessionStorage.setItem('almajlis_build_seen','302');sessionStorage.setItem('almajlis_active_build','302')}catch(_){}}document.addEventListener('DOMContentLoaded',mark,{once:true});window.addEventListener('pageshow',mark,{passive:true})})();</script></body></html>
