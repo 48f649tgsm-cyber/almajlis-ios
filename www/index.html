@@ -5585,6 +5585,27 @@ categoryImageFallback=function(img,c){
   img.style.display='none';
 };
 </script>
+<script id="BUILD303_CATEGORY_BOOTSTRAP">
+/* BUILD 258: restore the category renderer removed with the legacy builders. */
+window.categoryImageSource=function(c){
+ const maps=[
+  typeof BUILD216_CATEGORY_IMAGES==='object'?BUILD216_CATEGORY_IMAGES:null,
+  typeof BUILD214_LOCKED_PHOTO_IMAGES==='object'?BUILD214_LOCKED_PHOTO_IMAGES:null,
+  typeof BUILD199_CATEGORY_IMAGE_SOURCES==='object'?BUILD199_CATEGORY_IMAGE_SOURCES:null,
+  typeof CATEGORY_IMAGE_SOURCES==='object'?CATEGORY_IMAGE_SOURCES:null
+ ];
+ for(const map of maps){if(map&&map[c])return map[c]}
+ return '';
+};
+window.categoryVisual=function(c){
+ const name=String(c||''),src=window.categoryImageSource(name);
+ const safeName=name.replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+ if(!src)return '<span class="catAsset build258Fallback" aria-label="'+safeName+'"></span>';
+ const safeSrc=String(src).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+ const cls=/^data:image\/jpeg|\.jpe?g(?:\?|$)/i.test(src)?'catPhoto':'catAsset';
+ return '<img class="'+cls+'" src="'+safeSrc+'" alt="'+safeName+'" loading="eager" decoding="async">';
+};
+</script>
 <script id="BUILD216_CATEGORY_IMAGES_LOCK">const BUILD216_CATEGORY_IMAGES=Object.freeze({"مانشستر يونايتد":"./embedded-a0ce358f570dd17073c5.jpg","برشلونة":"./embedded-b95592309fd65b787aa1.jpg","ريال مدريد":"./embedded-e62aa92442ffdd488ba4.jpg","الكلاسيكو":"./embedded-1011aae5a99c8e64e656.jpg","AI كروية":"./embedded-f72610bdd77c51fc721a.jpg","اسم اللاعب الأول":"./embedded-d6814d9e5c96546d3c53.jpg"});const build215CategoryImageSource=categoryImageSource;categoryImageSource=function(c){return BUILD216_CATEGORY_IMAGES[c]||build215CategoryImageSource(c)};</script>
 <script id="BUILD259_EMBEDDED_CATEGORY_PHOTOS">
 'use strict';
@@ -5933,7 +5954,7 @@ body.matchActive224 .hostTools224{display:flex}
 (function(){
 'use strict';
 const SAVE='almajlis_match_build224',safeParse=v=>{try{return JSON.parse(v)}catch(e){return null}};
-let paused=false,lastAward=null,decisionBusy=false;
+let paused=false,lastAward=null;
 function activeScreen(){return document.querySelector('.screen.active')?.id||''}
 function snapshot(){
  if(typeof team1==='undefined'||typeof team2==='undefined'||typeof selected==='undefined'||!Array.isArray(selected)||!selected.length)return;
@@ -5954,7 +5975,8 @@ function setTeamGlow224(){
 }
 function delta(n,pts){const target=document.getElementById(n===1?'s1':'s2'),r=target?.getBoundingClientRect();if(!r)return;const x=document.createElement('div');x.className='scoreDelta224';x.textContent='+'+pts;x.style.left=(r.left+r.width/2)+'px';x.style.top=(r.top+r.height/2)+'px';document.body.appendChild(x);setTimeout(()=>x.remove(),950)}
 const oldAward=window.award;window.award=function(n){
- if(decisionBusy)return;decisionBusy=true;setTimeout(()=>decisionBusy=false,700);
+ // The core lock belongs to the current question; a timed global lock rejects a new question.
+ if(!current?.q||finalDecisionLocked)return;
  lastAward={score1,score2,usedCount,currentTurn,btn:current?.btn||null,html:current?.btn?.innerHTML||'',q:current?.q||null};
  if(n===1||n===2)delta(n,Number(current?.pts||0));const out=oldAward.apply(this,arguments);setTimeout(()=>{setTeamGlow224();snapshot()},0);return out
 };
@@ -9188,25 +9210,6 @@ body:has(#mjAuthGate.mjAuthHidden):has(#home.screen.active)>#mjLogoutBtn{display
 @media(max-height:520px) and (orientation:landscape){#mjLogoutBtn{top:max(9px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));min-width:126px;height:46px;padding:0 16px;font-size:17px}}
 </style>
 <script id="BUILD255_START_LOGOUT_RUNTIME">
-/* BUILD 258: restore the category renderer removed with the legacy builders. */
-window.categoryImageSource=function(c){
- const maps=[
-  typeof BUILD216_CATEGORY_IMAGES==='object'?BUILD216_CATEGORY_IMAGES:null,
-  typeof BUILD214_LOCKED_PHOTO_IMAGES==='object'?BUILD214_LOCKED_PHOTO_IMAGES:null,
-  typeof BUILD199_CATEGORY_IMAGE_SOURCES==='object'?BUILD199_CATEGORY_IMAGE_SOURCES:null,
-  typeof CATEGORY_IMAGE_SOURCES==='object'?CATEGORY_IMAGE_SOURCES:null
- ];
- for(const map of maps){if(map&&map[c])return map[c]}
- return '';
-};
-window.categoryVisual=function(c){
- const name=String(c||''),src=window.categoryImageSource(name);
- const safeName=name.replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
- if(!src)return '<span class="catAsset build258Fallback" aria-label="'+safeName+'"></span>';
- const safeSrc=String(src).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
- const cls=/^data:image\/jpeg|\.jpe?g(?:\?|$)/i.test(src)?'catPhoto':'catAsset';
- return '<img class="'+cls+'" src="'+safeSrc+'" alt="'+safeName+'" loading="eager" decoding="async">';
-};
 document.addEventListener('DOMContentLoaded',()=>{
  document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-259-PHOTO-COVERS-PRIORITY-PRELOAD-20260917');
  document.querySelector('meta[name="build-number"]')?.setAttribute('content','259');
@@ -9871,7 +9874,7 @@ document.addEventListener('error',event=>{
 #goalViewer292 button{position:absolute;top:max(10px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));z-index:3;background:#fff;color:#111;border:0;border-radius:12px;padding:10px 17px;font:bold 18px Arial}
 </style>
 
-<script>document.querySelector('#draw .note')?.replaceChildren(document.createTextNode('الإصدار: BUILD 302'));</script>
+<script>document.querySelector('#draw .note')?.replaceChildren(document.createTextNode('الإصدار: BUILD 303'));</script>
 <style id="TEAM_LINEUP_FLAGS_293">
 #questionScreen.lineupMode #qMedia:has(.filledImage){width:min(900px,98%)!important;max-width:none!important;max-height:49dvh!important;overflow:hidden!important}
 #questionScreen.lineupMode #qMedia .filledImage{width:100%!important;height:100%!important;max-height:49dvh!important;background:transparent!important}
@@ -9884,4 +9887,4 @@ document.addEventListener('error',event=>{
 #mjAnswerScreen.screen.active .mjAnswerMedia video{width:100%!important;height:50dvh!important;max-height:55dvh!important;object-fit:contain!important}
 #questionScreen #qMedia .mapStage,#questionScreen #qMedia .mapStage img{background:#fff!important}
 #questionScreen #qMedia .goalVideoStage video{max-height:46dvh!important}
-</style><script id="MAJLIS_302_BUILD_MARK">(()=>{function mark(){document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-302-MEDIA-OBSERVER-STABILITY');document.querySelector('meta[name="build-number"]')?.setAttribute('content','302');document.querySelector('#draw .note')?.replaceChildren(document.createTextNode('الإصدار: BUILD 302'));try{sessionStorage.setItem('almajlis_build_seen','302');sessionStorage.setItem('almajlis_active_build','302')}catch(_){}}document.addEventListener('DOMContentLoaded',mark,{once:true});window.addEventListener('pageshow',mark,{passive:true})})();</script></body></html>
+</style><script id="MAJLIS_303_BUILD_MARK">(()=>{function mark(){document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-303-QUESTION-DECISION-STABILITY');document.querySelector('meta[name="build-number"]')?.setAttribute('content','303');document.querySelector('#draw .note')?.replaceChildren(document.createTextNode('الإصدار: BUILD 303'));try{sessionStorage.setItem('almajlis_build_seen','303');sessionStorage.setItem('almajlis_active_build','303')}catch(_){}}document.addEventListener('DOMContentLoaded',mark,{once:true});window.addEventListener('pageshow',mark,{passive:true})})();</script></body></html>
