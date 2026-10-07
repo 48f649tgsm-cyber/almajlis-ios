@@ -2002,7 +2002,7 @@ async function loadBank(){
   if(showMimeRevealFromUrl())return;
   selected=[];loadStatus.className='';
   try{
-    const cached=JSON.parse(localStorage.getItem('almajlis_content_snapshot_v312')||'null');
+    const cached=JSON.parse(localStorage.getItem('almajlis_content_snapshot_v313')||'null');
     if(cached?.bank&&cached?.categories?.length){
       bank=applyReviewedContent311(cached.bank);categories=cached.categories;
       loadStatus.textContent='المجلس جاهز — جارٍ التحقق من آخر تحديث في الخلفية.';
@@ -2010,15 +2010,8 @@ async function loadBank(){
       return;
     }
   }catch(error){console.warn('تعذر فتح النسخة المحلية',error)}
-  const embedded=window.ALMAJLIS_EMBEDDED_SNAPSHOT;
-  if(embedded?.bank&&embedded?.categories?.length){
-    bank=applyReviewedContent311(embedded.bank);categories=embedded.categories;
-    loadStatus.textContent='المجلس جاهز — جارٍ التحقق من آخر تحديث في الخلفية.';
-    newGameBtn.disabled=false;
-    return;
-  }
   bank={};categories=[];
-  loadStatus.textContent='سجّل الدخول لتحميل مخزون الأسئلة المعتمد أول مرة.';
+  loadStatus.textContent='جارٍ تحميل مخزون الأسئلة المعتمد من Supabase…';
   newGameBtn.disabled=true;
 }
 
@@ -2741,9 +2734,9 @@ function renderQuestionMedia(q){
   }
   if(m.type==='video'){
     const src=String(m.src||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;');
-    const series=cat==='مسلسلات عربية'||/questions\/arabic-series\//.test(String(m.src||''));
+    const series=cat==='مسلسلات عربية'||cat==='افلام اجنبية'||/questions\/(?:arabic-series|foreign-movies)\//.test(String(m.src||''));
     const silent=!series&&(current?.cat==='من سجل الهدف'||m.silent===true);
-    return `<div class="mediaFrame goalVideoStage${series?' arabicSeriesVideo312':''}"><video src="${src}" ${silent?'autoplay muted loop':'controls'} playsinline webkit-playsinline preload="metadata" aria-label="${silent?'فيديو السؤال المموّه والصامت':'فيديو السؤال'}"></video>${series?'<button type="button" class="seriesExpand312" aria-label="تكبير الفيديو">⛶ تكبير الفيديو</button>':cat==='من سجل الهدف'?'<button type="button" class="goalExpand294" aria-label="تكبير الفيديو">⛶ تكبير الفيديو</button>':''}</div>`;
+    return `<div class="mediaFrame goalVideoStage${series?' arabicSeriesVideo312':''}"><video x-webkit-airplay="allow" src="${src}" ${silent?'autoplay muted loop':'controls'} playsinline webkit-playsinline preload="metadata" aria-label="${silent?'فيديو السؤال المموّه والصامت':'فيديو السؤال'}"></video>${series?'<button type="button" class="seriesExpand312" aria-label="تكبير الفيديو">⛶ تكبير الفيديو</button>':cat==='من سجل الهدف'?'<button type="button" class="goalExpand294" aria-label="تكبير الفيديو">⛶ تكبير الفيديو</button>':''}</div>`;
   }
   if(m.type==='audio'){
     if(!m.src)return `<div class="mediaError">المقطع الصوتي غير متوفر.</div>`;
@@ -9016,11 +9009,11 @@ body>#mjBoardV5{display:none!important}
   }
   if(!linked)return null;
   const path=`questions/${linked.folder}/${linked.file}`;
-  const src=contentDb.storage.from('question-media').getPublicUrl(path).data.publicUrl+'?build=288';
+  const src=contentDb.storage.from('question-media').getPublicUrl(path).data.publicUrl+'?build=313';
   return {type:/\.mp3$/i.test(linked.file)?'audio':/\.(mp4|webm|mov)$/i.test(linked.file)?'video':'image',src,alt:'وسيط السؤال',cacheKey:'question-media/'+path};
  }
- const CONTENT_SNAPSHOT_KEY='almajlis_content_snapshot_v288';
- const MEDIA_CACHE_NAME='almajlis-question-media-v288';
+ const CONTENT_SNAPSHOT_KEY='almajlis_content_snapshot_v313';
+ const MEDIA_CACHE_NAME='almajlis-question-media-v313';
  const mediaCacheUrl=key=>new URL('__almajlis_media_cache__/'+encodeURIComponent(key),location.href).href;
  function allMedia(sourceBank){
   const list=[];
@@ -9235,8 +9228,9 @@ document.addEventListener('DOMContentLoaded',()=>{
 
  function openCategories255(){
   if(!Array.isArray(categories)||!categories.length){
-   const embedded=window.ALMAJLIS_EMBEDDED_SNAPSHOT;
-   if(embedded?.bank&&embedded?.categories?.length){bank=applyReviewedContent311(embedded.bank);categories=embedded.categories}
+   try{window.syncAlmajlisContent?.(true)}catch(_){ }
+   const status=document.getElementById('loadStatus');if(status)status.textContent='انتظر اكتمال مزامنة الأسئلة المعتمدة من Supabase.';
+   return;
   }
   selected=[];
   score1=0;score2=0;current=null;currentTurn=1;gameQuestions={};
@@ -9966,4 +9960,5 @@ document.addEventListener('error',event=>{
  window.addEventListener('pagehide',close);
 })();
 </script>
+<script src="./build313.js"></script>
 </body></html>
