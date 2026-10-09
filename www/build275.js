@@ -2,8 +2,9 @@
 (()=>{'use strict';
  const BUILD='275',KEY='almajlis_helpers_275';
  const fresh=()=>({used:{1:{two:false,block:false,double:false},2:{two:false,block:false,double:false}},pendingDoubleTeam:0});
+ function cleanState(saved){const clean=fresh();for(const team of [1,2])for(const type of ['two','block','double'])clean.used[team][type]=saved?.used?.[team]?.[type]===true;const pending=Number(saved?.pendingDoubleTeam);clean.pendingDoubleTeam=[1,2].includes(pending)&&clean.used[pending].double?pending:0;return clean}
  let state=fresh();
- try{const saved=JSON.parse(sessionStorage.getItem(KEY)||'null');if(saved?.used)state={...fresh(),...saved}}catch(_){ }
+ try{const saved=JSON.parse(sessionStorage.getItem(KEY)||'null');state=cleanState(saved)}catch(_){ }
 
  function save(){try{sessionStorage.setItem(KEY,JSON.stringify(state))}catch(_){ }}
  function reset(){state.used=fresh().used;state.pendingDoubleTeam=0;save();syncBoard();window.ALMAJLIS_STABLE_QUESTION_272?.syncHelpButtons?.()}
@@ -30,9 +31,10 @@
   syncBoard();
  }
  function activateBoardDouble(team){
+  if(![1,2].includes(team))return;
   if(state.used?.[team]?.double)return;
   if(typeof currentTurn!=='undefined'&&Number(currentTurn)!==team){window.showGameToast?.('دبل النقاط متاحة للفريق صاحب الدور فقط');return}
-  state.used[team].double=true;state.pendingDoubleTeam=team;save();syncBoard();window.showGameToast?.('تم تفعيل دبل النقاط للسؤال القادم')
+  state.used[team].double=true;state.pendingDoubleTeam=team;save();syncBoard();window.ALMAJLIS_MATCH_STATE?.snapshot?.();window.showGameToast?.('تم تفعيل دبل النقاط للسؤال القادم')
  }
  function syncBoard(){const root=document.getElementById('mjBoardV5')?.shadowRoot;if(!root)return;root.querySelectorAll('.help275').forEach(button=>{const team=Number(button.dataset.team),type=button.dataset.type,active=type==='double'&&state.pendingDoubleTeam===team;button.classList.toggle('active',active);button.classList.toggle('used',!!state.used?.[team]?.[type]&&!active)})}
 
@@ -47,7 +49,11 @@
  }
  function install(){installNameLimit();installBoard();wrapFlows();document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-275-HELPERS-VISUAL-20260922');document.querySelector('meta[name="build-number"]')?.setAttribute('content',BUILD);document.querySelector('#draw .note')?.replaceChildren(document.createTextNode('الإصدار: BUILD '+BUILD));try{sessionStorage.setItem('almajlis_build_seen',BUILD);sessionStorage.setItem('almajlis_active_build',BUILD)}catch(_){ }}
 
- window.ALMAJLIS_HELP_275={state,save,reset,syncBoard,install,normalizeName,activateBoardDouble};
+ function restore(saved){
+  const clean=cleanState(saved);
+  state.used=clean.used;state.pendingDoubleTeam=clean.pendingDoubleTeam;save();syncBoard();window.ALMAJLIS_STABLE_QUESTION_272?.syncHelpButtons?.();
+ }
+ window.ALMAJLIS_HELP_275={state,save,reset,restore,syncBoard,install,normalizeName,activateBoardDouble};
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
  window.addEventListener('pageshow',install,{passive:true});
 })();

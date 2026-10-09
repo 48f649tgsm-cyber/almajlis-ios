@@ -17,7 +17,7 @@
  function categoryShell(){return document.getElementById('mjCategoriesV2')}
  function updateFooterState(){
   const start=document.querySelector('#mjCategoriesV2 #startBtn');
-  if(start)start.disabled=selected.length!==6||!document.getElementById('t1')?.value.trim()||!document.getElementById('t2')?.value.trim();
+  if(start)start.disabled=(typeof matchPreparing!=='undefined'&&matchPreparing)||selected.length!==6||!document.getElementById('t1')?.value.trim()||!document.getElementById('t2')?.value.trim();
  }
  function updateRail265(){
   const rail=document.getElementById('mjv2Rail');if(!rail)return;
@@ -26,7 +26,7 @@
    const name=selected[i],slot=document.createElement('div');slot.className='mjv2-slot'+(name?'':' is-empty');
    if(name){
     const src=window.categoryImageSource(name);slot.innerHTML='<span class="mjv2-thumb">'+(src?'<img src="'+esc(src)+'" alt="" loading="lazy">':'')+'</span><span class="mjv2-slot-name">'+esc(name)+'</span><button class="mjv2-remove" type="button" aria-label="حذف '+esc(name)+'">×</button>';
-    slot.querySelector('button').addEventListener('click',event=>{event.preventDefault();event.stopPropagation();selected=selected.filter(x=>x!==name);updateSelection265()});
+    slot.querySelector('button').addEventListener('click',event=>{event.preventDefault();event.stopPropagation();if(typeof matchPreparing!=='undefined'&&matchPreparing)return;selected=selected.filter(x=>x!==name);updateSelection265()});
    }
    rail.appendChild(slot);
   }
@@ -57,6 +57,7 @@
   updateSelection265();
  }
  function chooseCategory265(name){
+  if(typeof matchPreparing!=='undefined'&&matchPreparing)return;
   if(!playableCache.get(name))return;
   if(selected.includes(name))selected=selected.filter(x=>x!==name);
   else if(selected.length<6)selected=[...selected,name];
@@ -99,6 +100,7 @@
   window.ALMAJLIS_PRELOAD_CATEGORIES=()=>Promise.resolve();
   const previousRender=window.renderCats;
   window.renderCats=function(){
+   if(typeof matchPreparing!=='undefined'&&matchPreparing)return;
    /* Preserve team values and shell, but avoid reconstructing every embedded image. */
    if(!categoryShell()&&typeof previousRender==='function')previousRender.apply(this,arguments);
    renderCategories265(true);

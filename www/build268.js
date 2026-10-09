@@ -10,7 +10,7 @@
   if(cat===CAREER){
    if(!q||!q.id||!q.answer||![100,300,500].includes(Number(q.points)))return false;
    if(typeof usedIds!=='undefined'&&usedIds?.has?.(q.id))return false;
-   return q.media?.type==='image'&&!!q.media?.src;
+   return q.media?.type==='image'&&typeof q.media.src==='string'&&!!q.media.src.trim();
   }
   return typeof previousAvailable==='function'?previousAvailable(q,cat):true;
  };
@@ -18,7 +18,7 @@
  function careerInventory(){
   const items=Array.isArray(window.bank?.[CAREER])?window.bank[CAREER]:(typeof bank!=='undefined'&&Array.isArray(bank?.[CAREER])?bank[CAREER]:[]);
   const tiers={100:0,300:0,500:0};
-  for(const q of items){if(window.questionAvailable(q,CAREER)&&tiers[Number(q.points)]!==undefined)tiers[Number(q.points)]++}
+  for(const points of [100,300,500])tiers[points]=typeof remainingByLevel==='function'?remainingByLevel(CAREER,points):0;
   return {total:items.length,tiers,playable:tiers[100]>=2&&tiers[300]>=2&&tiers[500]>=2};
  }
 

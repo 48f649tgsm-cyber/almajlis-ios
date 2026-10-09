@@ -1,6 +1,6 @@
 /* BUILD 272 — isolated question runtime; legacy question observers stay dormant */
 (()=>{'use strict';
- const state={interval:0,seconds:30,steal:false,revealed:false,activeTeam:1,doubleTeam:0,twoAnswersTeam:0};
+ const state={interval:0,seconds:30,steal:false,revealed:false,activeTeam:1,doubleTeam:0,twoAnswersTeam:0,mimeStarted:false,timerPaused:false};
  const esc=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 
  function createHost(){
@@ -19,10 +19,10 @@
    .question{flex:0 0 auto;width:min(1000px,96%);max-height:25dvh;padding:8px 15px;border:1.5px solid #df7568;border-radius:16px;background:#fff;font-size:clamp(18px,2.15vw,29px);font-weight:700;line-height:1.48;text-align:center;overflow:auto}.question.long{font-size:clamp(15px,1.75vw,24px)}.ayah{display:block;margin-top:7px;font-family:"Amiri Quran","Traditional Arabic",serif;font-size:1.18em;line-height:1.8}
    .media{flex:1 1 auto;display:grid;place-items:center;width:min(1040px,98%);height:35dvh;min-height:0;max-height:390px;padding:0;border:1px solid #c5c5c5;border-radius:17px;background:#202b35;overflow:hidden}.media:empty{display:none}.media img,.media video{display:block;width:auto!important;height:auto!important;max-width:100%!important;max-height:100%!important;margin:auto!important;border-radius:11px;object-fit:contain!important}.media img{cursor:zoom-in}.media audio{width:min(680px,92%)}.media .mediaFrame{width:100%;height:100%;margin:0!important}.media .filledImage{position:relative;display:grid;place-items:center;overflow:hidden;border-radius:16px;background:#202b35}.media .filledImage .mediaBackdrop{position:absolute!important;inset:-9%;width:118%!important;height:118%!important;max-width:none!important;max-height:none!important;object-fit:cover!important;filter:blur(22px) brightness(.5) saturate(.8);transform:scale(1.08);border-radius:0!important}.media .filledImage .mediaMain{position:relative!important;z-index:1;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;border-radius:10px!important;filter:drop-shadow(0 5px 12px #0008)}.media .wikiPlayerStage{width:100%;height:100%;display:grid;place-items:center}.media .wikiPlayerStage img{width:100%!important;height:100%!important;object-fit:contain!important}
    .reveal,.who-button{position:absolute;left:4%;bottom:-24px;min-width:165px;height:48px;padding:0 20px;border:1px solid #9c3026;border-radius:15px;background:#cf7467;color:#fff;font-weight:800}.who-button{display:none;background:#172733;border-color:#172733}.who-button.show{display:block}.answer{display:none;width:min(900px,94%);padding:10px 16px;border:1.5px solid #df7568;border-radius:16px;background:#fff;text-align:center}.answer.show{display:block}.answer b{display:block;color:#b40000;font-size:clamp(20px,2.4vw,32px)}
-   .media-modal,.decision-screen{position:fixed;inset:0;z-index:20;display:none;place-items:center;padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));background:#07111af2}.media-modal.show,.decision-screen.show{display:grid}.zoom-surface{width:100%;height:100%;display:grid;place-items:center;overflow:hidden;touch-action:none;user-select:none}.media-modal img{display:block;max-width:96vw;max-height:90dvh;object-fit:contain;transform-origin:center center;pointer-events:none;-webkit-user-drag:none}.modal-close{position:absolute;z-index:2;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));width:52px;height:52px;border:0;border-radius:50%;background:#fff;color:#111;font-size:25px;font-weight:900}.decision-screen{z-index:21;background:#fff;color:#172733}.decision-back{position:absolute;top:max(13px,env(safe-area-inset-top));right:max(13px,env(safe-area-inset-right));min-width:150px;height:48px;border:1.5px solid #c66556;border-radius:15px;background:#fff;color:#9c3026;font-weight:800}.decision-card{width:min(760px,92vw);display:grid;gap:18px;text-align:center}.decision-card h1{margin:0 0 12px;color:#b40000;font-size:clamp(30px,4.5vw,58px)}.decision-team,.decision-none{width:100%;min-height:88px;padding:14px 22px;border:0;border-radius:22px;color:#fff;font-size:clamp(25px,3.6vw,47px);font-weight:900;box-shadow:0 10px 26px #0002}.decision-one{background:#303fa6}.decision-two{background:#d33327}.decision-none{width:min(420px,80%);min-height:68px;margin:auto;background:#65717d;font-size:clamp(21px,2.8vw,35px)}
+   .media-modal,.decision-screen{position:fixed;inset:0;z-index:20;display:none;place-items:center;padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));background:#07111af2}.media-modal{z-index:110}.media-modal.show,.decision-screen.show{display:grid}.zoom-surface{width:100%;height:100%;display:grid;place-items:center;overflow:hidden;touch-action:none;user-select:none}.media-modal img{display:block;max-width:96vw;max-height:90dvh;object-fit:contain;transform-origin:center center;pointer-events:none;-webkit-user-drag:none}.modal-close{position:absolute;z-index:2;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));width:52px;height:52px;border:0;border-radius:50%;background:#fff;color:#111;font-size:25px;font-weight:900}.decision-screen{z-index:21;background:#fff;color:#172733}.decision-back{position:absolute;top:max(13px,env(safe-area-inset-top));right:max(13px,env(safe-area-inset-right));min-width:150px;height:48px;border:1.5px solid #c66556;border-radius:15px;background:#fff;color:#9c3026;font-weight:800}.decision-card{width:min(760px,92vw);display:grid;gap:18px;text-align:center}.decision-card h1{margin:0 0 12px;color:#b40000;font-size:clamp(30px,4.5vw,58px)}.decision-team,.decision-none{width:100%;min-height:88px;padding:14px 22px;border:0;border-radius:22px;color:#fff;font-size:clamp(25px,3.6vw,47px);font-weight:900;box-shadow:0 10px 26px #0002}.decision-one{background:#303fa6}.decision-two{background:#d33327}.decision-none{width:min(420px,80%);min-height:68px;margin:auto;background:#65717d;font-size:clamp(21px,2.8vw,35px)}
    aside{min-height:0;display:flex;flex-direction:column;justify-content:center;gap:16px;direction:rtl}.team{display:grid;grid-template-rows:34px 58px 46px;padding:5px;border:1.5px solid #202b35;border-radius:19px;background:#fff}.name{z-index:1;display:grid;place-items:center;width:92%;margin:0 auto -4px;padding:3px;border-radius:13px 13px 6px 6px;background:#293f54;color:#fff;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.score{display:grid;place-items:center;border-radius:13px;color:#fff;font:700 clamp(24px,3vw,38px) Arial}.team:first-child .score{background:#303fa6}.team:last-child .score{background:#d33327}.helps{display:flex;align-items:center;justify-content:center;gap:7px;padding-top:5px}.help{display:grid;place-items:center;width:38px;height:38px;padding:5px;border:2px solid var(--help-accent);border-radius:50%;background:#090909;color:#d9b75f;cursor:pointer;box-shadow:0 2px 6px #0004}.help[data-type="two"]{--help-accent:#29a9e8}.help[data-type="block"]{--help-accent:#ef5c55}.help[data-type="double"]{--help-accent:#9a72db}.help svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}.help .x2{font:800 18px Arial;color:#d9b75f}.help.active{background:#090909;color:#f5d77d;box-shadow:0 0 0 3px var(--help-accent),0 0 13px var(--help-accent)}.help:disabled,.help.used{opacity:.3;filter:grayscale(1);cursor:default}.urgent{background:#d33327!important;color:#fff;animation:pulse .55s infinite alternate}@keyframes pulse{to{transform:translateX(-50%) scale(1.08)}}
    @media(max-height:530px){.screen{grid-template-rows:50px minmax(0,1fr)}.nav{top:5px;height:39px}.card{margin:29px 2px 21px;padding:37px 14px 31px}.question{font-size:clamp(16px,3.8vh,23px);max-height:21dvh}.media{height:36dvh;max-height:36dvh}.media img,.media video{max-height:100%!important}.points{top:-27px;height:48px}.timer{top:-28px;width:56px;height:56px}.category,.reveal{bottom:-21px;height:43px}}
-  </style><main class="screen"><header><button class="nav exit" type="button">الخروج</button><button class="nav back" type="button">الرجوع إلى اللوحة</button><div class="turn"></div><div class="brand">المجلس</div></header><section class="stage"><article class="card"><div class="points"></div><div class="timer">00:30</div><div class="question"></div><div class="media"></div><div class="answer"><small>الإجابة الصحيحة</small><b></b></div><div class="category"></div><button class="reveal" type="button">الجواب</button><button class="who-button" type="button">من أجاب؟</button></article><aside><div class="team" data-team="1"><div class="name t1"></div><div class="score s1">0</div><div class="helps"></div></div><div class="team" data-team="2"><div class="name t2"></div><div class="score s2">0</div><div class="helps"></div></div></aside></section></main><div class="media-modal" role="dialog" aria-modal="true" aria-label="عرض الصورة مكبرة"><button class="modal-close" type="button" aria-label="إغلاق">×</button><div class="zoom-surface"><img alt="الصورة المكبرة"></div></div><section class="decision-screen" role="dialog" aria-modal="true" aria-label="من أجاب"><header><button class="decision-back" type="button">العودة إلى الجواب</button><div class="turn decision-turn"></div><div class="brand">المجلس</div></header><div class="stage"><article class="card"><div class="decision-card"><h1>من أجاب؟</h1><div class="decision-choices"><button class="decision-team decision-one" type="button"></button><button class="decision-team decision-two" type="button"></button></div><button class="decision-none" type="button">لا أحد</button></div></article><aside><div class="team" data-team="1"><div class="name decision-t1"></div><div class="score decision-s1">0</div></div><div class="team" data-team="2"><div class="name decision-t2"></div><div class="score decision-s2">0</div></div></aside></div></section>`;
+  </style><main class="screen"><header><button class="nav exit" type="button">الخروج</button><button class="nav back" type="button">الرجوع إلى اللوحة</button><div class="turn"></div><div class="brand">المجلس</div></header><section class="stage"><article class="card"><div class="points"></div><div class="timer">00:30</div><div class="question"></div><div class="media"></div><div class="answer"><small>الإجابة الصحيحة</small><b></b></div><div class="category"></div><button class="reveal" type="button">الجواب</button><button class="who-button" type="button">من أجاب؟</button></article><aside><div class="team" data-team="1"><div class="name t1"></div><div class="score s1">0</div><div class="helps"></div></div><div class="team" data-team="2"><div class="name t2"></div><div class="score s2">0</div><div class="helps"></div></div></aside></section></main><div class="media-modal" role="dialog" aria-modal="true" aria-label="عرض الصورة مكبرة"><button class="modal-close" type="button" aria-label="إغلاق">×</button><div class="zoom-surface"><img alt="الصورة المكبرة"></div></div><section class="decision-screen" role="dialog" aria-modal="true" aria-label="من أجاب"></section>`;
   const mediaFit=document.createElement('style');
   mediaFit.textContent=`.card{justify-content:flex-start}.media{flex:1 1 0;height:auto;max-height:none;min-height:0;width:min(1040px,98%);background:#f8f7f3;display:flex!important;align-items:stretch;justify-content:center}.media .mediaFrame,.media .filledImage,.media .flagStage,.media .lineupStage,.media .mjCareerImage260{width:100%!important;height:100%!important;min-height:0!important;max-width:100%!important;max-height:100%!important;overflow:hidden!important}.media .filledImage{position:relative!important;display:block!important}.media .filledImage .mediaMain{position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;object-position:center!important}.media .mediaFrame>img:not(.mediaMain):not(.mediaBackdrop),.media .mjCareerImage260 img{display:block!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;object-position:center!important}.media .lineupStage{display:flex!important;flex-direction:column!important;justify-content:flex-start!important;overflow:hidden!important;padding:7px!important}.media .lineupStage .lineupHeader,.media .lineupStage .lineupHint{flex:none!important}.media .lineupStage .footballPitch{min-height:0!important;max-height:100%!important;height:auto!important;width:min(100%,650px)!important;aspect-ratio:auto!important;flex:1 1 0!important;margin:0 auto!important}.media .mediaBackdrop{display:none!important}.media .letterGrid{display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;grid-template-rows:repeat(4,minmax(0,1fr))!important;align-content:center!important;gap:min(1.2vh,10px)!important;width:min(100%,650px)!important;height:100%!important;padding:10px!important;margin:auto!important}.media .letterCell{display:grid!important;place-items:center!important;min-height:0!important;aspect-ratio:auto!important;border-radius:10px!important;border:1px solid #c9d7de!important;background:#edf5f8!important;color:#243442!important;font-size:clamp(16px,3.4vh,30px)!important;font-weight:800!important}.media .letterCell.active{background:#f37b4a!important;color:#fff!important;border-color:#bd4c23!important}.career-question .question{flex:none}.career-question .media{flex:1 1 0}`;
   root.appendChild(mediaFit);
@@ -50,7 +50,14 @@
    .media .mediaError{display:grid;place-items:center;width:100%;padding:14px;text-align:center;color:#8b2020}.media .filledImage .mediaError{position:absolute;inset:0;background:#fff9f7}
    @media(max-height:530px){.media .lineupStage .lineupHeader,.media .lineupStage .lineupHint{font-size:clamp(10px,2vh,14px);padding:2px}.media .playerGallery{gap:5px;padding:5px}}
   `;
+  allMediaFit.textContent+=`
+   .series-video-modal{position:fixed;inset:0;z-index:110;display:none;place-items:center;background:#000;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+   .series-video-modal.show{display:grid}.series-video-modal video{width:100%;height:100%;object-fit:contain}.series-video-modal button{position:absolute;right:max(12px,env(safe-area-inset-right));top:max(12px,env(safe-area-inset-top));z-index:1;border:0;border-radius:12px;padding:10px 16px;background:#fff;color:#111}
+   .arabicSeriesVideo312{position:relative;display:grid;place-items:center}.seriesExpand312{position:absolute;top:8px;left:8px;z-index:2;border:0;border-radius:10px;background:#243d43;color:#fff;padding:8px 12px}
+   .mimeQrShell{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:8px;width:100%;min-height:0;text-align:center;background:#fff;overflow:auto}.mimeQrSvg{width:min(240px,35vh);height:min(240px,35vh);flex:none}.mimeStartBtn{border:0;border-radius:12px;padding:10px 18px;background:#243d43;color:#fff}.mimeQrStep{display:none}.mimeActingLive{display:grid;place-content:center;width:100%;text-align:center;padding:20px;background:#fff;color:#243d43}
+  `;
   root.appendChild(allMediaFit);
+  root.addEventListener('play',event=>{const playing=event.target;if(!playing.matches?.('audio,video'))return;root.querySelectorAll('audio,video').forEach(m=>{if(m!==playing)m.pause()})},true);
   const goalStyle=document.createElement('style');
   goalStyle.textContent=`
    .screen.goal-question .media,.screen.goal-answer .media{flex:1 1 0;min-height:0;max-height:none;background:#f8f7f3}
@@ -137,7 +144,7 @@
   root.querySelector('.back').onclick=returnToBoard;
   root.querySelector('.exit').onclick=()=>{if(confirm('هل تريد الخروج من اللعبة؟')){stopTimer();hide();if(window.ALMAJLIS_STABILITY_273?.goHome){window.ALMAJLIS_STABILITY_273.goHome()}else{window.show?.('home')}}};
   root.querySelector('.who-button').onclick=openDecision;
-  root.querySelector('.decision-one').onclick=()=>givePoints(1);root.querySelector('.decision-two').onclick=()=>givePoints(2);root.querySelector('.decision-none').onclick=()=>givePoints(0);root.querySelector('.decision-back').onclick=closeDecision;root.querySelector('.answer-one').onclick=()=>givePoints(1);root.querySelector('.answer-two').onclick=()=>givePoints(2);root.querySelector('.answer-none').onclick=()=>givePoints(0);
+  root.querySelector('.answer-one').onclick=()=>givePoints(1);root.querySelector('.answer-two').onclick=()=>givePoints(2);root.querySelector('.answer-none').onclick=()=>givePoints(0);
   const mediaModal=root.querySelector('.media-modal');root.querySelector('.media').onclick=event=>{const image=event.target.closest('img');if(!image)return;mediaModal.querySelector('img').src=image.currentSrc||image.src;mediaModal.classList.add('show')};mediaModal.onclick=event=>{if(event.target===mediaModal||event.target.closest('.modal-close'))mediaModal.classList.remove('show')};
   root.querySelector('.media').addEventListener('error',event=>{
    const image=event.target;if(!(image instanceof HTMLImageElement)||!image.classList.contains('mediaMain'))return;
@@ -150,6 +157,7 @@
     image.style.setProperty('display','none','important');holder.appendChild(error);
    }
   },true);
+  root.addEventListener('error',event=>{const media=event.target;if(!media.matches?.('audio,video,img.ai-answer-photo'))return;const holder=media.parentElement;if(!holder||holder.querySelector('.mediaError'))return;const message=document.createElement('div');message.className='mediaError';message.setAttribute('role','status');message.textContent=media.matches('img')?'تعذر تحميل صورة الجواب. تحقق من الاتصال.':'تعذر تحميل المقطع. تحقق من الاتصال أو ملف الوسيط.';holder.append(message)},true);
   installHelpButtons(root);
   return host;
  }
@@ -187,7 +195,7 @@
   return '';
  }
  function renderGoalMedia(host,src,original){
-  closeGoalViewer();host.querySelectorAll('.goal-stage').forEach(stage=>stage.goalResize?.disconnect());host.querySelectorAll('video').forEach(v=>v.pause());host.replaceChildren();host.classList.add('goal-media');
+  closeGoalViewer();host.querySelectorAll('video').forEach(v=>v.pause());host.querySelectorAll('.goal-stage').forEach(stage=>{stage.goalResize?.disconnect();if(stage.goalResizeFallback)window.removeEventListener('resize',stage.goalResizeFallback)});host.replaceChildren();host.classList.add('goal-media');
   if(!src){host.textContent='الفيديو الأصلي غير مرتبط بهذا السؤال.';return}
   const stage=document.createElement('div');stage.className='goal-stage';
   const video=document.createElement('video');video.src=src;video.controls=false;video.playsInline=true;video.setAttribute('playsinline','');video.preload='metadata';video.muted=!original;video.loop=!original;
@@ -205,7 +213,7 @@
   video.addEventListener('play',()=>paintGoalButton(video,play));video.addEventListener('pause',()=>paintGoalButton(video,play));
   video.addEventListener('loadedmetadata',()=>fitGoalVideo(video));
   if(typeof ResizeObserver==='function'){stage.goalResize=new ResizeObserver(()=>fitGoalVideo(video));stage.goalResize.observe(stage)}
-  else window.addEventListener('resize',()=>fitGoalVideo(video),{passive:true});
+  else{stage.goalResizeFallback=()=>fitGoalVideo(video);window.addEventListener('resize',stage.goalResizeFallback,{passive:true})}
   video.play().catch(()=>{});
  }
  function fitPlayerQuestion(){
@@ -219,11 +227,62 @@
   if(q.dataset.fullTextVisible==='no')q.style.overflow='auto';
  }
  function stopTimer(){clearInterval(state.interval);state.interval=0}
- function hide(){stopTimer();const host=document.getElementById('mjStableQuestion272');if(host){host.shadowRoot.querySelectorAll('video').forEach(v=>v.pause());host.style.display='none'}}
+ function hide(){
+  window.ALMAJLIS_MATCH_STATE?.clearPause?.();
+  stopTimer();state.timerPaused=false;
+  const host=document.getElementById('mjStableQuestion272');if(!host)return;
+  closeGoalViewer();closeSeriesViewer();
+  const r=host.shadowRoot;r.querySelectorAll('video,audio').forEach(m=>m.pause());
+  r.querySelectorAll('.media-modal,.decision-screen').forEach(m=>m.classList.remove('show'));
+  r.querySelector('.decision-screen').replaceChildren();r.querySelector('.media-modal img')?.removeAttribute('src');host.style.display='none';
+ }
+ function snapshotHelpers(){
+  const saved=JSON.parse(JSON.stringify(helperStore()));
+  if(current?.q&&current?.btn?.dataset.used!=='1'&&state.doubleTeam)saved.pendingDoubleTeam=state.doubleTeam;
+  return saved;
+ }
+ function suspendTimer(){if(state.interval){state.timerPaused=true;stopTimer()}}
+ function resumeTimer(){if(state.timerPaused&&!document.hidden&&!document.body.classList.contains('paused224')&&!state.revealed&&createHost().style.display!=='none'){state.timerPaused=false;startTimer()}}
+ function startMime(){
+  if(!current||current.cat!=='من غير كلام'||state.revealed||state.mimeStarted)return;
+  state.mimeStarted=true;state.seconds=60;state.steal=false;state.activeTeam=currentTurn;
+  root().querySelector('.media').innerHTML='<div class="mimeActingLive"><strong>بدأ التمثيل</strong><p>60 ثانية — تمثيل صامت دون كلام أو أصوات أو كتابة</p></div>';
+  setText('.turn','يمثّل الآن '+(currentTurn===1?team1:team2));syncHelpButtons();startTimer();
+ }
+ let seriesVideo=null,seriesHome=null;
+ function closeSeriesViewer(){
+  if(seriesVideo&&seriesHome?.isConnected)seriesHome.replaceWith(seriesVideo);
+  else if(seriesVideo)seriesVideo.remove();
+  seriesVideo=null;seriesHome=null;root().querySelector('.series-video-modal')?.classList.remove('show');
+ }
+ function expandSeries(button){
+  const video=button.closest('.arabicSeriesVideo312')?.querySelector('video');if(!video)return;
+  closeSeriesViewer();const r=root();let modal=r.querySelector('.series-video-modal');
+  if(!modal){modal=document.createElement('div');modal.className='series-video-modal';modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-label','عرض الفيديو مكبرًا');const close=document.createElement('button');close.type='button';close.textContent='✕ إغلاق';close.onclick=closeSeriesViewer;modal.append(close);r.append(modal)}
+  seriesVideo=video;seriesHome=document.createComment('series-video-home');video.before(seriesHome);modal.append(video);modal.classList.add('show');modal.querySelector('button').focus();
+ }
+ function wireQuestionMedia(){
+  const r=root(),media=r.querySelector('.screen .media');
+  media.querySelectorAll('.seriesExpand312').forEach(b=>b.onclick=()=>expandSeries(b));
+  media.querySelectorAll('.mimeStartBtn').forEach(b=>{b.removeAttribute('onclick');b.onclick=startMime});
+  for(const node of media.querySelectorAll('.wikiPlayerStage[data-wiki-player],.playerCard[data-wiki]')){
+   if(node.dataset.loading315==='1')continue;node.dataset.loading315='1';
+   let title='';try{title=decodeURIComponent(node.dataset.wikiPlayer||node.dataset.wiki||'')}catch(_){}
+   const q=current?.q;
+   const task=new Promise(resolve=>{const timer=setTimeout(()=>resolve(''),8000);Promise.resolve().then(()=>window.fetchWikiPlayerImage?.(title)).then(src=>{clearTimeout(timer);resolve(src||'')},()=>{clearTimeout(timer);resolve('')})});
+   task.then(src=>{
+    if(!node.isConnected||current?.q!==q)return;
+    const label=node.querySelector('.playerNum');
+    node.replaceChildren();if(src){const image=document.createElement('img');image.src=src;image.alt='صورة اللاعب';image.onerror=()=>{image.remove();const error=document.createElement('div');error.className='playerFallback';error.textContent='تعذر تحميل الصورة';node.prepend(error)};node.append(image)}else{const error=document.createElement('div');error.className='playerFallback';error.textContent='تعذر تحميل الصورة';node.append(error)}
+    if(label)node.append(label);
+   });
+  }
+ }
+ document.addEventListener('visibilitychange',()=>{if(document.hidden){suspendTimer();root().querySelectorAll('audio,video').forEach(m=>m.pause());window.ALMAJLIS_MATCH_STATE?.snapshot?.()}else resumeTimer()});
  function openDecision(){
   if(!current||!state.revealed)return;
-  const r=root(),decision=r.querySelector('.decision-screen');
-  if(current.cat==='من سجل الهدف')r.querySelector('.screen .media video')?.pause();
+  const r=root(),decision=r.querySelector('.decision-screen');closeSeriesViewer();closeGoalViewer();
+  r.querySelectorAll('audio,video').forEach(m=>m.pause());
   // Copy the actual answer screen so that its header, question, media and score rail
   // remain identical; only the answer card and its button change.
   const screen=r.querySelector('.screen').cloneNode(true);
@@ -244,11 +303,12 @@
   selection.querySelector('.selection-none').onclick=()=>givePoints(0);
   screen.querySelector('.media').onclick=event=>{const image=event.target.closest('img');if(!image)return;const modal=r.querySelector('.media-modal');modal.querySelector('img').src=image.currentSrc||image.src;modal.classList.add('show')};
   decision.replaceChildren(screen);
+  decision.querySelectorAll('.seriesExpand312').forEach(b=>b.onclick=()=>expandSeries(b));
   decision.classList.add('show');
  }
- function closeDecision(){const r=root();r.querySelector('.decision-screen').classList.remove('show');r.querySelector('.answer').classList.remove('choosing');r.querySelector('.who-button').textContent='من أجاب؟';if(current?.cat==='من سجل الهدف'){const video=r.querySelector('.screen .media video');if(video&&!video.hidden)video.play().catch(()=>{})}}
+ function closeDecision(){const r=root();closeSeriesViewer();const decision=r.querySelector('.decision-screen');decision.querySelectorAll('audio,video').forEach(m=>m.pause());decision.classList.remove('show');decision.replaceChildren();r.querySelector('.answer').classList.remove('choosing');r.querySelector('.who-button').textContent='من أجاب؟';if(current?.cat==='من سجل الهدف'){const video=r.querySelector('.screen .media video');if(video&&!video.hidden)video.play().catch(()=>{})}}
  function setText(selector,value){const node=root().querySelector(selector);if(node)node.textContent=value}
- function updateTimer(){const timer=root().querySelector('.timer');timer.textContent='00:'+String(Math.max(0,state.seconds)).padStart(2,'0');timer.classList.toggle('urgent',state.seconds<=5&&state.seconds>0)}
+ function updateTimer(){const timer=root().querySelector('.timer');timer.textContent=String(Math.floor(Math.max(0,state.seconds)/60)).padStart(2,'0')+':'+String(Math.max(0,state.seconds)%60).padStart(2,'0');timer.classList.toggle('urgent',state.seconds<=5&&state.seconds>0)}
  function helperStore(){return window.ALMAJLIS_HELP_275?.state||{used:{1:{two:false,block:false,double:false},2:{two:false,block:false,double:false}}}}
  function helperIcon(type){
   if(type==='two')return '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M25 37 16.5 13C15 9 17 5 20.5 4s6.5 1 7.7 4.6L35 31M35 31l5-23c.9-4 3.6-6.4 7-5.7 3.6.7 5.2 3.9 4.4 7.7L46 38"/><path d="M25 36c-3-5-6-8-9-9-3-1-6 1-6 4 0 2 2 4 5 7l5 6M46 36c4 1 7 4 8 8 1 8-5 16-14 17H29c-8-1-14-6-16-14l-2-9M24 43c3-4 8-5 12-2M31 48c3-4 8-5 12-2M28 60v-5M43 60v-5"/></svg>';
@@ -263,10 +323,11 @@
  }
  function syncHelpButtons(){
   const store=helperStore(),r=root();
-  for(const button of r.querySelectorAll('.help')){const team=Number(button.closest('.team')?.dataset.team),type=button.dataset.type,used=!!store.used?.[team]?.[type],active=(type==='double'&&state.doubleTeam===team)||(type==='two'&&state.twoAnswersTeam===team);button.classList.toggle('used',used&&!active);button.classList.toggle('active',active);button.disabled=type==='double'||used||(type==='block'?team===state.activeTeam:team!==state.activeTeam)||state.revealed}
+  for(const button of r.querySelectorAll('.help')){const team=Number(button.closest('.team')?.dataset.team),type=button.dataset.type,used=!!store.used?.[team]?.[type],active=(type==='double'&&state.doubleTeam===team)||(type==='two'&&state.twoAnswersTeam===team);button.classList.toggle('used',used&&!active);button.classList.toggle('active',active);button.disabled=type==='double'||used||(type==='block'?team===state.activeTeam:team!==state.activeTeam)||state.revealed||(current?.cat==='من غير كلام'&&!state.mimeStarted)}
  }
  function activateHelp(team,type){
-  if(!current||state.revealed)return;const store=helperStore();if(store.used?.[team]?.[type])return;
+  if(![1,2].includes(team)||!['two','block','double'].includes(type)||document.getElementById('mjStableQuestion272')?.style.display!=='block')return;
+  if(!current||state.revealed||(current.cat==='من غير كلام'&&!state.mimeStarted))return;const store=helperStore();if(store.used?.[team]?.[type])return;
    if(type==='double')return window.showGameToast?.('دبل النقاط تُفعّل من لوحة الأسئلة قبل اختيار السؤال');
    if(type==='block'){
    if(team===state.activeTeam)return window.showGameToast?.('البلوك يستخدمه الفريق المنافس');
@@ -276,21 +337,24 @@
    store.used[team][type]=true;
    if(type==='two'){state.twoAnswersTeam=team;setText('.turn',(team===1?team1:team2)+' — لديه محاولتان')}
   }
-  window.ALMAJLIS_HELP_275?.save?.();syncHelpButtons();window.ALMAJLIS_HELP_275?.syncBoard?.()
+  window.ALMAJLIS_HELP_275?.save?.();syncHelpButtons();window.ALMAJLIS_HELP_275?.syncBoard?.();window.ALMAJLIS_MATCH_STATE?.snapshot?.()
  }
- function startTimer(){stopTimer();updateTimer();state.interval=setInterval(()=>{state.seconds--;updateTimer();if(state.seconds>0)return;stopTimer();if(!state.steal){state.steal=true;state.activeTeam=state.activeTeam===1?2:1;state.seconds=30;setText('.turn','فرصة لفريق: '+(state.activeTeam===1?team1:team2));syncHelpButtons();startTimer()}else{setText('.turn','انتهى الوقت — يمكن إظهار الجواب')}},1000)}
+ function startTimer(){stopTimer();updateTimer();if(document.hidden||document.body.classList.contains('paused224')){state.timerPaused=true;return}state.timerPaused=false;state.interval=setInterval(()=>{state.seconds--;updateTimer();if(state.seconds>0)return;stopTimer();if(current?.cat==='من غير كلام'){setText('.turn',state.steal?'انتهى وقت البلوك — الجواب ما زال مخفيًا':'انتهت دقيقة التمثيل — الجواب ما زال مخفيًا');return}if(!state.steal){state.steal=true;state.activeTeam=state.activeTeam===1?2:1;state.seconds=30;setText('.turn','فرصة لفريق: '+(state.activeTeam===1?team1:team2));syncHelpButtons();startTimer()}else{setText('.turn','انتهى الوقت — يمكن إظهار الجواب')}},1000)}
  function questionMarkup(q){const raw=String(q?.question||''),marker='[[AYAH]]',at=raw.indexOf(marker);if(at>=0)return esc(raw.slice(0,at).trim())+'<span class="ayah">'+esc(raw.slice(at+marker.length).trim())+'</span>';return q?.question_html||esc(raw)}
  function mediaMarkup(cat,q){try{
-  if(cat==='حروف اسلامي')return renderQuestionMedia({media:{type:'letter_grid',highlight:String(q?.answer||'').trim().charAt(0)}});
+  if(['حروف اسلامي','حروف إسلامي'].includes(cat))return renderQuestionMedia({media:{type:'letter_grid',highlight:q?.media?.highlight||String(q?.answer||'').trim().charAt(0)}});
   return cat==='من غير كلام'&&q?.mime&&typeof renderMimeQR==='function'?renderMimeQR(q):(typeof renderQuestionMedia==='function'?renderQuestionMedia(q):'');
  }catch(error){console.error('BUILD 272 media',error);return '<div>تعذر تجهيز الوسيط</div>'}}
 
  async function open(cat,pts,button){
-  if(!button||button.dataset.used==='1')return false;
+  if(![100,300,500].includes(Number(pts))||!button||button.dataset.used==='1')return false;
   const pool=gameQuestions?.[cat]?.[Number(pts)];if(!Array.isArray(pool)||!pool.length){window.showGameToast?.('لا يوجد سؤال متاح في هذا المستوى');return false}
-  const q=pool.shift();stopTimer();
+  if(createHost().style.display!=='none'&&current?.btn?.dataset.used!=='1')return false;
+  const valid=q=>q&&typeof q.id==='string'&&q.id.trim()&&typeof q.answer==='string'&&q.answer.trim()&&(typeof q.question==='string'&&q.question.trim()||typeof q.question_html==='string'&&q.question_html.trim())&&(q.points==null||Number(q.points)===Number(pts));const index=pool.findIndex(valid);if(index<0){window.showGameToast?.('بيانات السؤال غير مكتملة. اختر سؤالًا آخر.');return false}
+  const helpersBefore=snapshotHelpers(),q=pool.splice(index,1)[0];hide();
+  root().querySelectorAll('.goal-stage').forEach(stage=>{stage.goalResize?.disconnect();if(stage.goalResizeFallback)window.removeEventListener('resize',stage.goalResizeFallback)});
   try{
-   const helpers=helperStore(),pendingDouble=Number(helpers.pendingDoubleTeam||0);current={cat,pts:Number(pts),basePts:Number(pts),btn:button,q};finalDecisionLocked=false;state.seconds=cat==='من غير كلام'?60:30;state.steal=false;state.revealed=false;state.activeTeam=currentTurn;state.doubleTeam=pendingDouble===currentTurn?pendingDouble:0;state.twoAnswersTeam=0;if(state.doubleTeam){helpers.pendingDoubleTeam=0;window.ALMAJLIS_HELP_275?.save?.();window.ALMAJLIS_HELP_275?.syncBoard?.()}
+   const helpers=helperStore(),pendingDouble=Number(helpers.pendingDoubleTeam||0);current={cat,pts:Number(pts),basePts:Number(pts),btn:button,q};finalDecisionLocked=false;state.seconds=cat==='من غير كلام'?60:30;state.steal=false;state.revealed=false;state.mimeStarted=false;state.timerPaused=false;state.activeTeam=currentTurn;state.doubleTeam=pendingDouble===currentTurn?pendingDouble:0;state.twoAnswersTeam=0;if(state.doubleTeam){helpers.pendingDoubleTeam=0;window.ALMAJLIS_HELP_275?.save?.();window.ALMAJLIS_HELP_275?.syncBoard?.()}
    document.querySelectorAll('.screen.active').forEach(screen=>screen.classList.remove('active'));
    const host=createHost(),r=root();host.style.display='block';
    try{sessionStorage.removeItem('almajlis_opening_question_270')}catch(_){ }
@@ -303,12 +367,13 @@
    r.querySelector('.screen').classList.toggle('player-question',cat==='من هو اللاعب');
    r.querySelector('.screen').classList.remove('goal-answer');r.querySelector('.screen').classList.toggle('goal-question',cat==='من سجل الهدف');
    if(cat==='مسيرة لاعب')question.textContent='من هو اللاعب؟';r.querySelector('.answer').classList.remove('show','choosing');r.querySelector('.who-button').textContent='من أجاب؟';r.querySelector('.answer').querySelector('img.ai-answer-photo')?.remove();r.querySelector('.answer b').textContent=q.answer||'';r.querySelector('.reveal').style.display='block';r.querySelector('.who-button').classList.remove('show');r.querySelector('.decision-screen').classList.remove('show');r.querySelector('.media-modal').classList.remove('show');
-   r.querySelector('.decision-one').textContent=team1||'الفريق الأول';r.querySelector('.decision-two').textContent=team2||'الفريق الثاني';
+   // BUILD 314: decision choices are created by openDecision for each reveal.
+   // The original decision-one/two nodes are replaced after the first answer.
    if(cat==='من هو اللاعب')requestAnimationFrame(fitPlayerQuestion);
-   syncHelpButtons();startTimer();return true;
-  }catch(error){pool.unshift(q);current=null;hide();window.show?.('boardScreen');console.error('BUILD 272 isolated open',error);return false}
+   wireQuestionMedia();syncHelpButtons();if(cat==='من غير كلام'){updateTimer();setText('.turn','بانتظار قراءة الرمز — '+(currentTurn===1?team1:team2))}else startTimer();window.ALMAJLIS_MATCH_STATE?.snapshot?.();return true;
+  }catch(error){pool.splice(index,0,q);window.ALMAJLIS_HELP_275?.restore?.(helpersBefore);current=null;hide();window.show?.('boardScreen');console.error('BUILD 272 isolated open',error);return false}
  }
- function reveal(){if(!current)return;state.revealed=true;stopTimer();const r=root();if(current.q?.answerOnlyMedia)r.querySelector('.media').innerHTML=mediaMarkup(current.cat,current.q);
+ function reveal(){if(!current||state.revealed)return;state.revealed=true;window.ALMAJLIS_CONSUME_QUESTION?.(current.q);stopTimer();const r=root();if(current.q?.answerOnlyMedia)r.querySelector('.media').innerHTML=mediaMarkup(current.cat,current.q);
  if(current.cat==='من سجل الهدف'){
   closeGoalViewer();r.querySelector('.screen').classList.add('goal-answer');
   renderGoalMedia(r.querySelector('.media'),goalOriginalUrl(current.q),true);
@@ -320,12 +385,12 @@
   photo.style.cssText='display:block;max-width:100%;max-height:42dvh;min-height:0;object-fit:contain;margin:8px auto 0;border-radius:11px';
   answer.querySelector('img.ai-answer-photo')?.remove();answer.appendChild(photo);
  }
- r.querySelector('.answer').classList.add('show');r.querySelector('.reveal').style.display='none';r.querySelector('.who-button').classList.add('show');syncHelpButtons()}
- function returnToBoard(){if(current?.q&&current?.btn?.dataset.used!=='1'){const pool=gameQuestions?.[current.cat]?.[current.basePts||current.pts];if(Array.isArray(pool)&&!pool.some(q=>q?.id===current.q.id))pool.unshift(current.q)}if(state.doubleTeam){const helpers=helperStore();helpers.pendingDoubleTeam=state.doubleTeam;window.ALMAJLIS_HELP_275?.save?.();window.ALMAJLIS_HELP_275?.syncBoard?.()}current=null;hide();window.show?.('boardScreen')}
- function givePoints(team){if(!current||!state.revealed)return;closeDecision();if(team&&state.doubleTeam===team)current.pts=Number(current.basePts||current.pts)*2;hide();try{window.award?.(team)}catch(error){console.error('BUILD 272 award',error);window.show?.('boardScreen')}}
+ r.querySelector('.answer').classList.add('show');r.querySelector('.reveal').style.display='none';r.querySelector('.who-button').classList.add('show');wireQuestionMedia();syncHelpButtons()}
+ function returnToBoard(){if(current?.q&&current?.btn?.dataset.used!=='1'){const pool=gameQuestions?.[current.cat]?.[current.basePts||current.pts];if(Array.isArray(pool)&&!pool.some(q=>q?.id===current.q.id))pool.unshift(current.q)}if(state.doubleTeam&&current?.q&&current?.btn?.dataset.used!=='1'){const helpers=helperStore();helpers.pendingDoubleTeam=state.doubleTeam;window.ALMAJLIS_HELP_275?.save?.();window.ALMAJLIS_HELP_275?.syncBoard?.()}current=null;hide();window.show?.('boardScreen');window.ALMAJLIS_MATCH_STATE?.snapshot?.()}
+ function givePoints(team){if(!current||!state.revealed||finalDecisionLocked||![0,1,2].includes(team))return;state.revealed=false;closeDecision();if(team&&state.doubleTeam===team)current.pts=Number(current.basePts||current.pts)*2;hide();try{window.award?.(team)}catch(error){console.error('BUILD 272 award',error);window.show?.('boardScreen')}}
 
  window.addEventListener('resize',()=>{if(current?.cat==='من هو اللاعب'&&document.getElementById('mjStableQuestion272')?.style.display!=='none')requestAnimationFrame(fitPlayerQuestion)},{passive:true});
- createHost();window.ALMAJLIS_DIRECT_OPEN_269=open;window.ALMAJLIS_STABLE_QUESTION_272={open,hide,returnToBoard,activateHelp,syncHelpButtons};
+ createHost();window.ALMAJLIS_DIRECT_OPEN_269=open;window.ALMAJLIS_STABLE_QUESTION_272={open,hide,returnToBoard,activateHelp,syncHelpButtons,snapshotHelpers,suspendTimer,resumeTimer,startMime};
  document.querySelector('meta[name="almajlis-build"]')?.setAttribute('content','BUILD-272-ISOLATED-QUESTION-20260922');document.querySelector('meta[name="build-number"]')?.setAttribute('content','272');document.querySelector('#draw .note')?.replaceChildren(document.createTextNode('الإصدار: BUILD 272'));
  try{sessionStorage.setItem('almajlis_build_seen','272');sessionStorage.setItem('almajlis_active_build','272')}catch(_){ }
 })();

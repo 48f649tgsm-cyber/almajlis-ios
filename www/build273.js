@@ -27,7 +27,7 @@
   try{window.stopTheme?.()}catch(_){ }
   document.querySelectorAll('.qv2-modal.show,.qv2-media-modal.show,#tieBreakOverlay.show,#matchIntro.show,#categorySplash.show,#mjMediaModal260.show').forEach(node=>node.classList.remove('show'));
   document.querySelectorAll('[data-loading="1"]').forEach(node=>{node.dataset.loading='0';node.classList.remove('launching')});
-  document.documentElement.classList.remove('mjModalOpen');
+  document.documentElement.classList.remove('mjModalOpen','mjMediaOpen260');
   document.body.style.removeProperty('overflow');
  }
 
@@ -44,13 +44,16 @@
  function goHome(){
   if(navigating)return;
   navigating=true;
-  try{stopLegacyActivity();try{current=null}catch(_){ }activate('home')}
+  try{window.ALMAJLIS_CANCEL_PREPARATION?.()}catch(_){}
+  try{if(current?.q&&current?.btn?.dataset.used!=='1')window.ALMAJLIS_STABLE_QUESTION_272?.returnToBoard?.();window.ALMAJLIS_MATCH_STATE?.snapshot?.();stopLegacyActivity();try{current=null}catch(_){ }activate('home')}
   finally{requestAnimationFrame(()=>{navigating=false})}
  }
 
  const previousShow=window.show;
  window.show=function(id){
+  if(!document.getElementById(id)?.classList.contains('screen'))return false;
   if(id==='home'){goHome();return}
+  if(id!=='result')try{window.stopWinnerCelebration263?.()}catch(_){}
   try{window.ALMAJLIS_STABLE_QUESTION_272?.hide?.()}catch(_){ }
   document.querySelectorAll('.qv2-modal.show,.qv2-media-modal.show,#mjMediaModal260.show').forEach(node=>node.classList.remove('show'));
   const out=typeof previousShow==='function'?previousShow.call(this,id):activate(id);
@@ -91,6 +94,6 @@
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
   window.addEventListener('pageshow',install,{passive:true});
-  window.addEventListener('pagehide',stopLegacyActivity,{passive:true});
+  window.addEventListener('pagehide',()=>{try{window.ALMAJLIS_CANCEL_PREPARATION?.()}catch(_){}if(current?.q&&current?.btn?.dataset.used!=='1')window.ALMAJLIS_STABLE_QUESTION_272?.returnToBoard?.();stopLegacyActivity()},{passive:true});
   window.ALMAJLIS_STABILITY_273={goHome,stopLegacyActivity,install};
 })();
