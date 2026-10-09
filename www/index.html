@@ -110,7 +110,7 @@ Future batches may update only question JSON loading and game logic, not CATEGOR
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="almajlis-build" content="BUILD-318-TRANSITION-STATE-AUDIT"><meta name="build-number" content="318">
+<meta name="almajlis-build" content="BUILD-324-PUBLISHED-ONLY"><meta name="build-number" content="324">
 
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#ffffff">
@@ -1636,7 +1636,7 @@ window.ALMAJLIS_ACTIVE_BUILD='214';
 })();
 </script>
 
-<div id="buildBadge025" style="position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:20000;background:#fff;color:#e65d31;border:1px solid #f0a07f;border-radius:999px;padding:6px 9px;font:700 10px Arial;opacity:.9">BUILD 221</div>
+<div id="buildBadge025" style="position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:20000;background:#fff;color:#e65d31;border:1px solid #f0a07f;border-radius:999px;padding:6px 9px;font:700 10px Arial;opacity:.9">BUILD 324</div>
 <button class="btn fullscreenBtn" type="button" onclick="toggleMajlisFullscreen()">⛶</button><main class="app">
 <section id="home" class="screen active">
   <div class="homeAtmosphere" aria-hidden="true"><i></i><i></i><i></i></div>
@@ -1660,7 +1660,7 @@ window.ALMAJLIS_ACTIVE_BUILD='214';
 </section>
 <section id="teams" class="screen"><h2>أسماء الفريقين</h2><div class="card teamEntryCard"><div class="teamField"><label for="t1">الفريق الأول</label><input id="t1" class="input" placeholder="مثال: الصقور"></div><div class="teamField"><label for="t2">الفريق الثاني</label><input id="t2" class="input" placeholder="مثال: النسور"></div></div><button class="btn gold pregamePrimary" onclick="toCategories()">التالي</button></section>
 <section id="cats" class="screen"><div class="topline"><h2>اختيار الفئات</h2><span id="cc" class="badge">0 / 6</span></div><p class="small">اختر 6 فئات</p><div id="catGrid" class="categories"></div><button id="startBtn" class="btn gold pregamePrimary" disabled onclick="draw()">ابدأ اللعبة</button></section>
-<section id="draw" class="screen"><h2>القرعة</h2><div class="card winner"><div class="trophy">🎲</div><p>الفريق الذي يبدأ هو</p><div id="starter" class="winnerName"></div></div><button class="btn gold" onclick="startGame()">ابدأ المباراة</button><div class="note">الإصدار: BUILD 221</div></section>
+<section id="draw" class="screen"><h2>القرعة</h2><div class="card winner"><div class="trophy">🎲</div><p>الفريق الذي يبدأ هو</p><div id="starter" class="winnerName"></div></div><button class="btn gold" onclick="startGame()">ابدأ المباراة</button><div class="note">الإصدار: BUILD 324</div></section>
 <section id="boardScreen" class="screen"><div class="logo">المجلس</div><div id="matchProgress" class="matchProgress"><span id="progressText">0 / 36</span><div class="progressTrack"><i id="progressFill"></i></div></div><div id="streakBar" class="streakBar"></div><div id="boardTurn" class="card" style="text-align:center;font-size:20px;font-weight:900;border:2px solid var(--gold);padding:12px"></div><div class="scorebar broadcastScorebar"><div id="s2" class="teamScore red"></div><div>⚔️</div><div id="s1" class="teamScore blue"></div></div><div id="board" class="board"></div></section>
 <section id="questionScreen" class="screen"><div class="questionLandscapeBar" aria-label="الفئة ونتيجة الفريقين"><div class="questionLandscapeCategory"><img id="qCatLandscapeImg" alt="" aria-hidden="true"><span id="qCatLandscape"></span><small id="qPtsLandscape"></small></div><div id="qs1" class="teamScore blue questionTeamScore"></div><div id="qs2" class="teamScore red questionTeamScore"></div></div><div class="topline"><span id="qCat" class="badge"></span><span id="qPts" class="badge"></span></div><div id="qPointHero" class="questionPointHero" aria-label="نقاط السؤال"></div><div id="qText" class="question"></div><div class="tvLowerThird"><span id="tvLowerThird">الفئة • النقاط</span></div><div id="qMedia"></div><div id="timer" class="timer">00:30</div><p id="turnText" class="small"></p><div style="text-align:center"><span id="phaseLabel" class="phaseLabel">الفريق الأول — 30 ثانية</span></div><button id="answerBtn" class="btn" onclick="reveal()">👁 إظهار الجواب</button><div id="answerArea" class="hidden"><div class="small">الإجابة الصحيحة</div><div id="answer" class="answer"></div><p class="small">من حصل على النقاط؟</p><button id="give1" class="btn blue" onclick="award(1)"></button><button id="give2" class="btn red" onclick="award(2)"></button><button class="btn" onclick="award(0)">لا أحد</button>
 <div class="questionTools">
@@ -2003,16 +2003,8 @@ function startMimeRound(){
 async function loadBank(){
   if(showMimeRevealFromUrl())return;
   selected=[];loadStatus.className='';
-  try{
-    const cached=JSON.parse(localStorage.getItem('almajlis_content_snapshot_v313')||'null');
-    if(cached?.bank&&typeof cached.bank==='object'&&!Array.isArray(cached.bank)&&Array.isArray(cached.categories)&&cached.categories.length&&cached.categories.every(cat=>typeof cat==='string'&&Array.isArray(cached.bank[cat]))){
-      window.ALMAJLIS_CONTENT_OWNER=cached.userId||null;
-      bank=applyReviewedContent311(cached.bank);categories=cached.categories;
-      loadStatus.textContent='المجلس جاهز — جارٍ التحقق من آخر تحديث في الخلفية.';
-      newGameBtn.disabled=false;
-      return;
-    }
-  }catch(error){console.warn('تعذر فتح النسخة المحلية',error)}
+  // BUILD 324: never load a stored question bank.
+  try{localStorage.removeItem('almajlis_content_snapshot_v313')}catch(_){}
   bank={};categories=[];
   loadStatus.textContent='جارٍ تحميل مخزون الأسئلة المعتمد من Supabase…';
   newGameBtn.disabled=true;
@@ -9039,7 +9031,7 @@ body>#mjBoardV5{display:none!important}
   syncPromise=(async()=>{
   let epoch=syncEpoch;const usedBefore=new Set(usedIds);
   const status=document.getElementById('loadStatus'),start=document.getElementById('newGameBtn');
-  const localReady=categories.length>0&&Object.values(bank).some(items=>Array.isArray(items)&&items.length);
+  const localReady=false;
   /* Keep the verified local bank playable while a background refresh runs. */
   if(start)start.disabled=!localReady;
   if(status)status.textContent='جارٍ مزامنة أحدث الأسئلة والوسائط…';
@@ -9102,8 +9094,7 @@ body>#mjBoardV5{display:none!important}
     }
     (dynamic[name]||(dynamic[name]=[])).push(item);
    }
-   const bundledAi=window.ALMAJLIS_AI_FOOTBALL_286;
-   if(Array.isArray(bundledAi)){const known=new Set(questions.map(row=>String(row.id)));dynamic['AI كروية']=bundledAi.filter(item=>!disabledQuestionIds.has(item.id)).map(item=>({...item,db_question_id:known.has(item.id)?item.id:null}));}
+   // BUILD 324: no embedded question bank overrides.
    let replaced=0,total=0;
    const nextBank={};
    for(const cat of cats){
@@ -9121,13 +9112,13 @@ body>#mjBoardV5{display:none!important}
     if(user)localStorage.setItem('almajlis_used_questions_'+user.id,JSON.stringify([...usedIds]));
     localStorage.setItem(usedKey,JSON.stringify([...usedIds]));
    }catch(_){ }
-   bank=applyReviewedContent311(nextBank);window.ALMAJLIS_CONTENT_OWNER=user?.id||null;
+   bank=nextBank;window.ALMAJLIS_CONTENT_OWNER=user?.id||null;
    categories=Object.keys(nextBank);
    if(typeof renderCats==='function'&&document.getElementById('catGrid')&&!matchPreparing&&(document.getElementById('home')?.classList.contains('active')||document.getElementById('cats')?.classList.contains('active')))renderCats();
    if(status)status.textContent=`تمت مزامنة ${replaced} فئة و${total} سؤال من قاعدة البيانات — البنك جاهز`;
    if(start)start.disabled=false;
    try{
-    localStorage.setItem(CONTENT_SNAPSHOT_KEY,JSON.stringify({version:318,userId:user?.id||null,savedAt:Date.now(),categories,bank}));
+    localStorage.removeItem(CONTENT_SNAPSHOT_KEY);
    }catch(error){console.warn('تعذر حفظ نسخة الأسئلة المحلية',error)}
    /* Preload chosen categories first instead of saturating the connection with
       every media asset in the complete bank. */
@@ -9137,7 +9128,8 @@ body>#mjBoardV5{display:none!important}
    if(epoch!==syncEpoch)return;
    console.error('Supabase content sync failed',error);
    // Never destroy the verified local bank because a network/RLS refresh failed.
-   const cachedReady=categories.length>0&&Object.values(bank).some(items=>Array.isArray(items)&&items.length);
+   bank={};categories=[];gameQuestions={};current=null;
+   const cachedReady=false;
    if(!cachedReady){
     if(start)start.disabled=true;
    }else{
